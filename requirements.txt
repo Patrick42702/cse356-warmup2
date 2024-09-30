@@ -1,1 +1,4 @@
 flask
+pymongo
+email-validator
+Flask-Mail

@@ -1,0 +1,9 @@
+This will be the instructions file on setting the project up on the server.
+STEP 0. Configure our DNS to point to the IP of our server
+
+STEP 1. CONFIGURE THE MAIL SERVER
+    - sudo apt install mailutils
+    - select "Internet Site" and press enter
+    - enter esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
+    - test with echo "This is the body" | mail -s "test" testemail@domain.com
+
