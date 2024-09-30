@@ -2,3 +2,5 @@ flask
 pymongo
 email-validator
 Flask-Mail
+flask-jwt-extended
+python-dotenv
