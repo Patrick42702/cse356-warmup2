@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request, make_response, render_template, url_for, redirect
+from flask import Flask, jsonify, request, make_response
 from pymongo import MongoClient
 from email_validator import validate_email
 from flask_mail import Mail, Message
@@ -29,6 +29,7 @@ mail = Mail(app)
 
 # configure JWTManager
 jwt = JWTManager(app)
+app.config['JWT_BLACKLIST_ENABLED'] = True
 
 # error handling
 def error(err_msg):
@@ -41,8 +42,16 @@ def success(data, session_id=None):
     response = make_response(jsonify(data))
     if session_id:
         response.set_cookie("session_id", session_id)
+        response.headers["Authorization"] = f"Bearer {session_id}"
     response.headers["X-CSE356"] = SUBMIT_ID
     return response
+
+# validate session
+def validate_session(user, session_id):
+    if user["session_id"] == session_id:
+        return True
+    else:
+        return False
 
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
@@ -58,7 +67,7 @@ def add_user():
             existing_email = users.find_one({"email": email})
             if existing_user or existing_email:
                 raise Exception("User or email already exists")
-            verify_key = create_access_token(identity=email)
+            verify_key = create_access_token(identity=email, expires_delta=False)
             users.insert_one({"username": username,
                               "password": password,
                               "email": email,
@@ -101,11 +110,10 @@ def login():
         else:
             raise Exception("username not found")
         if user["password"] == password and user["validated"]:
-            response = make_response("Login successful")
+            success_msg = {"message" :"Login successful"}
             access_token = create_access_token(identity=username)
-            response.set_cookie("session_id", access_token)
             users.update_one({"username": username}, {"$set": {"session_id": access_token}})
-            return response
+            return success(success_msg, access_token)
         else:
             if user["password"] != password:
                 raise Exception("Invalid password")
@@ -115,12 +123,30 @@ def login():
         print(e)
         return error(str(e))
 
+@jwt.expired_token_loader
+def expired_token_response(jwt_header, jwt_payload):
+    return error("Token has expired")
+
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(jwt_header, jwt_payload):
+    blacklist = db.blacklist
+    jti = jwt_payload["jti"]
+    return jti in blacklist
+
 @app.route('/logout', methods=["POST"])
 @jwt_required()
 def logout():
-    cookies = request.cookies
-    if 'session_id' in cookies:
-        identity = get_jwt_identity()
-        print(identity)
-        return "logout successful"
-    return "Logout"
+    # cookies = request.cookies
+    users = db.users
+    identity = get_jwt_identity()
+    user = users.find_one({"username": identity})
+    print(user)
+    try:
+        if validate_session(user, user["session_id"]):
+            print("valid session")
+            users.update_one({"username": identity}, {"$set": {"session_id": None}})
+            return success({"message": "Logout successful"})
+        else:
+            raise Exception("There was an error verifying that you were already logged in")
+    except Exception as e:
+        return error(str(e))
