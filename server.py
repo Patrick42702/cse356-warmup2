@@ -21,7 +21,7 @@ db = client.eskpj_airplanes
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # configure mail server
-# our DNS is esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
+# our DNS is esk-pj-airplanes.cse357.compas.cs.stonybrook.edu
 app.config['MAIL_SERVER'] = 'localhost'
 app.config['MAIL_PORT'] = 25
 app.config['MAIL_DEFAULT_SENDER'] = f"root@{DOMAIN}"
@@ -30,34 +30,47 @@ mail = Mail(app)
 # configure JWTManager
 jwt = JWTManager(app)
 
+# error handling
+def error(err_msg):
+    return jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200
+
+# valid reponse handling
+def success(data, session_id=None):
+    # assume data is a dictioanry
+    data["status"] = "OK"
+    response = make_response(jsonify(data))
+    if session_id:
+        response.set_cookie("session_id", session_id)
+    response.headers["X-CSE356"] = SUBMIT_ID
+    return response
+
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
-@app.route('/adduser', methods=['GET', 'POST'])
+@app.route('/adduser', methods=['POST'])
 def add_user():
-    if request.method == 'POST':
-        users = db.users
-        username = request.json['username']
-        password = request.json['password']
-        email = request.json['email']
-        try:
-            if username and password and validate_email(email):
-                existing_user = users.find_one({"username": username})
-                if existing_user:
-                    raise Exception("User already exists")
-                verify_key = create_access_token(identity=email)
-                users.insert_one({"username": username,
-                                  "password": password,
-                                  "email": email,
-                                  "validated": False,
-                                  "verify-key": verify_key})
-                msg = Message(subject="Verify email", 
-                              recipients=[email], 
-                              body=f"Please verify your email at http://{DOMAIN}?email={email}&?verify={verify_key}")
-                mail.send(msg)
-            return "User added successfully. Please verify email"
-        except Exception as e:
-            return jsonify(str(e.args[0])), 400
-    return render_template("adduser.html")
+    users = db.users
+    username = request.json['username']
+    password = request.json['password']
+    email = request.json['email']
+    try:
+        if username and password and validate_email(email):
+            existing_user = users.find_one({"username": username})
+            existing_email = users.find_one({"email": email})
+            if existing_user or existing_email:
+                raise Exception("User or email already exists")
+            verify_key = create_access_token(identity=email)
+            users.insert_one({"username": username,
+                              "password": password,
+                              "email": email,
+                              "validated": False,
+                              "verify-key": verify_key})
+            # msg = Message(subject="Verify email",
+            #               recipients=[email],
+            #               body=f"Please verify your email at http://{DOMAIN}?email={email}&?verify={verify_key}")
+            # mail.send(msg)
+        return success({"message": "User successfully added"})
+    except Exception as e:
+        return error(str(e))
 
 # He specifies to use query string params for the verify endpoint
 @app.route('/verify', methods=['GET'])
@@ -70,43 +83,44 @@ def verify():
         saved_token = user["verify-key"]
         if saved_token == verify_key:
             users.update_one({"email": email}, {"$set": {"validated": True}})
-            return jsonify("Email Successfully Verified")
+            return success({"message" : "Email Successfully Verified"})
         else:
             raise Exception("Invalid verification key")
         return
     except Exception as e:
-        return jsonify(str(e.args[0])), 400
+        return error(str(e))
 
-@app.route('/please_verify', methods=['GET'])
-def please_verify():
-    return render_template("verify.html")
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
-        users = db.users
-        username = request.json['username']
-        password = request.json['password']
-        try:
-            if username and password:
-                user = users.find_one({"username": username})
-            else:
-                raise Exception("username not found")
-            if user["password"] == password:
-                # response = make_response(render_template("verify.html"))
-                print("inputted correct password")
-                response = make_response(redirect(url_for("please_verify")))
-                access_token = create_access_token(identity=username)
-                response.set_cookie("session_id", access_token)
-                response.headers["X-CSE356"] = SUBMIT_ID
-                print(response.response)
-                return response
-            else:
+    users = db.users
+    username = request.json['username']
+    password = request.json['password']
+    try:
+        if username and password and users.find_one({"username": username}):
+            user = users.find_one({"username": username})
+        else:
+            raise Exception("username not found")
+        if user["password"] == password and user["validated"]:
+            response = make_response("Login successful")
+            access_token = create_access_token(identity=username)
+            response.set_cookie("session_id", access_token)
+            users.update_one({"username": username}, {"$set": {"session_id": access_token}})
+            return response
+        else:
+            if user["password"] != password:
                 raise Exception("Invalid password")
-        except Exception as e:
-            return jsonify(str(e.args[0])), 400
-    return render_template("login.html")
+            else:
+                raise Exception("User not validated")
+    except Exception as e:
+        print(e)
+        return error(str(e))
 
-@app.route('/logout')
+@app.route('/logout', methods=["POST"])
+@jwt_required()
 def logout():
+    cookies = request.cookies
+    if 'session_id' in cookies:
+        identity = get_jwt_identity()
+        print(identity)
+        return "logout successful"
     return "Logout"
