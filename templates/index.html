@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management with Media Player</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
     <h1>Video Player</h1>
@@ -29,21 +29,21 @@
         </form>
     </div>    
 
-    <div id="media-player-section" class="media-player" style="display:block;">
+    <div id="media-player-section" class="media-player" style="display:none;">
         <h2>MPEG-DASH Media Player</h2>
         <div id="media"></div>
             <video id="videoPlayer" controls width="800"></video>
             <button id="playPauseBtn">Play</button>
             <input type="range" id="seekBar" value="0" min="0" max="100" step="1">
             <select id="resolutionSelect">
-                <option value="0res">320x180 .... 254kbps </option>
-                <option value="1res">320x180 .... 507kbps </option>
-                <option value="2res">480x270 .... 759kbps </option>
-                <option value="3res">640x360 .... 1013kbps</option>
-                <option value="4res">640x360 .... 1254kbps</option>
-                <option value="5res">768x432 .... 1883kbps</option>
-                <option value="6res">1024x576 ... 3134kbps</option>
-                <option value="7res">1280x720 ... 4952kbps</option>
+{#                <option value="0res">320x180 .... 254kbps </option>#}
+{#                <option value="1res">320x180 .... 507kbps </option>#}
+{#                <option value="2res">480x270 .... 759kbps </option>#}
+{#                <option value="3res">640x360 .... 1013kbps</option>#}
+{#                <option value="4res">640x360 .... 1254kbps</option>#}
+{#                <option value="5res">768x432 .... 1883kbps</option>#}
+{#                <option value="6res">1024x576 ... 3134kbps</option>#}
+{#                <option value="7res">1280x720 ... 4952kbps</option>#}
             </select>
         </div>
     </div>
@@ -56,6 +56,6 @@
     </div>
 
     <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
-    <script src="script.js"></script>
+    <script src="../static/script.js"></script>
 </body>
 </html>

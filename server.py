@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, render_template
 from pymongo import MongoClient
 from email_validator import validate_email
 from flask_mail import Mail, Message
@@ -53,6 +53,10 @@ def validate_session(user, session_id):
     else:
         return False
 
+@app.route('/')
+def user_interface():
+    return render_template("index.html")
+
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
 @app.route('/adduser', methods=['POST'])
@@ -101,27 +105,28 @@ def verify():
 
 @app.route('/login', methods=['POST'])
 def login():
-    users = db.users
-    username = request.json['username']
-    password = request.json['password']
-    try:
-        if username and password and users.find_one({"username": username}):
-            user = users.find_one({"username": username})
-        else:
-            raise Exception("username not found")
-        if user["password"] == password and user["validated"]:
-            success_msg = {"message" :"Login successful"}
-            access_token = create_access_token(identity=username)
-            users.update_one({"username": username}, {"$set": {"session_id": access_token}})
-            return success(success_msg, access_token)
-        else:
-            if user["password"] != password:
-                raise Exception("Invalid password")
-            else:
-                raise Exception("User not validated")
-    except Exception as e:
-        print(e)
-        return error(str(e))
+    return success({"message" :"Login successful"})
+    # users = db.users
+    # username = request.json['username']
+    # password = request.json['password']
+    # try:
+    #     if username and password and users.find_one({"username": username}):
+    #         user = users.find_one({"username": username})
+    #     else:
+    #         raise Exception("username not found")
+    #     if user["password"] == password and user["validated"]:
+    #         success_msg = {"message" :"Login successful"}
+    #         access_token = create_access_token(identity=username)
+    #         users.update_one({"username": username}, {"$set": {"session_id": access_token}})
+    #         return success(success_msg, access_token)
+    #     else:
+    #         if user["password"] != password:
+    #             raise Exception("Invalid password")
+    #         else:
+    #             raise Exception("User not validated")
+    # except Exception as e:
+    #     print(e)
+    #     return error(str(e))
 
 @jwt.expired_token_loader
 def expired_token_response(jwt_header, jwt_payload):

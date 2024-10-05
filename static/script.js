@@ -64,12 +64,20 @@ document.getElementById('logout-form').addEventListener('submit', async (e) => {
 // Dash.js setup for MPEG-DASH playback
 const videoPlayer = document.getElementById('videoPlayer');
 const player = dashjs.MediaPlayer().create();
-player.initialize(videoPlayer, 'MPEG_DASH_STREAM_URL_GOES_HERE', false);
+
+player.updateSettings({
+    streaming: {
+        abr: { autoSwitchBitrate: { audio: true, video: false }, fastSwitchEnabled: true }
+    }
+});
+
+// Initialize the Dash.js player
+player.initialize(videoPlayer, 'https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd', false);
 
 // Play/Pause button
 const playPauseBtn = document.getElementById('playPauseBtn');
 playPauseBtn.addEventListener('click', () => {
-    if (videoPlayer.isPaused()) {
+    if (videoPlayer.paused) {
         videoPlayer.play();
         playPauseBtn.innerText = 'Pause';
     } else {
@@ -86,12 +94,27 @@ videoPlayer.addEventListener('timeupdate', () => {
 
 seekBar.addEventListener('input', () => {
     const seekTime = (seekBar.value / 100) * videoPlayer.duration;
-    videoPlayer.seek(seekTime);
+    videoPlayer.currentTime = seekTime;
 });
 
 // Resolution change
 const resolutionSelect = document.getElementById('resolutionSelect');
 resolutionSelect.addEventListener('change', () => {
-    const quality = parseInt(resolutionSelect.value[0]); // index 0-7
-    player.setQualityFor('video', quality)
+    const quality = parseInt(resolutionSelect.value);
+    console.log(`Change to quality ${quality}`);
+    player.setQualityFor('video', quality);
+});
+
+// Populate resolution options dynamically once the stream is initialized
+player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+    const bitrates = player.getBitrateInfoListFor('video');
+    resolutionSelect.innerHTML = '';
+    console.log(bitrates);
+    bitrates.forEach((bitrate, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.text = `${bitrate.width}x${bitrate.height}\t${bitrate.bitrate}kbps`;
+        resolutionSelect.appendChild(option);
+    });
+    resolutionSelect.value = bitrates.length - 1;
 });
