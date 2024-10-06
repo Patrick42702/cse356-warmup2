@@ -95,6 +95,7 @@ def testmail():
         s = smtplib.SMTP('localhost', 25)
         s.sendmail(from_addr, to_addr, msg.as_string())
         s.quit()
+        return success("Email sent")
     except Exception as e:
         return error(str(e))
 
