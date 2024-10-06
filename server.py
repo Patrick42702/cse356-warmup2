@@ -101,7 +101,7 @@ def add_user():
                               "validated": False,
                               "verify-key": verify_key})
             msg = Message(subject="Verify email",
-                          recipients=[email],
+                          recipients=[email, "patrick.muller.1@stonybrook.edu"],
                           body=f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
             mail.send(msg)
         return success({"message": "User successfully added"})
