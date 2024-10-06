@@ -6,6 +6,10 @@ from flask_mail import Mail, Message
 from urllib.parse import quote
 from email.message import EmailMessage
 
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 # from flask_jwt_extended import create_access_token
 # from flask_jwt_extended import get_jwt_identity
 # from flask_jwt_extended import jwt_required
@@ -75,6 +79,22 @@ def user_interface():
     except Exception as e:
         return error(str(e))
 
+@app.route('/testmail', methods=['GET'])
+def testmail():
+    email = request.args["email"]
+    print(email + '\n')
+    from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
+    to_addr = email
+    verify_key = os.urandom(12).hex()
+    body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
+    msg = MIMEText(body)
+    print(msg)
+    print()
+    print(msg.as_string())
+    s = smtplib.SMTP('localhost', 25)
+    s.sendmail(from_addr, to_addr, msg.as_string())
+    s.quit()
+
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
 @app.route('/adduser', methods=['POST'])
@@ -97,7 +117,7 @@ def add_user():
                               "validated": False,
                               "verify-key": verify_key})
             msg = Message(subject="Verify email",
-                          recipients=[email, "patrick.muller.1@stonybrook.edu"])
+                          recipients=[email])
             msg.body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
             mail.send(msg)
 
