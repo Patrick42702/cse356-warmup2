@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request, make_response, render_template
+from flask import Flask, jsonify, request, make_response, render_template, url_for
 from pymongo import MongoClient
 from email_validator import validate_email
 from flask_mail import Mail, Message
@@ -163,3 +163,7 @@ def logout():
             raise Exception("There was an error verifying that you were already logged in")
     except Exception as e:
         return error(str(e))
+
+@app.route('/media/<path:path>', methods=["GET"])
+def get_media(path):
+    return url_for('static', filename=f'media/{path}')
