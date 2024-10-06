@@ -11,6 +11,7 @@ from email.message import EmailMessage
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email import charset
 
 # from flask_jwt_extended import create_access_token
 # from flask_jwt_extended import get_jwt_identity
@@ -90,8 +91,9 @@ def testmail():
         to_addr = email
         verify_key = os.urandom(12).hex()
         body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
-        msg = MIMEText(quopri.encodestring(body.encode('utf-8')).decode('utf-8'), 'plain', 'utf-8')
-        msg['Content-Transfer-Encoding'] = 'quoted-printable'
+        cs = charset.Charset('utf-8')
+        cs.body_encoding = charset.QP
+        msg = MIMEText(body, 'plain', cs)
         print(msg.as_string())
         s = smtplib.SMTP('localhost', 25)
         s.sendmail(from_addr, to_addr, msg.as_string())
