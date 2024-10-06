@@ -4,10 +4,12 @@ from pymongo import MongoClient
 from email_validator import validate_email
 from flask_mail import Mail, Message
 
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import JWTManager
+# from flask_jwt_extended import create_access_token
+# from flask_jwt_extended import get_jwt_identity
+# from flask_jwt_extended import jwt_required
+# from flask_jwt_extended import JWTManager
+
+import jwt
 
 DOMAIN = "esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
 SUBMIT_ID = "66d216517f77bf55c5005074"
@@ -29,8 +31,8 @@ app.config['MAIL_DEFAULT_SENDER'] = f"root@{DOMAIN}"
 mail = Mail(app)
 
 # configure JWTManager
-jwt = JWTManager(app)
-app.config['JWT_BLACKLIST_ENABLED'] = True
+# jwt = JWTManager(app)
+# app.config['JWT_BLACKLIST_ENABLED'] = True
 
 # error handling
 def error(err_msg):
@@ -43,7 +45,6 @@ def success(data, session_id=None):
     response = make_response(jsonify(data))
     if session_id:
         response.set_cookie("session_id", session_id)
-        response.headers["Authorization"] = f"Bearer {session_id}"
     response.headers["X-CSE356"] = SUBMIT_ID
     return response
 
@@ -72,16 +73,17 @@ def add_user():
             existing_email = users.find_one({"email": email})
             if existing_user or existing_email:
                 raise Exception("User or email already exists")
-            verify_key = create_access_token(identity=email, expires_delta=False)
+            # verify_key = create_access_token(identity=email, expires_delta=False)
+            verify_key = jwt.encode({"email": email}, app.config['SECRET_KEY'])
             users.insert_one({"username": username,
                               "password": password,
                               "email": email,
                               "validated": False,
                               "verify-key": verify_key})
-            # msg = Message(subject="Verify email",
-            #               recipients=[email],
-            #               body=f"Please verify your email at http://{DOMAIN}?email={email}&?verify={verify_key}")
-            # mail.send(msg)
+            msg = Message(subject="Verify email",
+                          recipients=[email],
+                          body=f"Please verify your email at http://{DOMAIN}/?email={email}&verify={verify_key}")
+            mail.send(msg)
         return success({"message": "User successfully added"})
     except Exception as e:
         return error(str(e))
@@ -116,7 +118,8 @@ def login():
             raise Exception("username not found")
         if user["password"] == password and user["validated"]:
             success_msg = {"message" :"Login successful"}
-            access_token = create_access_token(identity=username)
+            # access_token = create_access_token(identity=username)
+            access_token = jwt.encode({"username": username}, app.config['SECRET_KEY'], algorithm="HS256")
             users.update_one({"username": username}, {"$set": {"session_id": access_token}})
             return success(success_msg, access_token)
         else:
@@ -128,24 +131,22 @@ def login():
         print(e)
         return error(str(e))
 
-@jwt.expired_token_loader
-def expired_token_response(jwt_header, jwt_payload):
-    return error("Token has expired")
-
-@jwt.token_in_blocklist_loader
-def check_if_token_in_blocklist(jwt_header, jwt_payload):
-    blacklist = db.blacklist.find()
-    jti = jwt_payload["jti"]
-    return jti in blacklist
+# @jwt.expired_token_loader
+# def expired_token_response(jwt_header, jwt_payload):
+#     return error("Token has expired")
+#
+# @jwt.token_in_blocklist_loader
+# def check_if_token_in_blocklist(jwt_header, jwt_payload):
+#     blacklist = db.blacklist.find()
+#     jti = jwt_payload["jti"]
+#     return jti in blacklist
 
 @app.route('/logout', methods=["POST"])
-@jwt_required()
 def logout():
-    # cookies = request.cookies
+    cookies = request.cookies
     users = db.users
-    identity = get_jwt_identity()
-    user = users.find_one({"username": identity})
-    print(user)
+    identity = jwt.decode(cookies["session_id"], app.config['SECRET_KEY'], algorithms=["HS256"])
+    user = users.find_one({"username": identity["username"]})
     try:
         if validate_session(user, user["session_id"]):
             print("valid session")
