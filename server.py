@@ -173,7 +173,7 @@ def logout():
 @app.route('/media/<path:path>', methods=["GET"])
 def get_media(path):
     try:
-        if validate_session():
+        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
             resp = make_response(send_from_directory("static/media", path))
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
