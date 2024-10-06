@@ -36,7 +36,9 @@ mail = Mail(app)
 
 # error handling
 def error(err_msg):
-    return jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200
+    resp = make_response(jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200)
+    resp.headers["X-CSE356"] = SUBMIT_ID
+    return resp
 
 # valid reponse handling
 def success(data, session_id=None):
