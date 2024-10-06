@@ -27,16 +27,14 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         },
         body: JSON.stringify({ username, password })
     });
-
-    if (true || response.ok) {
-        document.getElementById('message').innerText = 'Login successful';
+    const result = await response.json();
+    console.log(`Login response: ${result}`);
+    document.getElementById('message').innerText = result.message;
+    if (!result.error) {
         document.getElementById('register-section').style.display = 'none';
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('logout-section').style.display = 'block';
         document.getElementById('media-player-section').style.display = 'block';
-    } else {
-        const result = await response.json();
-        document.getElementById('message').innerText = result.message;
     }
 });
 
@@ -49,15 +47,14 @@ document.getElementById('logout-form').addEventListener('submit', async (e) => {
             'Authorization': `Bearer ${document.cookie.split('=')[1]}`  // Fetch JWT token from cookie
         }
     });
-
-    if (response.ok) {
-        document.getElementById('message').innerText = 'Logout successful';
+    const result = await response.json();
+    console.log(`Logout response: ${result}`);
+    document.getElementById('message').innerText = result.message;
+    if (!result.error) {
         document.getElementById('register-section').style.display = 'block';
         document.getElementById('login-section').style.display = 'block';
         document.getElementById('logout-section').style.display = 'none';
         document.getElementById('media-player-section').style.display = 'none';
-    } else {
-        document.getElementById('message').innerText = 'Failed to logout';
     }
 });
 
@@ -67,12 +64,12 @@ const player = dashjs.MediaPlayer().create();
 
 player.updateSettings({
     streaming: {
-        abr: { autoSwitchBitrate: { audio: true, video: false }, fastSwitchEnabled: true }
+        abr: { autoSwitchBitrate: { audio: true, video: false } }, buffer: { fastSwitchEnabled: true }
     }
 });
 
 // Initialize the Dash.js player
-player.initialize(videoPlayer, 'https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd', false);
+player.initialize(videoPlayer, '../static/media/output.mpd', false);
 
 // Play/Pause button
 const playPauseBtn = document.getElementById('playPauseBtn');
@@ -113,7 +110,7 @@ player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
     bitrates.forEach((bitrate, index) => {
         const option = document.createElement('option');
         option.value = index;
-        option.text = `${bitrate.width}x${bitrate.height}\t${bitrate.bitrate}kbps`;
+        option.text = `${bitrate.width}x${bitrate.height}\t${bitrate.bitrate/1000}kbps`;
         resolutionSelect.appendChild(option);
     });
     resolutionSelect.value = bitrates.length - 1;

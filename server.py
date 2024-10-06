@@ -18,6 +18,7 @@ client = MongoClient("localhost", 27017)
 db = client.eskpj_airplanes
 
 #config env variables
+os.environ['SECRET_KEY'] = os.urandom(12).hex()
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # configure mail server
@@ -105,28 +106,27 @@ def verify():
 
 @app.route('/login', methods=['POST'])
 def login():
-    return success({"message" :"Login successful"})
-    # users = db.users
-    # username = request.json['username']
-    # password = request.json['password']
-    # try:
-    #     if username and password and users.find_one({"username": username}):
-    #         user = users.find_one({"username": username})
-    #     else:
-    #         raise Exception("username not found")
-    #     if user["password"] == password and user["validated"]:
-    #         success_msg = {"message" :"Login successful"}
-    #         access_token = create_access_token(identity=username)
-    #         users.update_one({"username": username}, {"$set": {"session_id": access_token}})
-    #         return success(success_msg, access_token)
-    #     else:
-    #         if user["password"] != password:
-    #             raise Exception("Invalid password")
-    #         else:
-    #             raise Exception("User not validated")
-    # except Exception as e:
-    #     print(e)
-    #     return error(str(e))
+    users = db.users
+    username = request.json['username']
+    password = request.json['password']
+    try:
+        if username and password and users.find_one({"username": username}):
+            user = users.find_one({"username": username})
+        else:
+            raise Exception("username not found")
+        if user["password"] == password and user["validated"]:
+            success_msg = {"message" :"Login successful"}
+            access_token = create_access_token(identity=username)
+            users.update_one({"username": username}, {"$set": {"session_id": access_token}})
+            return success(success_msg, access_token)
+        else:
+            if user["password"] != password:
+                raise Exception("Invalid password")
+            else:
+                raise Exception("User not validated")
+    except Exception as e:
+        print(e)
+        return error(str(e))
 
 @jwt.expired_token_loader
 def expired_token_response(jwt_header, jwt_payload):
@@ -134,7 +134,7 @@ def expired_token_response(jwt_header, jwt_payload):
 
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blocklist(jwt_header, jwt_payload):
-    blacklist = db.blacklist
+    blacklist = db.blacklist.find()
     jti = jwt_payload["jti"]
     return jti in blacklist
 
