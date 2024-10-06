@@ -91,6 +91,7 @@ def testmail():
         verify_key = os.urandom(12).hex()
         body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
         msg = MIMEText(quopri.encodestring(body.encode('utf-8')).decode('utf-8'), 'plain', 'utf-8')
+        msg['Content-Transfer-Encoding'] = 'quoted-printable'
         print(msg.as_string())
         s = smtplib.SMTP('localhost', 25)
         s.sendmail(from_addr, to_addr, msg.as_string())
