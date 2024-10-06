@@ -53,7 +53,7 @@ def validate_session(session_id):
     identity = jwt.decode(session_id, app.config['SECRET_KEY'], algorithms=["HS256"])
     email = identity["username"]
     user = db.users.find_one({"username": email})
-    if user["session_id"] == session_id:
+    if user["session_id"] == request.cookies["session_id"]:
         return True
     else:
         return False
@@ -61,8 +61,7 @@ def validate_session(session_id):
 @app.route('/')
 def user_interface():
     try:
-        session_id = request.cookies["session_id"]
-        if validate_session(session_id):
+        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
             resp = make_response(render_template("homepage.html"))
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
