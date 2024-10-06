@@ -57,9 +57,12 @@ def validate_session(user, session_id):
 
 @app.route('/')
 def user_interface():
-    if "session_id" in request.cookies:
-        print(True)
-    return render_template("index.html")
+    logged_in = 'session_id' in request.cookies
+    print("User logged in:", logged_in)
+    if not logged_in:
+        return render_template("index.html")
+    else:
+        return render_template("homepage.html")
 
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
@@ -153,7 +156,9 @@ def logout():
         if validate_session(user, user["session_id"]):
             print("valid session")
             users.update_one({"username": identity}, {"$set": {"session_id": None}})
-            return success({"message": "Logout successful"})
+            response = success({"message": "Logout successful"})
+            response.delete_cookie("session_id")
+            return response
         else:
             raise Exception("There was an error verifying that you were already logged in")
     except Exception as e:
