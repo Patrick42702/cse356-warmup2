@@ -87,7 +87,7 @@ def add_user():
             if existing_user or existing_email:
                 raise Exception("User or email already exists")
             # verify_key = create_access_token(identity=email, expires_delta=False)
-            verify_key = jwt.encode({"email": email}, app.config['SECRET_KEY'])
+            verify_key = os.urandom(12).hex()
             users.insert_one({"username": username,
                               "password": password,
                               "email": email,
