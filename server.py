@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from email_validator import validate_email
 from flask_mail import Mail, Message
 from urllib.parse import quote
+from email.message import EmailMessage
 
 # from flask_jwt_extended import create_access_token
 # from flask_jwt_extended import get_jwt_identity
@@ -100,10 +101,16 @@ def add_user():
                               "email": email,
                               "validated": False,
                               "verify-key": verify_key})
-            msg = Message(subject="Verify email",
-                          recipients=[email, "patrick.muller.1@stonybrook.edu"],
-                          body=f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
-            mail.send(msg)
+            # msg = Message(subject="Verify email",
+            #               recipients=[email, "patrick.muller.1@stonybrook.edu"],
+            #               body=f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
+            email_msg = EmailMessage()
+            email_msg["To"] = email
+            email_msg["Subject"] = "verify email"
+            email_msg.set_content(f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
+            with mail.connect() as conn:
+                conn.send_message(email_msg)
+            # mail.send()
         return success({"message": "User successfully added"})
     except Exception as e:
         return error(str(e))
