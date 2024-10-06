@@ -95,7 +95,7 @@ def add_user():
                               "verify-key": verify_key})
             msg = Message(subject="Verify email",
                           recipients=[email],
-                          body=f"Please verify your email at http://{DOMAIN}/verify?email={email}&verify={verify_key}")
+                          body=f"Please verify your email at http://{DOMAIN}/verify?email={email}&key={verify_key}")
             mail.send(msg)
         return success({"message": "User successfully added"})
     except Exception as e:
@@ -106,7 +106,7 @@ def add_user():
 def verify():
     users = db.users
     email = request.args["email"]
-    verify_key = request.args["verify"]
+    verify_key = request.args["key"]
     try:
         user = users.find_one({"email": email})
         saved_token = user["verify-key"]
