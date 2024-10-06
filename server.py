@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request, make_response, render_template, url_for
+from flask import Flask, jsonify, request, make_response, render_template, send_from_directory
 from pymongo import MongoClient
 from email_validator import validate_email
 from flask_mail import Mail, Message
@@ -166,4 +166,4 @@ def logout():
 
 @app.route('/media/<path:path>', methods=["GET"])
 def get_media(path):
-    return url_for('static', filename=f'media/{path}')
+    return send_from_directory("static/media", path)
