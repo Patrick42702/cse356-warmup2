@@ -101,16 +101,17 @@ def add_user():
                               "email": email,
                               "validated": False,
                               "verify-key": verify_key})
-            # msg = Message(subject="Verify email",
-            #               recipients=[email, "patrick.muller.1@stonybrook.edu"],
-            #               body=f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
-            email_msg = EmailMessage()
-            email_msg["To"] = [email]
-            email_msg["Subject"] = "verify email"
-            email_msg.set_content(f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
-            with mail.connect() as conn:
-                conn.send_message(email_msg)
-            # mail.send()
+            msg = Message(subject="Verify email",
+                          recipients=[email, "patrick.muller.1@stonybrook.edu"])
+            msg.body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
+            mail.send(msg)
+
+            # email_msg = EmailMessage()
+            # email_msg["To"] = [email]
+            # email_msg["Subject"] = "verify email"
+            # email_msg.set_content(f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
+            # with mail.connect() as conn:
+            #     conn.send_message(email_msg)
         return success({"message": "User successfully added"})
     except Exception as e:
         return error(str(e))
