@@ -84,7 +84,7 @@ def add_user():
                               "verify-key": verify_key})
             msg = Message(subject="Verify email",
                           recipients=[email],
-                          body=f"Please verify your email at http://{DOMAIN}/verify/?email={email}&verify={verify_key}")
+                          body=f"Please verify your email at http://{DOMAIN}/verify?email={email}&verify={verify_key}")
             mail.send(msg)
         return success({"message": "User successfully added"})
     except Exception as e:
