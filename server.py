@@ -105,7 +105,7 @@ def add_user():
             #               recipients=[email, "patrick.muller.1@stonybrook.edu"],
             #               body=f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
             email_msg = EmailMessage()
-            email_msg["To"] = email
+            email_msg["To"] = [email]
             email_msg["Subject"] = "verify email"
             email_msg.set_content(f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
             with mail.connect() as conn:
