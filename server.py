@@ -166,4 +166,6 @@ def logout():
 
 @app.route('/media/<path:path>', methods=["GET"])
 def get_media(path):
-    return send_from_directory("static/media", path)
+    resp = make_response(send_from_directory("static/media", path))
+    resp.headers["X-CSE356"] = SUBMIT_ID
+    return resp
