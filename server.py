@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request, make_response, render_template, send_
 from pymongo import MongoClient
 from email_validator import validate_email
 from flask_mail import Mail, Message
+from urllib.parse import quote
 
 # from flask_jwt_extended import create_access_token
 # from flask_jwt_extended import get_jwt_identity
@@ -95,7 +96,7 @@ def add_user():
                               "verify-key": verify_key})
             msg = Message(subject="Verify email",
                           recipients=[email],
-                          body=f"Please verify your email at http://{DOMAIN}/verify?email={email}&key={verify_key}")
+                          body=f"Please verify your email at http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
             mail.send(msg)
         return success({"message": "User successfully added"})
     except Exception as e:
