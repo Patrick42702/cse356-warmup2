@@ -81,19 +81,22 @@ def user_interface():
 
 @app.route('/testmail', methods=['GET'])
 def testmail():
-    email = request.args["email"]
-    print(email + '\n')
-    from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
-    to_addr = email
-    verify_key = os.urandom(12).hex()
-    body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
-    msg = MIMEText(body)
-    print(msg)
-    print()
-    print(msg.as_string())
-    s = smtplib.SMTP('localhost', 25)
-    s.sendmail(from_addr, to_addr, msg.as_string())
-    s.quit()
+    try:
+        email = request.args["email"]
+        print(email + '\n')
+        from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
+        to_addr = email
+        verify_key = os.urandom(12).hex()
+        body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
+        msg = MIMEText(body)
+        print(msg)
+        print()
+        print(msg.as_string())
+        s = smtplib.SMTP('localhost', 25)
+        s.sendmail(from_addr, to_addr, msg.as_string())
+        s.quit()
+    except Exception as e:
+        return error(str(e))
 
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
