@@ -63,11 +63,6 @@ def validate_session(session_id):
     else:
         return False
 
-@app.before_request
-def log_request_info():
-    app.logger.debug('Headers: %s', request.headers)
-    app.logger.debug('Body: %s', request.get_data())
-
 @app.route('/')
 def user_interface():
     try:
@@ -103,7 +98,7 @@ def add_user():
                               "verify-key": verify_key})
             msg = Message(subject="Verify email",
                           recipients=[email, "patrick.muller.1@stonybrook.edu"])
-            msg.body = f"http://{DOMAIN}/verify?email=3D{quote(email)}&key=3D{verify_key}"
+            msg.body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
             mail.send(msg)
 
             # email_msg = EmailMessage()
