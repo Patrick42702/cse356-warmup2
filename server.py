@@ -1,4 +1,6 @@
 import os
+import quopri
+
 from flask import Flask, jsonify, request, make_response, render_template, send_from_directory
 from pymongo import MongoClient
 from email_validator import validate_email
@@ -88,9 +90,7 @@ def testmail():
         to_addr = email
         verify_key = os.urandom(12).hex()
         body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
-        msg = MIMEText(body)
-        print(msg)
-        print()
+        msg = MIMEText(quopri.encodestring(body.encode('utf-8')).decode('utf-8'), 'plain', 'utf-8')
         print(msg.as_string())
         s = smtplib.SMTP('localhost', 25)
         s.sendmail(from_addr, to_addr, msg.as_string())
