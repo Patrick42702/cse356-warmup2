@@ -57,6 +57,8 @@ def validate_session(user, session_id):
 
 @app.route('/')
 def user_interface():
+    if "session_id" in request.cookies:
+        print(True)
     return render_template("index.html")
 
 # for now get params via a POST form. Adjust when we have an answer
@@ -82,7 +84,7 @@ def add_user():
                               "verify-key": verify_key})
             msg = Message(subject="Verify email",
                           recipients=[email],
-                          body=f"Please verify your email at http://{DOMAIN}/?email={email}&verify={verify_key}")
+                          body=f"Please verify your email at http://{DOMAIN}/verify/?email={email}&verify={verify_key}")
             mail.send(msg)
         return success({"message": "User successfully added"})
     except Exception as e:
