@@ -59,10 +59,12 @@ def validate_session(user, session_id):
 def user_interface():
     logged_in = 'session_id' in request.cookies
     print("User logged in:", logged_in)
-    if not logged_in:
-        return render_template("index.html")
-    else:
-        return render_template("homepage.html")
+    try:
+        resp = make_response(render_template("index.html" if not logged_in else "homepage.html"))
+        resp.headers["X-CSE356"] = SUBMIT_ID
+        return resp
+    except Exception as e:
+        return error(str(e))
 
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
