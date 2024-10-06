@@ -123,10 +123,24 @@ def add_user():
                               "email": email,
                               "validated": False,
                               "verify-key": verify_key})
-            msg = Message(subject="Verify email",
-                          recipients=[email])
-            msg.body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
-            mail.send(msg)
+
+            cs = charset.Charset('utf-8')
+            cs.body_encoding = charset.QP
+            from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
+            to_addr = email
+            body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
+
+            msg = MIMEText(body, 'plain', cs)
+            print(msg.as_string())
+            s = smtplib.SMTP('localhost', 25)
+            s.sendmail(from_addr, to_addr, msg.as_string())
+            s.quit()
+            return success({'message': "Email sent"})
+
+            # msg = Message(subject="Verify email",
+            #               recipients=[email])
+            # msg.body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
+            # mail.send(msg)
 
             # email_msg = EmailMessage()
             # email_msg["To"] = [email]
