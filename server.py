@@ -112,9 +112,9 @@ def add_user():
 @app.route('/verify', methods=['GET'])
 def verify():
     users = db.users
-    email = request.args["email"]
-    verify_key = request.args["key"]
     try:
+        email = request.args["email"]
+        verify_key = request.args["key"]
         user = users.find_one({"email": email})
         saved_token = user["verify-key"]
         if saved_token == verify_key:
