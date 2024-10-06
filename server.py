@@ -49,25 +49,26 @@ def success(data, session_id=None):
     return response
 
 # validate session
-def validate_session(user, session_id):
-    if user["session_id"] == session_id:
+def validate_session():
+    identity = jwt.decode(request.cookies["session_id"], app.config['SECRET_KEY'], algorithms=["HS256"])
+    email = identity["username"]
+    user = db.users.find_one({"username": email})
+    if user["session_id"] == request.cookies["session_id"]:
         return True
     else:
         return False
 
 @app.route('/')
 def user_interface():
-    logged_in = 'session_id' in request.cookies
-    print("User logged in:", logged_in)
-    if logged_in:
-        try:
-            resp = make_response(render_template("index.html" if not logged_in else "homepage.html"))
+    try:
+        if validate_session():
+            resp = make_response(render_template("homepage.html"))
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
-        except Exception as e:
-            return error(str(e))
-    else:
-        return error("User not logged in")
+        else:
+            raise Exception("User not logged in")
+    except Exception as e:
+        return error(str(e))
 
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
@@ -171,6 +172,12 @@ def logout():
 
 @app.route('/media/<path:path>', methods=["GET"])
 def get_media(path):
-    resp = make_response(send_from_directory("static/media", path))
-    resp.headers["X-CSE356"] = SUBMIT_ID
-    return resp
+    try:
+        if validate_session():
+            resp = make_response(send_from_directory("static/media", path))
+            resp.headers["X-CSE356"] = SUBMIT_ID
+            return resp
+        else:
+            raise Exception("User not logged in")
+    except Exception as e:
+        return error(str(e))
