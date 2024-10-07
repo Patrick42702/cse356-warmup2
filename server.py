@@ -45,11 +45,12 @@ mail = Mail(app)
 # app.config['JWT_BLACKLIST_ENABLED'] = True
 
 # error handling
-def error(err_msg):
+def error(err_msg, weird_case=None):
     print(f"found an error: {err_msg}")
     traceback.print_exc()
-    # resp = make_response(jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200)
-    resp = make_response('{"status":"ERROR","error":True,"message":"error"}', 200) # more silly spaces?
+    resp = make_response(jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200)
+    if weird_case == "media":
+        resp = make_response('{"status":"ERROR","error":True,"message":"error"}', 200) # more silly spaces?
     resp.headers["X-CSE356"] = SUBMIT_ID
     return resp
 
@@ -237,4 +238,4 @@ def get_media(path):
         else:
             raise Exception("User not logged in")
     except Exception as e:
-        return error(str(e))
+        return error(str(e), weird_case='media')
