@@ -163,7 +163,7 @@ def verify():
         saved_token = user["verify-key"]
         if saved_token == verify_key:
             users.update_one({"email": email}, {"$set": {"validated": True}})
-            return success({"message" : "Email Successfully Verified"})
+            return success({})
         else:
             raise Exception("Invalid verification key")
         return
