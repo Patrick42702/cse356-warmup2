@@ -48,7 +48,8 @@ mail = Mail(app)
 def error(err_msg):
     print(f"found an error: {err_msg}")
     traceback.print_exc()
-    resp = make_response(jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200)
+    # resp = make_response(jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200)
+    resp = make_response('{"status":"ERROR","error":True,"message":err_msg}', 200) # more silly spaces?
     resp.headers["X-CSE356"] = SUBMIT_ID
     return resp
 
@@ -58,9 +59,6 @@ def success(data, session_id=None):
     data["status"] = "OK"
     # response = make_response(jsonify(data))
     response = make_response('{"status":"OK"}') # try setting it directly to remove spaces and such
-    print('Data: ', data, '\n_________________________\n')
-    print('Jsonify: ', str(jsonify(data)), '\n_________________________\n')
-    print('Response: ', str(response), '\n_________________________\n')
     if session_id:
         response.set_cookie("session_id", session_id)
     response.headers["X-CSE356"] = SUBMIT_ID
