@@ -1,5 +1,6 @@
 import os
 import quopri
+import traceback
 
 from flask import Flask, jsonify, request, make_response, render_template, send_from_directory
 from pymongo import MongoClient
@@ -46,6 +47,7 @@ mail = Mail(app)
 # error handling
 def error(err_msg):
     print(f"found an error: {err_msg}")
+    traceback.print_exc()
     resp = make_response(jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200)
     resp.headers["X-CSE356"] = SUBMIT_ID
     return resp
@@ -56,8 +58,8 @@ def success(data, session_id=None):
     data["status"] = "OK"
     response = make_response(jsonify(data))
     print('Data: ', data, '\n_________________________\n')
-    print('Jsonify: ', jsonify(data), '\n_________________________\n')
-    print('Response: ', response, '\n_________________________\n')
+    print('Jsonify: ', str(jsonify(data)), '\n_________________________\n')
+    print('Response: ', str(response), '\n_________________________\n')
     if session_id:
         response.set_cookie("session_id", session_id)
     response.headers["X-CSE356"] = SUBMIT_ID
