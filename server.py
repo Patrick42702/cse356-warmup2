@@ -55,6 +55,9 @@ def success(data, session_id=None):
     # assume data is a dictioanry
     data["status"] = "OK"
     response = make_response(jsonify(data))
+    print('Data: ', data, '\n_________________________\n')
+    print('Jsonify: ', jsonify(data), '\n_________________________\n')
+    print('Response: ', response, '\n_________________________\n')
     if session_id:
         response.set_cookie("session_id", session_id)
     response.headers["X-CSE356"] = SUBMIT_ID
@@ -98,7 +101,7 @@ def testmail():
         s = smtplib.SMTP('localhost', 25)
         s.sendmail(from_addr, to_addr, msg.as_string())
         s.quit()
-        return success({'message':"Email sent"})
+        return success({})
     except Exception as e:
         return error(str(e))
 
