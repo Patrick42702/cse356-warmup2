@@ -56,7 +56,8 @@ def error(err_msg):
 def success(data, session_id=None):
     # assume data is a dictioanry
     data["status"] = "OK"
-    response = make_response(jsonify(data))
+    # response = make_response(jsonify(data))
+    response = make_response('{"status":"OK"}') # try setting it directly to remove spaces and such
     print('Data: ', data, '\n_________________________\n')
     print('Jsonify: ', str(jsonify(data)), '\n_________________________\n')
     print('Response: ', str(response), '\n_________________________\n')
