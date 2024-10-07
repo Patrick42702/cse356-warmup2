@@ -50,7 +50,7 @@ def error(err_msg, weird_case=None):
     traceback.print_exc()
     resp = make_response(jsonify({"status": "ERROR", "error":True, "message": err_msg}), 200)
     if weird_case == "media":
-        resp = make_response('{"status":"ERROR","error":True,"message":"error"}', 200) # more silly spaces?
+        resp = make_response('{"status":"ERROR","error":true,"message":"error"}', 200) # more silly spaces?
     resp.headers["X-CSE356"] = SUBMIT_ID
     return resp
 
