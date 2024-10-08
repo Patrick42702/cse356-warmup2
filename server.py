@@ -218,10 +218,10 @@ def logout():
     users = db.users
     try:
         identity = jwt.decode(cookies["session_id"], app.config['SECRET_KEY'], algorithms=["HS256"])
-        user = users.find_one({"username": identity["username"]})
-        if validate_session(user, user["session_id"]):
+        # user = users.find_one({"username": identity["username"]})
+        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
             print("valid session")
-            users.update_one({"username": identity}, {"$set": {"session_id": None}})
+            users.update_one({"username": identity["username"]}, {"$set": {"session_id": None}})
             response = success({"message": "Logout successful"})
             response.delete_cookie("session_id")
             return response
