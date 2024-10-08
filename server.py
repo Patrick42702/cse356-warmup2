@@ -86,11 +86,14 @@ def log_request_info():
 
 @app.after_request
 def log_response(response):
-    app.logger.debug('--- RESPONSE --- ')
-    app.logger.debug('Status: %s', response.status)
-    app.logger.debug('Body: %s', response.get_data())
-    app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
-    app.logger.debug("-" * 110)
+    try:
+        app.logger.debug('--- RESPONSE --- ')
+        app.logger.debug('Status: %s', response.status)
+        app.logger.debug('Body: %s', response.get_data())
+        app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
+        app.logger.debug("-" * 110)
+    except Exception as e:
+        app.logger.debug("Can't display response.")
     return response
 
 @app.route('/')
