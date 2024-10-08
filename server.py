@@ -89,11 +89,11 @@ def log_response(response):
     try:
         app.logger.debug('--- RESPONSE --- ')
         app.logger.debug('Status: %s', response.status)
-        app.logger.debug('Body: %s', response.get_data())
         app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
-        app.logger.debug("-" * 110)
+        app.logger.debug('Body: %s', response.get_data())
     except Exception as e:
         app.logger.debug("Can't display response.")
+    app.logger.debug("-" * 110)
     return response
 
 @app.route('/')

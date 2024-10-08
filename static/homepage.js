@@ -27,7 +27,7 @@ player.updateSettings({
 player.initialize(videoPlayer, '../static/media/output.mpd', false);
 
 // Play/Pause button
-const playPauseBtn = document.getElementById('playPauseBtn');
+const playPauseBtn = document.getElementById('playPauseBtnButton');
 playPauseBtn.addEventListener('click', () => {
     if (videoPlayer.paused) {
         videoPlayer.play();
@@ -35,6 +35,15 @@ playPauseBtn.addEventListener('click', () => {
     } else {
         videoPlayer.pause();
         playPauseBtn.innerText = 'Play';
+    }
+});
+
+const playPauseBtnDiv = document.getElementById('playPauseBtn');
+playPauseBtnDiv.addEventListener('click', () => {
+    if (videoPlayer.paused) {
+        videoPlayer.play();
+    } else {
+        videoPlayer.pause();
     }
 });
 
