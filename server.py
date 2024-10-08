@@ -89,7 +89,7 @@ def log_response(response):
     app.logger.debug('--- RESPONSE --- ')
     app.logger.debug('Status: %s', response.status)
     app.logger.debug('Body: %s', response.get_data())
-    app.logger.debug('Cookies: %s', response.cookies)
+    app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
     app.logger.debug("-" * 140)
 
 @app.route('/')
