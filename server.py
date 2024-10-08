@@ -77,6 +77,11 @@ def validate_session(session_id):
     else:
         return False
 
+@app.before_request
+def log_request_info():
+    app.logger.debug("-"*80)
+    app.logger.debug('Body: %s', request.get_data())
+
 @app.route('/')
 def user_interface():
     try:
