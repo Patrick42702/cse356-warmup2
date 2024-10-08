@@ -79,8 +79,18 @@ def validate_session(session_id):
 
 @app.before_request
 def log_request_info():
-    app.logger.debug("-"*80)
+    app.logger.debug("-"*140)
+    app.logger.debug('--- REQUEST --- ')
     app.logger.debug('Body: %s', request.get_data())
+    app.logger.debug('Cookies: %s', request.cookies)
+
+@app.after_request
+def log_response(response):
+    app.logger.debug('--- RESPONSE --- ')
+    app.logger.debug('Status: %s', response.status)
+    app.logger.debug('Body: %s', response.get_data())
+    app.logger.debug('Cookies: %s', response.cookies)
+    app.logger.debug("-" * 140)
 
 @app.route('/')
 def user_interface():
