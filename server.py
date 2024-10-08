@@ -114,10 +114,10 @@ def testmail():
 @app.route('/adduser', methods=['POST'])
 def add_user():
     users = db.users
-    username = request.json['username']
-    password = request.json['password']
-    email = request.json['email']
     try:
+        username = request.json['username']
+        password = request.json['password']
+        email = request.json['email']
         if username and password and validate_email(email):
             existing_user = users.find_one({"username": username})
             existing_email = users.find_one({"email": email})
@@ -180,9 +180,9 @@ def verify():
 @app.route('/login', methods=['POST'])
 def login():
     users = db.users
-    username = request.json['username']
-    password = request.json['password']
     try:
+        username = request.json['username']
+        password = request.json['password']
         if username and password and users.find_one({"username": username}):
             user = users.find_one({"username": username})
         else:
