@@ -15,11 +15,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email import charset
 
-# from flask_jwt_extended import create_access_token
-# from flask_jwt_extended import get_jwt_identity
-# from flask_jwt_extended import jwt_required
-# from flask_jwt_extended import JWTManager
-
 import jwt
 
 DOMAIN = "esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
@@ -41,27 +36,19 @@ app.config['MAIL_PORT'] = 25
 app.config['MAIL_DEFAULT_SENDER'] = f"root@{DOMAIN}"
 mail = Mail(app)
 
-# configure JWTManager
-# jwt = JWTManager(app)
-# app.config['JWT_BLACKLIST_ENABLED'] = True
-
 # error handling
 def error(err_msg, weird_case=None):
     print(f"found an error: {err_msg}")
     traceback.print_exc()
-    # resp = make_response(jsonify({"status":"ERROR","error":True,"message": err_msg}), 200)
     resp = json.dumps({"status":"ERROR","error":True,"message": err_msg}), 200, {'Content-Type': 'application/json', 'X-CSE356': SUBMIT_ID}
-    # if weird_case == "media":
-    #     resp = make_response('{"status":"ERROR","error":true,"message":"error"}', 200) # more silly spaces?
-    # resp.headers["X-CSE356"] = SUBMIT_ID
     return resp
 
 # valid reponse handling
 def success(data, session_id=None):
     # assume data is a dictioanry
     data["status"] = "OK"
-    # response = make_response(jsonify(data))
-    response = make_response('{"status":"OK"}') # try setting it directly to remove spaces and such
+    print(data)
+    response = make_response(data) # try setting it directly to remove spaces and such
     if session_id:
         response.set_cookie("session_id", session_id)
     response.headers["X-CSE356"] = SUBMIT_ID
@@ -70,8 +57,8 @@ def success(data, session_id=None):
 # validate session
 def validate_session(session_id):
     identity = jwt.decode(session_id, app.config['SECRET_KEY'], algorithms=["HS256"])
-    email = identity["username"]
-    user = db.users.find_one({"username": email})
+    username = identity["username"]
+    user = db.users.find_one({"username": username})
     if user["session_id"] == request.cookies["session_id"]:
         return True
     else:
@@ -130,7 +117,7 @@ def testmail():
 
 # for now get params via a POST form. Adjust when we have an answer
 # from ferdman on how to get params
-@app.route('/adduser', methods=['POST'])
+@app.route('/api/adduser', methods=['POST'])
 def add_user():
     users = db.users
     try:
@@ -162,24 +149,12 @@ def add_user():
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
             return success({'message': "Email sent"})
-
-            # msg = Message(subject="Verify email",
-            #               recipients=[email])
-            # msg.body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
-            # mail.send(msg)
-
-            # email_msg = EmailMessage()
-            # email_msg["To"] = [email]
-            # email_msg["Subject"] = "verify email"
-            # email_msg.set_content(f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}")
-            # with mail.connect() as conn:
-            #     conn.send_message(email_msg)
         return success({"message": "User successfully added"})
     except Exception as e:
         return error(str(e))
 
 # He specifies to use query string params for the verify endpoint
-@app.route('/verify', methods=['GET'])
+@app.route('/api/verify', methods=['GET'])
 def verify():
     users = db.users
     try:
@@ -196,7 +171,7 @@ def verify():
     except Exception as e:
         return error(str(e))
 
-@app.route('/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     users = db.users
     try:
@@ -210,7 +185,7 @@ def login():
             success_msg = {"message" :"Login successful"}
             # access_token = create_access_token(identity=username)
             access_token = jwt.encode({"username": username}, app.config['SECRET_KEY'], algorithm="HS256")
-            users.update_one({"username": username}, {"$set": {"session_id": access_token}})
+            users.update_one({"username": username}, {"$set": {"session_id": access_token, "login": True}})
             return success(success_msg, access_token)
         else:
             if user["password"] != password:
@@ -221,17 +196,7 @@ def login():
         print(e)
         return error(str(e))
 
-# @jwt.expired_token_loader
-# def expired_token_response(jwt_header, jwt_payload):
-#     return error("Token has expired")
-#
-# @jwt.token_in_blocklist_loader
-# def check_if_token_in_blocklist(jwt_header, jwt_payload):
-#     blacklist = db.blacklist.find()
-#     jti = jwt_payload["jti"]
-#     return jti in blacklist
-
-@app.route('/logout', methods=["POST"])
+@app.route('/api/logout', methods=["POST"])
 def logout():
     cookies = request.cookies
     users = db.users
@@ -239,8 +204,7 @@ def logout():
         identity = jwt.decode(cookies["session_id"], app.config['SECRET_KEY'], algorithms=["HS256"])
         # user = users.find_one({"username": identity["username"]})
         if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
-            print("valid session")
-            users.update_one({"username": identity["username"]}, {"$set": {"session_id": None}})
+            users.update_one({"username": identity["username"]}, {"$set": {"session_id": None, "login": False}})
             response = success({"message": "Logout successful"})
             response.delete_cookie("session_id")
             return response
@@ -260,3 +224,29 @@ def get_media(path):
             raise Exception("User not logged in")
     except Exception as e:
         return error(str(e), weird_case='media')
+
+@app.route('/api/check-auth', methods=["POST"])
+def check_auth():
+    cookies = request.cookies
+    users = db.users
+    try:
+        if "session_id" not in request.cookies:
+            raise Exception("You do not have an active session token")
+        identity = jwt.decode(cookies["session_id"], app.config['SECRET_KEY'], algorithms=["HS256"])
+        if validate_session(cookies["session_id"]):
+            user = users.find_one({"username": identity["username"]})
+            return success({"isLoggedIn": user["login"], "userId": str(user["_id"])})
+            raise Exception("")
+    except Exception as e:
+        return error(str(e))
+
+
+
+
+
+
+
+
+
+
+
