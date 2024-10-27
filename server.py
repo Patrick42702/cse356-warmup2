@@ -240,6 +240,23 @@ def check_auth():
     except Exception as e:
         return error(str(e))
 
+@app.route('/api/videos', methods=["POST"])
+def get_videos():
+    try:
+        if "count" not in request.json:
+            raise Exception("Count parameter not found")
+
+        with open("static/videos/m1.json") as f:
+            meta = json.load(f)
+            count = request.json["count"]
+            ids = list(meta.keys())
+            id = ids[count - 1]
+            desc = meta[id]
+            return success({"title": id, "description": desc})
+
+    except Exception as e:
+        return error(str(e))
+
 
 
 
