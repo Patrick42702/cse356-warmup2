@@ -47,8 +47,8 @@ def error(err_msg, weird_case=None):
 def success(data, session_id=None):
     # assume data is a dictioanry
     data["status"] = "OK"
-    print(data)
-    response = make_response(data) # try setting it directly to remove spaces and such
+    body = json.dumps(data)
+    response = make_response(body) # try setting it directly to remove spaces and such
     if session_id:
         response.set_cookie("session_id", session_id)
     response.headers["X-CSE356"] = SUBMIT_ID
