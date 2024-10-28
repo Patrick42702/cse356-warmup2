@@ -155,7 +155,7 @@ def add_user():
             cs.body_encoding = charset.QP
             from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
             to_addr = email
-            body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
+            body = f"http://{DOMAIN}/api/verify?email={quote(email)}&key={verify_key}"
 
             msg = MIMEText(body, 'plain', cs)
             print(msg.as_string())
