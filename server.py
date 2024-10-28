@@ -229,7 +229,7 @@ def logout():
         return error(str(e))
 
 @app.route('/api/<path:path>', methods=["GET"])
-def get_media(path):
+def api_media(path):
     ftype = path.split("/")[0]
     file = path.split("/")[-1]
     id = file.split("-")[0]
@@ -247,6 +247,19 @@ def get_media(path):
             raise Exception("User not logged in")
     except Exception as e:
         return error(str(e), weird_case='media')
+
+@app.route('/media/<path:path>', methods=["GET"])
+def get_media(path):
+    try:
+        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
+            resp = make_response(send_from_directory("static/media", path))
+            resp.headers["X-CSE356"] = SUBMIT_ID
+            return resp
+        else:
+            raise Exception("User not logged in")
+    except Exception as e:
+        return error(str(e), weird_case='media')
+
 
 @app.route('/api/check-auth', methods=["POST"])
 def check_auth():
