@@ -1,81 +1,45 @@
-document.getElementById('logout-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Path to the JSON file with video data
+const jsonPath = "/static/m1.json";
 
-    const response = await fetch('/logout', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${document.cookie.split('=')[1]}`  // Fetch JWT token from cookie
+// Function to generate the video list
+async function generateVideoList() {
+    const videoListContainer = document.getElementById("video-list");
+
+    try {
+        // Fetch video data from JSON file
+        const response = await fetch(jsonPath);
+        const videoData = await response.json();
+
+        // Loop through each video entry in the JSON
+        for (const [filename, description] of Object.entries(videoData)) {
+            // Extract video ID from filename
+            const videoId = filename.split('-')[0];
+
+            // Create link element for the video
+            const videoLink = document.createElement("a");
+            videoLink.href = `/play/${videoId}`;
+            videoLink.className = "video-link";
+
+            // Create image element for the thumbnail
+            const thumbnail = document.createElement("img");
+            thumbnail.src = `/static/media/thumbnail_${videoId}.jpg`;
+            thumbnail.alt = `Thumbnail for video ${videoId}`;
+            thumbnail.className = "thumbnail";
+
+            // Create description element
+            const descriptionText = document.createElement("p");
+            descriptionText.textContent = description;
+            descriptionText.className = "description";
+
+            // Append thumbnail and description to the link, and link to the container
+            videoLink.appendChild(thumbnail);
+            videoLink.appendChild(descriptionText);
+            videoListContainer.appendChild(videoLink);
         }
-    });
-    const result = await response.json();
-    console.log(`Logout response: ${result}`);
-    document.getElementById('message').innerText = result.message;
-    location.reload();
-});
-
-// Dash.js setup for MPEG-DASH playback
-const videoPlayer = document.getElementById('videoPlayer');
-const player = dashjs.MediaPlayer().create();
-
-player.updateSettings({
-    streaming: {
-        abr: { autoSwitchBitrate: { audio: true, video: false } }, buffer: { fastSwitchEnabled: true }
+    } catch (error) {
+        console.error("Error fetching video data:", error);
     }
-});
+}
 
-// Initialize the Dash.js player
-player.initialize(videoPlayer, '../static/media/output.mpd', false);
-
-// Play/Pause button
-const playPauseBtn = document.getElementById('playPauseBtnButton');
-playPauseBtn.addEventListener('click', () => {
-    if (videoPlayer.paused) {
-        videoPlayer.play();
-        playPauseBtn.innerText = 'Pause';
-    } else {
-        videoPlayer.pause();
-        playPauseBtn.innerText = 'Play';
-    }
-});
-
-const playPauseBtnDiv = document.getElementById('playPauseBtn');
-playPauseBtnDiv.addEventListener('click', () => {
-    if (videoPlayer.paused) {
-        videoPlayer.play();
-    } else {
-        videoPlayer.pause();
-    }
-});
-
-// Seek bar
-const seekBar = document.getElementById('seekBar');
-videoPlayer.addEventListener('timeupdate', () => {
-    seekBar.value = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-});
-
-seekBar.addEventListener('input', () => {
-    const seekTime = (seekBar.value / 100) * videoPlayer.duration;
-    videoPlayer.currentTime = seekTime;
-});
-
-// Resolution change
-const resolutionSelect = document.getElementById('resolutionSelect');
-resolutionSelect.addEventListener('change', () => {
-    const quality = parseInt(resolutionSelect.value);
-    console.log(`Change to quality ${quality}`);
-    player.setQualityFor('video', quality);
-});
-
-// Populate resolution options dynamically once the stream is initialized
-player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
-    const bitrates = player.getBitrateInfoListFor('video');
-    resolutionSelect.innerHTML = '';
-    console.log(bitrates);
-    bitrates.forEach((bitrate, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.text = `${bitrate.width}x${bitrate.height}\t${bitrate.bitrate/1000}kbps`;
-        resolutionSelect.appendChild(option);
-    });
-    resolutionSelect.value = bitrates.length - 1;
-});
+// Run the function when the page loads
+window.addEventListener("DOMContentLoaded", generateVideoList);

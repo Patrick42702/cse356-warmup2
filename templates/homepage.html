@@ -3,31 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management with Media Player</title>
-    <link rel="stylesheet" href="../static/style.css">
+    <title>Video List</title>
+    <link rel="stylesheet" href="../static/homepage.css">
+    <script defer src="../static/homepage.js"></script>
 </head>
 <body>
-    <h1>Video Player</h1>
-    <div id="message" class="message"></div>
-
-    <div id="media-player-section" class="media-player">
-        <h2>MPEG-DASH Media Player</h2>
-        <div id="media"></div>
-            <video id="videoPlayer" controls width="800"></video>
-        <div id="playPauseBtn"><button id="playPauseBtnButton">Play</button></div>
-            <input type="range" id="seekBar" value="0" min="0" max="100" step="1">
-            <select id="resolutionSelect"> </select>
-        </div>
+    <h1>Available Videos</h1>
+    <div id="video-list" class="video-list">
+        <!-- Video list will be populated here by JavaScript -->
     </div>
-
-    <div id="logout-section">
-        <form id="logout-form">
-            <h2>Logout</h2>
-            <button type="submit">Logout</button>
-        </form>
-    </div>
-
-    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
-    <script src="../static/homepage.js"></script>
 </body>
 </html>

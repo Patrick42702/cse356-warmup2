@@ -4,7 +4,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     const password = document.getElementById('register-password').value;
     const email = document.getElementById('register-email').value;
 
-    const response = await fetch('/adduser', {
+    const response = await fetch('/api/adduser', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
-    const response = await fetch('/login', {
+    const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

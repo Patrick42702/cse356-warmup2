@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.video-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.video-link {
+    display: inline-block;
+    text-align: center;
+    margin: 10px;
+}
+
+.thumbnail {
+    width: 320px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 5px;
+    transition: transform 0.2s;
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}

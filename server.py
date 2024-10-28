@@ -91,7 +91,21 @@ def user_interface():
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
         else:
-            raise Exception("User not logged in")
+            resp = make_response(render_template("index.html"))
+            resp.headers["X-CSE356"] = SUBMIT_ID
+            return resp
+            # raise Exception("User not logged in")
+    except Exception as e:
+        return error(str(e))
+
+@app.route('/play/<id>', methods=['GET'])
+def play_video(id):
+    try:
+        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
+            resp = make_response(render_template("viewer.html"))
+            resp.headers["X-CSE356"] = SUBMIT_ID
+            return resp
+        else: raise Exception("User not logged in")
     except Exception as e:
         return error(str(e))
 
