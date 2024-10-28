@@ -228,11 +228,19 @@ def logout():
     except Exception as e:
         return error(str(e))
 
-@app.route('/media/<path:path>', methods=["GET"])
+@app.route('/api/<path:path>', methods=["GET"])
 def get_media(path):
+    ftype = path.split("/")[0]
+    file = path.split("/")[-1]
+    id = file.split("-")[0]
+    fpath = ""
+    if ftype == "manifest":
+        fpath += f"{id}.mpd"
+    else:
+        fpath += f"thumbnail_{id}.jpg"
     try:
         if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
-            resp = make_response(send_from_directory("static/media", path))
+            resp = make_response(send_from_directory("static/media", fpath))
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
         else:
