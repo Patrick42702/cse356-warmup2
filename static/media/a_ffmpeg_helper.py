@@ -68,6 +68,7 @@ for filename in os.listdir(input_dir):
         subprocess.run(ffmpeg_cmd)
 
         # Generate thumbnail
+        scale_thumbnails = "scale='if(gt(a,16/9),320,-2)':'if(gt(a,16/9),-2,180)',pad=320:180:(ow-iw)/2:(oh-ih)/2:black"
         thumbnail_path = f"thumbnail_{video_id}.jpg"
         thumbnail_cmd = [
             'ffmpeg', '-y', '-i', input_path,
