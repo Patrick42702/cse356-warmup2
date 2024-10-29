@@ -238,7 +238,7 @@ def get_videos():
         if "count" not in request.json:
             raise Exception("Count parameter not found")
 
-        with open("static/videos/m1.json") as f:
+        with open("./static/m1.json") as f:
             count = int(request.json["count"])
             return success({"videos": video_list[:count]})
 
