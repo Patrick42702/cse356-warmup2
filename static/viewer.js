@@ -1,3 +1,61 @@
+// Video list - this should match the format you defined on the server
+let videoList = []; // Will be populated with data from m1.json
+let currentIndex = 0; // Index of the currently playing video
+
+// Fetch video list on load
+async function loadVideoList() {
+    const response = await fetch('/static/m1.json');
+    const data = await response.json();
+    videoList = Object.entries(data).map(([title, description]) => {
+        return { id: title.split('-')[0], metadata: { title, description } };
+    });
+
+    // Find initial video based on URL and play it
+    const videoId = window.location.pathname.split('/').pop();
+    currentIndex = videoList.findIndex(video => video.id === videoId) || 0;
+    playVideo(currentIndex);
+}
+
+// Function to play the video at the given index
+function playVideo(index) {
+    if (index < 0 || index >= videoList.length) return; // Check bounds
+
+    const video = videoList[index];
+    const videoPlayer = document.getElementById('videoPlayer');
+    const player = dashjs.MediaPlayer().create();
+    player.initialize(videoPlayer, `../static/media/${video.id}.mpd`, true);
+
+    // Update the URL without reloading the page
+    window.history.pushState({}, '', `/play/${video.id}`);
+}
+
+// Handle scroll event for infinite scroll navigation
+function handleScroll(event) {
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+
+    if (scrollY > 0) {  // Scroll down
+        if (currentIndex < videoList.length - 1) {
+            currentIndex++;
+            playVideo(currentIndex);
+        }
+    } else if (scrollY < 0) {  // Scroll up
+        if (currentIndex > 0) {
+            currentIndex--;
+            playVideo(currentIndex);
+        }
+    }
+
+    // Reset scroll position to avoid cumulative scroll effect
+    window.scrollTo(0, 0);
+}
+
+// Load video list and set up initial video
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadVideoList();
+    window.addEventListener('scroll', handleScroll);
+});
+
+
 document.getElementById('logout-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
