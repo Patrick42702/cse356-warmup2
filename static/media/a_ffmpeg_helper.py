@@ -72,7 +72,7 @@ for filename in os.listdir(input_dir):
         thumbnail_path = f"thumbnail_{video_id}.jpg"
         thumbnail_cmd = [
             'ffmpeg', '-y', '-i', input_path,
-            '-vf', scale_filter, '-vframes', '1', thumbnail_path
+            '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path
         ]
         print(f"Generating thumbnail for {filename} with video ID {video_id}")
         subprocess.run(thumbnail_cmd)
