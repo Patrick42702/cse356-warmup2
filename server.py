@@ -232,6 +232,19 @@ def logout():
     except Exception as e:
         return error(str(e))
 
+@app.route('/api/videos', methods=["POST"])
+def get_videos():
+    try:
+        if "count" not in request.json:
+            raise Exception("Count parameter not found")
+
+        with open("static/videos/m1.json") as f:
+            count = int(request.json["count"])
+            return success({"videos": video_list[:count]})
+
+    except Exception as e:
+        return error(str(e))
+
 @app.route('/api/<path:path>', methods=["GET"])
 def api_media(path):
     ftype = path.split("/")[0]
@@ -279,27 +292,3 @@ def check_auth():
             raise Exception("")
     except Exception as e:
         return error(str(e))
-
-@app.route('/api/videos', methods=["POST"])
-def get_videos():
-    try:
-        if "count" not in request.json:
-            raise Exception("Count parameter not found")
-
-        with open("static/videos/m1.json") as f:
-            count = int(request.json["count"])
-            return success({"videos": video_list[:count]})
-
-    except Exception as e:
-        return error(str(e))
-
-
-
-
-
-
-
-
-
-
-
