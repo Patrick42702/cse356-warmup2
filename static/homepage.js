@@ -11,7 +11,7 @@ async function generateVideoList() {
         const videoData = await response.json();
 
         // Loop through each video entry in the JSON
-        for (const [filename, description] of Object.entries(videoData)) {
+        for (const [filename, description] of Object.entries(videoData).slice(0,10)) {
             // Extract video ID from filename
             const videoId = filename.split('-')[0];
 
