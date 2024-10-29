@@ -29,22 +29,14 @@ player.initialize(videoPlayer, `../static/media/${video_id}.mpd`, false);
 
 // Play/Pause button
 const playPauseBtn = document.getElementById('playPauseBtnButton');
-playPauseBtn.addEventListener('click', () => {
+const playPauseBtnDiv = document.getElementById('playPauseBtn');
+playPauseBtnDiv.addEventListener('click', () => {
     if (videoPlayer.paused) {
         videoPlayer.play();
         playPauseBtn.innerText = 'Pause';
     } else {
         videoPlayer.pause();
         playPauseBtn.innerText = 'Play';
-    }
-});
-
-const playPauseBtnDiv = document.getElementById('playPauseBtn');
-playPauseBtnDiv.addEventListener('click', () => {
-    if (videoPlayer.paused) {
-        videoPlayer.play();
-    } else {
-        videoPlayer.pause();
     }
 });
 
