@@ -20,6 +20,10 @@ import jwt
 DOMAIN = "esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
 SUBMIT_ID = "66d216517f77bf55c5005074"
 
+# Create video list
+with open('./static/m1.json') as f: video_data = json.load(f)
+video_list = [{"id": title.split('-')[0], "metadata":{"title": title, "description": description}} for title, description in video_data.items()]
+
 # configure flask app and pymongo
 app = Flask(__name__)
 client = MongoClient("localhost", 27017)
@@ -43,7 +47,7 @@ def error(err_msg, weird_case=None):
     resp = json.dumps({"status":"ERROR","error":True,"message": err_msg}), 200, {'Content-Type': 'application/json', 'X-CSE356': SUBMIT_ID}
     return resp
 
-# valid reponse handling
+# valid response handling
 def success(data, session_id=None):
     # assume data is a dictioanry
     data["status"]="OK"
@@ -228,6 +232,11 @@ def logout():
     except Exception as e:
         return error(str(e))
 
+@app.route('/api/videos/<count>', methods=['POST'])
+def get_videos(count):
+    count = int(count)
+    return success({"videos": video_list[:count]})
+
 @app.route('/api/<path:path>', methods=["GET"])
 def api_media(path):
     ftype = path.split("/")[0]
@@ -236,7 +245,7 @@ def api_media(path):
     fpath = ""
     if ftype == "manifest":
         fpath += f"{id}.mpd"
-    else:
+    elif ftype == "thumbnail":
         fpath += f"thumbnail_{id}.jpg"
     try:
         if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
