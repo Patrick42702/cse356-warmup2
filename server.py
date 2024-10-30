@@ -1,17 +1,14 @@
 import os
-import quopri
 import traceback
 import json
 
-from flask import Flask, jsonify, request, make_response, render_template, send_from_directory
+from flask import Flask, request, make_response, render_template, send_from_directory
 from pymongo import MongoClient
 from email_validator import validate_email
-from flask_mail import Mail, Message
+from flask_mail import Mail
 from urllib.parse import quote
-from email.message import EmailMessage
 
 import smtplib
-from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email import charset
 
@@ -41,18 +38,19 @@ app.config['MAIL_DEFAULT_SENDER'] = f"root@{DOMAIN}"
 mail = Mail(app)
 
 # error handling
-def error(err_msg, weird_case=None):
+def error(err_msg):
     print(f"found an error: {err_msg}")
     traceback.print_exc()
     resp = json.dumps({"status":"ERROR","error":True,"message": err_msg}), 200, {'Content-Type': 'application/json', 'X-CSE356': SUBMIT_ID}
     return resp
 
 # valid response handling
+# @param data: dictionary of data to be returned
+# @param session_id: session_id to be set in the cookie
 def success(data, session_id=None):
-    # assume data is a dictioanry
     data["status"]="OK"
-    body = json.dumps(data, separators=(',', ':'))
-    response = make_response(body) # try setting it directly to remove spaces and such
+    body = json.dumps(data, separators=(',', ':')) # take out any spaces in json response
+    response = make_response(body)
     if session_id:
         response.set_cookie("session_id", session_id)
     response.headers["X-CSE356"] = SUBMIT_ID
@@ -70,7 +68,7 @@ def validate_session(session_id):
 
 @app.before_request
 def log_request_info():
-    app.logger.debug("-"*110)
+    app.logger.debug("-" * 110)
     app.logger.debug('--- REQUEST --- ')
     app.logger.debug('Body: %s', request.get_data())
     app.logger.debug('Cookies: %s', request.cookies)
@@ -82,7 +80,7 @@ def log_response(response):
         app.logger.debug('Status: %s', response.status)
         app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
         app.logger.debug('Body: %s', response.get_data())
-    except Exception as e:
+    except Exception:
         app.logger.debug("Can't display response.")
     app.logger.debug("-" * 110)
     return response
@@ -133,8 +131,6 @@ def testmail():
     except Exception as e:
         return error(str(e))
 
-# for now get params via a POST form. Adjust when we have an answer
-# from ferdman on how to get params
 @app.route('/api/adduser', methods=['POST'])
 def add_user():
     users = db.users
@@ -147,7 +143,6 @@ def add_user():
             existing_email = users.find_one({"email": email})
             if existing_user or existing_email:
                 raise Exception("User or email already exists")
-            # verify_key = create_access_token(identity=email, expires_delta=False)
             verify_key = os.urandom(12).hex()
             users.insert_one({"username": username,
                               "password": password,
@@ -163,7 +158,6 @@ def add_user():
 
             msg = MIMEText(body, 'plain', cs)
             msg['Subject'] = "Verify your email with ESKPJ"
-            print(msg.as_string())
             s = smtplib.SMTP('localhost', 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
@@ -172,7 +166,6 @@ def add_user():
     except Exception as e:
         return error(str(e))
 
-# He specifies to use query string params for the verify endpoint
 @app.route('/api/verify', methods=['GET'])
 def verify():
     users = db.users
@@ -202,7 +195,6 @@ def login():
             raise Exception("username not found")
         if user["password"] == password and user["validated"]:
             success_msg = {"message" :"Login successful"}
-            # access_token = create_access_token(identity=username)
             access_token = jwt.encode({"username": username}, app.config['SECRET_KEY'], algorithm="HS256")
             users.update_one({"username": username}, {"$set": {"session_id": access_token, "login": True}})
             return success(success_msg, access_token)
@@ -221,7 +213,6 @@ def logout():
     users = db.users
     try:
         identity = jwt.decode(cookies["session_id"], app.config['SECRET_KEY'], algorithms=["HS256"])
-        # user = users.find_one({"username": identity["username"]})
         if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
             users.update_one({"username": identity["username"]}, {"$set": {"session_id": None, "login": False}})
             response = success({"message": "Logout successful"})
@@ -238,9 +229,8 @@ def get_videos():
         if "count" not in request.json:
             raise Exception("Count parameter not found")
 
-        with open("./static/m1.json") as f:
-            count = int(request.json["count"])
-            return success({"videos": video_list[:count]})
+        count = int(request.json["count"])
+        return success({"videos": video_list[:count]})
 
     except Exception as e:
         return error(str(e))
@@ -263,7 +253,7 @@ def api_media(path):
         else:
             raise Exception("User not logged in")
     except Exception as e:
-        return error(str(e), weird_case='media')
+        return error(str(e))
 
 @app.route('/media/<path:path>', methods=["GET"])
 def get_media(path):
