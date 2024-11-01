@@ -1,0 +1,27 @@
+<!-- templates/error.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+</head>
+<body>
+    <div id="error-message" color: red;">
+        <h2>Error</h2>
+        <p>{{ error }}</p>
+        <button onclick="closeError()">Close</button>
+    </div>
+
+    <script>
+        function deleteSessionCookie() {
+            document.cookie = "session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+
+        function closeError() {
+            deleteSessionCookie();
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>
