@@ -23,7 +23,8 @@ def log_response(response):
         app.logger.debug('--- RESPONSE --- ')
         app.logger.debug('Status: %s', response.status)
         app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
-        app.logger.debug('Body: %s', response.get_data())
+        if len(response.get_data()) < 2 ** 20: # if the data is less than 1MB print it out
+            app.logger.debug('Body: %s', response.get_data())
     except Exception:
         app.logger.debug("Can't display response.")
     app.logger.debug("-" * 110)

@@ -9,6 +9,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email import charset
 from .util import db, error, success, validate_session, DOMAIN
+from .routes import check_session
 
 import jwt
 
@@ -118,19 +119,20 @@ def verify():
 
 
 @auth.route('/api/logout', methods=["POST"])
+@check_session
 def logout():
     cookies = request.cookies
     users = db.users
     try:
         identity = jwt.decode(cookies["session_id"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
         # user = users.find_one({"username": identity["username"]})
-        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
-            users.update_one({"username": identity["username"]}, {"$set": {"session_id": None, "login": False}})
-            response = success({"message": "Logout successful"})
-            response.delete_cookie("session_id")
-            return response
-        else:
-            raise Exception("There was an error verifying that you were already logged in")
+        # if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
+        users.update_one({"username": identity["username"]}, {"$set": {"session_id": None, "login": False}})
+        response = success({"message": "Logout successful"})
+        response.delete_cookie("session_id")
+        return response
+        # else:
+        #     raise Exception("There was an error verifying that you were already logged in")
     except Exception as e:
         return error(str(e))
 
