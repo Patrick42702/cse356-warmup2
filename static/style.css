@@ -27,11 +27,13 @@ button {
     color: white;
     border: none;
     cursor: pointer;
+    max-width: 125px;
 }
 button:hover {
     background-color: #507b56;
 }
 .message {
+    display: none;
     margin-top: 20px;
     padding: 10px;
     background-color: #f9f9f9;
@@ -45,4 +47,30 @@ button:hover {
 }
 #resolutionSelect {
     margin-left: auto;
+}
+
+#welcome-section {
+    display: var(--display, flex);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#welcome-buttons {
+    display: inline-block;
+}
+
+#register-section {
+    display: var(--display, none);
+}
+
+#login-section {
+    display: var(--display, none);
 }

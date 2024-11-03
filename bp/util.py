@@ -22,7 +22,7 @@ db = connect_db()
 def error(err_msg):
     traceback.print_exc()
     resp = json.dumps({"status":"ERROR","error":True,"message": err_msg}), 200, {'Content-Type': 'application/json', 'X-CSE356': SUBMIT_ID}
-    return render_template("error.html", error=err_msg), 200, {'Content-Type': 'text/html', 'X-CSE356': SUBMIT_ID}
+    return resp
 
 # valid response handling
 # @param data: dictionary of data to be returned

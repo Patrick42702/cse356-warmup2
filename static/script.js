@@ -1,3 +1,31 @@
+document.getElementById('login-button').addEventListener('click', ()  => {
+    const loginform = document.getElementById('login-section')
+    loginform.style.setProperty("--display", "flex")
+    const welcome_section = document.getElementById('welcome-section')
+    welcome_section.style.setProperty("--display", "none")
+})
+
+document.getElementById('signup-button').addEventListener('click', ()  => {
+    const registerform = document.getElementById('register-section')
+    registerform.style.setProperty("--display", "flex")
+    const welcome_section = document.getElementById('welcome-section')
+    welcome_section.style.setProperty("--display", "none")
+})
+
+document.getElementById('redir-login-button').addEventListener('click', ()  => {
+    const registerform = document.getElementById('register-section')
+    registerform.style.setProperty("--display", "none")
+    const login_section = document.getElementById('login-section')
+    login_section.style.setProperty("--display", "flex")
+})
+
+document.getElementById('redir-register-button').addEventListener('click', ()  => {
+    const loginform = document.getElementById('login-section')
+    loginform.style.setProperty("--display", "none")
+    const registerform = document.getElementById('register-section')
+    registerform.style.setProperty("--display", "flex")
+})
+
 document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const username = document.getElementById('register-username').value;
@@ -13,6 +41,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     });
     const result = await response.json();
     document.getElementById('message').innerText = result.message;
+    document.getElementById('message').style.display = "block";
 });
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -28,7 +57,13 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         body: JSON.stringify({ username, password })
     });
     const result = await response.json();
-    console.log(`Login response: ${result}`);
-    document.getElementById('message').innerText = result.message;
-    location.reload();
+    if (result.status === "ERROR"){
+        document.getElementById('message').innerText = result.message;
+        document.getElementById('message').style.display = "block";
+    }
+    else{
+        console.log(`Login response: ${result}`);
+        document.getElementById('message').innerText = result.message;
+        location.reload();
+    }
 });

@@ -1,5 +1,6 @@
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, render_template, make_response
 import os
+import json
 
 from flask import request
 from email_validator import validate_email

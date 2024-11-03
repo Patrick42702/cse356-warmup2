@@ -68,7 +68,7 @@ document.getElementById('logout-form').addEventListener('submit', async (e) => {
     const result = await response.json();
     console.log(`Logout response: ${result}`);
     document.getElementById('message').innerText = result.message;
-    location.reload();
+    location.href = "/";
 });
 
 // Dash.js setup for MPEG-DASH playback

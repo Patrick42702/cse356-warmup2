@@ -2,6 +2,8 @@ from flask import send_from_directory, request, make_response, Blueprint, render
 from .util import error, success, SUBMIT_ID, validate_session
 from functools import wraps
 import json
+import uuid
+import os
 
 routes = Blueprint('routes', __name__)
 
@@ -88,6 +90,7 @@ def upload_file():
         mp4file = request.files["mp4file"]
         if mp4file.filename != '':
             mp4file.save(f"{current_app.static_folder}/media/tmp/{mp4file.filename}")
+        file_id = os.urandom(10).hex()
         return redirect(url_for('routes.user_interface'))
     except Exception as e:
         return error("Failed to upload file")
