@@ -14,7 +14,9 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 def log_request_info():
     app.logger.debug("-" * 110)
     app.logger.debug('--- REQUEST --- ')
-    app.logger.debug('Body: %s', request.get_data())
+    if (len(request.get_data()) < 2 ** 15):
+        app.logger.debug('Body: %s', request.get_data())
+    # app.logger.debug('Body: %s', request.get_data())
     app.logger.debug('Cookies: %s', request.cookies)
 
 @app.after_request
@@ -23,8 +25,7 @@ def log_response(response):
         app.logger.debug('--- RESPONSE --- ')
         app.logger.debug('Status: %s', response.status)
         app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
-        if len(response.get_data()) < 2 ** 20: # if the data is less than 1MB print it out
-            app.logger.debug('Body: %s', response.get_data())
+        app.logger.debug('Body: %s', response.get_data())
     except Exception:
         app.logger.debug("Can't display response.")
     app.logger.debug("-" * 110)

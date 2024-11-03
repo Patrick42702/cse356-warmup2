@@ -6,7 +6,11 @@
   <body>
     <h1>File Upload</h1>
     <form method="POST" action="/api/upload" enctype="multipart/form-data">
-      <p><input type="file" name="file" accept=".mp4"></p>
+      <label for="">Please enter the name of the author of the video</label>
+      <p><input type="text" name="author"></p>
+      <label for="">Please enter a titile for your video</label>
+      <p><input type="text" name="title"></p>
+      <p><input type="file" name="mp4file" accept=".mp4"></p>
       <p><input type="submit" value="Submit"></p>
     </form>
   </body>

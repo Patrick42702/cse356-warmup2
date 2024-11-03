@@ -55,6 +55,7 @@ def add_user():
                               "password": password,
                               "email": email,
                               "validated": False,
+                              "videos": [],
                               "verify-key": verify_key})
 
             cs = charset.Charset('utf-8')
