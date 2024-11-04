@@ -112,6 +112,23 @@ def upload_file():
     except Exception as e:
         return error("Failed to upload file")
 
+@routes.route('/api/processing-status')
+@check_session
+def processing_status():
+    cookies = request.cookies
+    try:
+        users = db.users
+        videos = db.videos
+        identity = jwt.decode(cookies["session_id"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
+        user = users.find_one({"username": identity["username"]})
+        videos = videos.find({"user": user["_id"]}, {"_id": 1, "title": 1, "status": 1})
+        if videos:
+            return success({"videos": [{"id": str(video["_id"]),
+                                        "title": video["title"],
+                                        "status": video["status"]} for video in videos]})
+    except Exception as e:
+        return error(str(e))
+
 
 @routes.route('/api/<path:path>', methods=["GET"])
 def api_media(path):

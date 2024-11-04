@@ -6,10 +6,6 @@ import os
 db = connect_db()
 
 @celery.task
-def add(x, y):
-    return x + y
-
-@celery.task
 def process_video(filepath):
     # Video filter for padding to 16:9 aspect ratio
     scale_filter = "scale='if(gt(a,16/9),1280,-2)':'if(gt(a,16/9),-2,720)',pad=1280:720:(ow-iw)/2:(oh-ih)/2:black"
@@ -36,15 +32,18 @@ def process_video(filepath):
     ]
     # /Users/patrickmuller/school/sb356/cse356-warmup2/static/tmp/6728f0dd8289003926090026/6728f0dd8289003926090026.mp4
     cwd = os.path.dirname(filepath)
+    os.chdir(cwd)
+
     filename = filepath.split('/')[-1]
     file_id = filename.split('.')[0]
     output_mpd = f"{file_id}.mpd"
+    input_path = os.path.join(cwd, filename)
+    print(f"{filename} is the filename, {input_path} is the input path, and {file_id} is the file id")
 
-    os.chdir(cwd)
 
     # Start constructing the FFmpeg command
     ffmpeg_cmd = [
-        'ffmpeg', '-y', '-i', filename,
+        'ffmpeg', '-y', '-i', input_path,
         '-vf', scale_filter, '-report'
     ]
 
@@ -56,29 +55,29 @@ def process_video(filepath):
             f'-s:v:{i}', resolution
         ])
 
-        # Set segment names with video_id
-        ffmpeg_cmd.extend([
-            '-init_seg_name', f"init_{file_id}_$RepresentationID$.mp4",
-            '-media_seg_name', f"chunk_{file_id}_$Bandwidth$_$Number$.m4s"
-        ])
+    # Set segment names with video_id
+    ffmpeg_cmd.extend([
+        '-init_seg_name', f"init_{file_id}_$RepresentationID$.mp4",
+        '-media_seg_name', f"chunk_{file_id}_$Bandwidth$_$Number$.m4s"
+    ])
 
-        # Add DASH options and output MPD file path
-        ffmpeg_cmd.extend(dash_options)
-        ffmpeg_cmd.append(output_mpd)
+    # Add DASH options and output MPD file path
+    ffmpeg_cmd.extend(dash_options)
+    ffmpeg_cmd.append(output_mpd)
 
-        # Run the FFmpeg command for DASH
-        print(f"Processing {filename} with video ID {file_id}")
-        subprocess.run(ffmpeg_cmd)
+    # Run the FFmpeg command for DASH
+    print(f"Processing {filename} with video ID {file_id}")
+    subprocess.run(ffmpeg_cmd)
 
-        # Generate thumbnail
-        scale_thumbnails = "scale='if(gt(a,16/9),320,-2)':'if(gt(a,16/9),-2,180)',pad=320:180:(ow-iw)/2:(oh-ih)/2:black"
-        thumbnail_path = f"thumbnail_{file_id}.jpg"
-        thumbnail_cmd = [
-            'ffmpeg', '-y', '-i', filepath,
-            '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path
-        ]
-        print(f"Generating thumbnail for {filename} with video ID {file_id}")
-        subprocess.run(thumbnail_cmd)
+    # Generate thumbnail
+    scale_thumbnails = "scale='if(gt(a,16/9),320,-2)':'if(gt(a,16/9),-2,180)',pad=320:180:(ow-iw)/2:(oh-ih)/2:black"
+    thumbnail_path = f"thumbnail_{file_id}.jpg"
+    thumbnail_cmd = [
+        'ffmpeg', '-y', '-i', filepath,
+        '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path
+    ]
+    print(f"Generating thumbnail for {filename} with video ID {file_id}")
+    subprocess.run(thumbnail_cmd)
 
     print("Processing complete.")
     return filepath
