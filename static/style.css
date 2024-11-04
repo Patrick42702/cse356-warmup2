@@ -74,3 +74,22 @@ button:hover {
 #login-section {
     display: var(--display, none);
 }
+
+#nav form{
+    padding: 0;
+    width: 100px;
+    margin-bottom: 0;
+}
+
+#nav ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 25px;
+}
+
+#nav button {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}

@@ -4,3 +4,6 @@ email-validator
 Flask-Mail
 flask-jwt-extended
 python-dotenv
+redis
+celery
+flower

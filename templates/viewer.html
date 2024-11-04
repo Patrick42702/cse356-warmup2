@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+    <div id="nav">
+        <nav>
+            <ul>
+                <form id="home-form"action="/">
+                    <button type="submit">Home</button>
+                </form>
+                <form id="logout-form">
+                    <button type="submit">Logout</button>
+                </form>
+            </ul>
+        </nav>
+    </div>
     <h1>Video Player</h1>
     <div id="message" class="message"></div>
 
@@ -20,19 +32,10 @@
         </div>
     </div>
 
-    <div id="logout-section">
-        <form id="logout-form">
-            <h2>Logout</h2>
-            <button type="submit">Logout</button>
-        </form>
+    <div id="next-video">
+        <p>Next video</p>        
+        <p>&#x2193;</p>
     </div>
-
-    <div id="backhome-section">
-        <form action="/">
-            <button type="submit">Home</button>
-        </form>
-    </div>
-
 
     <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
     <script src="../static/viewer.js"></script>

@@ -43,3 +43,15 @@ async function generateVideoList() {
 
 // Run the function when the page loads
 window.addEventListener("DOMContentLoaded", generateVideoList);
+
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('upload-form');
+    
+    if (uploadForm) {
+        uploadForm.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log("Clicked!");
+            window.location.href = '/upload';
+        });
+    }
+});

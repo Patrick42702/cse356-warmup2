@@ -3,6 +3,7 @@ from .util import error, success, SUBMIT_ID, validate_session, connect_db
 from functools import wraps
 import json
 import jwt
+import os
 
 routes = Blueprint('routes', __name__)
 
@@ -99,7 +100,14 @@ def upload_file():
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video["_id"]}})
         mp4file = request.files["mp4file"]
         if mp4file.filename != '':
-            mp4file.save(f"{current_app.static_folder}/tmp/{video['_id']}.mp4")
+            os.makedirs(f"{current_app.static_folder}/tmp/{video['_id']}", exist_ok=True)
+            mp4file.save(f"{current_app.static_folder}/tmp/{video['_id']}/{video['_id']}.mp4")
+        # get the file_path of the video we receive and pass it to the celery task so it can do work
+        bp_dir = os.path.dirname(__file__)
+        project_root = os.path.dirname(bp_dir)
+        tmp_dir = os.path.join(project_root, "static", "tmp")
+        file_name = os.path.join(tmp_dir, f"{video['_id']}", f"{video['_id']}.mp4")
+        current_app.celery.send_task("bp.tasks.process_video", args=[file_name])
         return redirect(url_for('routes.user_interface'))
     except Exception as e:
         return error("Failed to upload file")
