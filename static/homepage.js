@@ -55,3 +55,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutform = document.getElementById('logout-form');
+    
+    if (logoutform) {
+        logoutform.addEventListener('click', async function(e) {
+            e.preventDefault();
+            console.log("Clicked!");
+            const response = await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${document.cookie.split('=')[1]}`  // Fetch JWT token from cookie
+                }
+            });
+            const result = await response.json();
+            console.log(`Logout response: ${result}`);
+            location.href = "/";
+        });
+    }
+});

@@ -2,8 +2,7 @@ from server import celery
 from .util import connect_db
 import subprocess
 import os
-
-db = connect_db()
+from bson import ObjectId
 
 @celery.task
 def process_video(filepath):
@@ -80,4 +79,7 @@ def process_video(filepath):
     subprocess.run(thumbnail_cmd)
 
     print("Processing complete.")
+    db = connect_db()
+    print(file_id)
+    db.videos.update_one({"_id": ObjectId(file_id)}, {"$set": {"status": "complete"}})
     return filepath
