@@ -12,7 +12,10 @@ def download_m2json():
     else:
         return
     os.chdir(video_dir)
-    subprocess.run(["wget", "-r", "-l1", "-A", "*.json", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
+    if os.path.exists(f"{video_dir}/videos/m2.json"):
+        return
+    else:
+        subprocess.run(["wget", "-r", "-l1", "-A", "*.json", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
 
 
 def download_and_extract_videos():
@@ -21,7 +24,13 @@ def download_and_extract_videos():
     cwd = os.getcwd()
     video_dir = f"{cwd}/videos"
     os.chdir(video_dir)
-    subprocess.run(["wget", "-r", "-l1", "-A", "*.mp4", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
+    with open("m2.json", "r") as f:
+        data = dict(json.load(f))
+
+    # only download video if it doesn't exist
+    for video in data:
+        if not os.path.exists(f"{video_dir}/{video}"):
+            subprocess.run(["wget", "-r", "-l1", "-A", f"{video}", "http://130.245.136.73/mnt2/video/m2.html"])
     return
 
 def run_docker_compose():
@@ -53,3 +62,5 @@ if __name__ == "__main__":
         }
 
         requests.post("http://localhost:5050/api/upload", data=form, files=files)
+
+
