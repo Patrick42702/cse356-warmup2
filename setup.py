@@ -19,7 +19,7 @@ def download_and_extract_videos():
     # Download videos
     # Define the directory and video URL
     cwd = os.getcwd()
-    video_dir = f"{cwd}/static/tmp/videos"
+    video_dir = f"{cwd}/videos"
     os.chdir(video_dir)
     subprocess.run(["wget", "-r", "-l1", "-A", "*.mp4", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
     return
