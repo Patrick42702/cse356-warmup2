@@ -2,11 +2,9 @@ import os
 import subprocess
 import time
 import requests
+import json
 
-
-def download_and_extract_videos():
-    # Download videos
-    # Define the directory and video URL
+def download_m2json():
     cwd = os.getcwd()
     video_dir = f"{cwd}/static/tmp"
     if not os.path.exists(video_dir):
@@ -14,7 +12,16 @@ def download_and_extract_videos():
     else:
         return
     os.chdir(video_dir)
-    subprocess.run(["wget", "-r", "-l1", "-A", "*.mp4", "-A", "*.json", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
+    subprocess.run(["wget", "-r", "-l1", "-A", "*.json", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
+
+
+def download_and_extract_videos():
+    # Download videos
+    # Define the directory and video URL
+    cwd = os.getcwd()
+    video_dir = f"{cwd}/static/tmp/videos"
+    os.chdir(video_dir)
+    subprocess.run(["wget", "-r", "-l1", "-A", "*.mp4", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
     return
 
 def run_docker_compose():
@@ -25,20 +32,24 @@ def run_docker_compose():
     return
 
 if __name__ == "__main__":
+    download_m2json()
     download_and_extract_videos()
     run_docker_compose()
     time.sleep(10)
     cwd = os.getcwd()
     video_dir = f"{cwd}/static/tmp/videos"
-    for file in os.listdir(video_dir):
-        if file.endswith(".mp4"):
-            data = {
-                'title': 'Your Video Title',
-                'author': 'Author Name'
-            }
-            # Define the file to upload
-            files = {
-                'mp4file': (f'{file}.mp4', open(f'{video_dir}/{file}', 'rb'), 'video/mp4')
-            }
+    meta = f"{video_dir}/m2.json"
+    os.chdir(video_dir)
+    with open(f"{meta}", "r") as f:
+        data = dict(json.load(f))
+    for video in data:
+        form = {
+            'title': video['title'],
+            'author': "CSE356 Team"
+        }
 
-            requests.post("http://localhost:5050/api/upload", data=data, files=files)
+        files = {
+            'mp4file': (open(f'{video_dir}/{video}', 'rb'), 'video/mp4')
+        }
+
+        requests.post("http://localhost:5050/api/upload", data=form, files=files)
