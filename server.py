@@ -8,8 +8,8 @@ from bp.routes import routes
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
     app.config.update(
-        broker_url='redis://localhost:6379/0',
-        result_backend='redis://localhost:6379/0',
+        broker_url='redis://redis:6379/0',
+        result_backend='redis://redis:6379/0',
         include=['bp.tasks']
     )
 
@@ -48,6 +48,6 @@ def create_app():
 app, celery = create_app()
 
 if __name__ == "__main__":
-    host = os.getenv('HOST', "localhost")
+    host = os.getenv('HOST', "0.0.0.0")
     port = int(os.getenv('PORT', 5050))
     app.run(host=host, port=port, debug=True)

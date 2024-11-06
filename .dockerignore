@@ -1,0 +1,9 @@
+static/media
+static/tmp/*
+
+.git
+.dockerignore
+Dockerfile
+*.pyc
+__pycache__
+venv
