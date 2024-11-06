@@ -11,14 +11,18 @@ def download_and_extract_videos():
     video_dir = f"{cwd}/static/tmp"
     if not os.path.exists(video_dir):
         os.makedirs(video_dir)
+    else:
+        return
     os.chdir(video_dir)
     subprocess.run(["wget", "-r", "-l1", "-A", "*.mp4", "-A", "*.json", "-nd", "-P", "videos", "http://130.245.136.73/mnt2/video/m2.html"])
+    return
 
 def run_docker_compose():
     # Run docker-compose up
     print("Starting Docker Compose...")
     subprocess.run(["docker", "compose", "up", "-d"], check=True)
     print("Docker Compose services started.")
+    return
 
 if __name__ == "__main__":
     download_and_extract_videos()
