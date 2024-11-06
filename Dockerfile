@@ -4,9 +4,6 @@ FROM python:3.11
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the current directory contents into the container
-COPY . .
-
 # Install system dependencies for Python packages and node
 RUN apt-get update && apt-get install -y \
       build-essential \
@@ -25,6 +22,8 @@ RUN npm install pm2 -g
 
 # Create a virtual environment using virtualenv instead of venv
 RUN virtualenv venv
+
+COPY . .
 
 # Activate the virtual environment and install Python dependencies
 RUN /bin/bash -c "source venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"

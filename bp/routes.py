@@ -1,6 +1,4 @@
 from flask import send_from_directory, request, make_response, Blueprint, render_template, current_app, g, redirect, url_for
-
-from static.media.a_ffmpeg_helper import video_id
 from .util import error, success, SUBMIT_ID, validate_session, connect_db, get_user
 from functools import wraps
 import json
@@ -10,14 +8,6 @@ from collaborative_filtering import rec_algo
 routes = Blueprint('routes', __name__)
 
 db = connect_db()
-
-@routes.before_request
-def get_videolist():
-    with open(f'{current_app.static_folder}/m1.json') as f:
-        video_data = json.load(f)
-    g.video_list = [{"id": title.split('-')[0], "metadata":{"title": title, "description": description}} for title, description in video_data.items()]
-    g.db = db
-    return
 
 # decorator to check if user is logged in
 def check_session(f):
