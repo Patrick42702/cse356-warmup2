@@ -11,6 +11,7 @@ from email.mime.text import MIMEText
 from email import charset
 from .util import db, error, success, validate_session, DOMAIN
 from .routes import check_session
+from .collaborative_filtering import rec_algo
 
 import jwt
 
@@ -51,12 +52,14 @@ def add_user():
                 raise Exception("User or email already exists")
             # verify_key = create_access_token(identity=email, expires_delta=False)
             verify_key = os.urandom(12).hex()
-            users.insert_one({"username": username,
+            user_id = users.insert_one({"username": username,
                               "password": password,
                               "email": email,
                               "validated": False,
                               "videos": [],
-                              "verify-key": verify_key})
+                              "watched": [],
+                              "verify-key": verify_key}).inserted_id
+            rec_algo.add_user(user_id)
 
             cs = charset.Charset('utf-8')
             cs.body_encoding = charset.QP

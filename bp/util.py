@@ -48,3 +48,7 @@ def validate_session(session_id):
         else:
             return False
 
+def get_user(cookies):
+    identity = jwt.decode(cookies["session_id"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
+    user = db.users.find_one({"username": identity["username"]})
+    return user

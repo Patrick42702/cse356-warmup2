@@ -1,6 +1,11 @@
 import numpy as np
 from .util import db
 
+def cosine_similarity_matrix(M):
+    norm = np.linalg.norm(M, axis=1, keepdims=True)
+    norm[norm == 0] = 1  # Avoid division by zero for zero vectors (users with no ratings)
+    normalized_matrix = M / norm
+    return np.dot(normalized_matrix, normalized_matrix.T)
 
 class CollaborativeFiltering:
     def __init__(self):
@@ -36,15 +41,8 @@ class CollaborativeFiltering:
         self.M[self.user_to_index[user_id]][self.video_to_index[video_id]] = value
         self.predicted_likes = self.predict_missing_values(np.array(self.M, dtype=np.int32))
 
-    def cosine_similarity_matrix(self, M):
-        norm = np.linalg.norm(M, axis=1, keepdims=True)
-        norm[norm == 0] = 1  # Avoid division by zero for zero vectors (users with no ratings)
-        normalized_matrix = M / norm
-        return np.dot(normalized_matrix, normalized_matrix.T)
-
-
     def predict_missing_values(self, M):
-        similarity_matrix = self.cosine_similarity_matrix(M)
+        similarity_matrix = cosine_similarity_matrix(M)
         predicted_matrix = M.copy()
 
         for user in range(self.num_users):
