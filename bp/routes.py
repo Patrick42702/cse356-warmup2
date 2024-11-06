@@ -4,7 +4,7 @@ from functools import wraps
 import json
 import jwt
 import os
-from collaborative_filtering import rec_algo
+from .collaborative_filtering import rec_algo
 routes = Blueprint('routes', __name__)
 
 db = connect_db()
@@ -48,7 +48,7 @@ def play_video(id):
 
 @routes.route('/api/view', methods=["POST"])
 @check_session
-def view_video():
+def view_video_like():
     try:
         user = get_user(request.cookies)
         video_id = request.form['id']
