@@ -137,6 +137,6 @@ if __name__ == "__main__":
     video_ids = []
     for url in mp4_urls:
         video_ids.append(add_video(url, media_folder, admin_id))
-    db.users.update({"_id": admin_id}, {"$set": {"videos": video_ids}})
+    db.users.update_one({"_id": admin_id}, {"$set": {"videos": video_ids}})
 
     print("Downloaded 30 videos to the tmp folder.")
