@@ -19,6 +19,7 @@ async function generateVideoList() {
         for (const video of videos) {
             // Extract video ID from filename
             const videoId = video.id;
+            const description = video.description;
 
             // Create link element for the video
             const videoLink = document.createElement("a");
