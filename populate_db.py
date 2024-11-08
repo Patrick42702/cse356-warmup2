@@ -126,7 +126,7 @@ def process_video(filepath):
 
 # Main execution
 if __name__ == "__main__":
-    db = MongoClient('mongo', 27017).eskpj_airplanes
+    db = MongoClient('localhost', 27017).eskpj_airplanes
     admin_id = db.users.insert_one({"username": "admin", "password": "padmen",
                       "email": "admin@admin.pop", "validated": True,
                       "videos": [], "watched": [], "verify-key": "whatever"}).inserted_id
