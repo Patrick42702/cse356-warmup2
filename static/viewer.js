@@ -39,6 +39,11 @@ function playVideo(index) {
     if (index < 0 || index >= videoList.length) return; // Check bounds
 
     const video = videoList[index];
+    fetch("/api/view", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: video.id})
+    });
     const videoPlayer = document.getElementById('videoPlayer');
 
     // Destroy any previous player instance to clear buffers
@@ -97,15 +102,6 @@ function handleScrollWheel(event) {
 // Load video list and set up initial video
 document.addEventListener('DOMContentLoaded', async () => {
     await loadVideoList();
-    // Track view of the initial video
-    const videoId = videoList[currentIndex]?.id;
-    if (videoId) {
-        await fetch("/api/view", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({id: videoId})
-        });
-    }
     window.addEventListener('wheel', handleScrollWheel, { passive: false });
 });
 
