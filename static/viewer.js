@@ -53,11 +53,24 @@ function handleScroll(event) {
     window.scrollTo(0, 0);
 }
 
+function handleScrollWheel(event) {
+    event.preventDefault();
+    if (event.deltaY < 0) {
+        currentIndex = (currentIndex + 1) % videoList.length  // should actually just get more videos
+    } else if (event.deltaY < 0) {
+        if (currentIndex > 0) {
+            currentIndex--;
+        }
+    }
+    playVideo(currentIndex);
+}
+
 // Load video list and set up initial video
 document.addEventListener('DOMContentLoaded', async () => {
     await loadVideoList();
     await fetch("/api/view", {method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({id: video_id})});
-    window.addEventListener('scroll', handleScroll);
+    // window.addEventListener('scroll', handleScroll);
+    window.addEventListener('wheel', handleScrollWheel, {passive:false})
 });
 
 
