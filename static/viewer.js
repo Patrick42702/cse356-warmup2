@@ -27,7 +27,7 @@ function playVideo(index) {
     const video = videoList[index];
     const videoPlayer = document.getElementById('videoPlayer');
     const player = dashjs.MediaPlayer().create();
-    player.initialize(videoPlayer, `../static/media${video.id}//${video.id}.mpd`, true);
+    player.initialize(videoPlayer, `../static/media/${video.id}/${video.id}.mpd`, true);
 
     // Update the URL without reloading the page
     window.history.pushState({}, '', `/play/${video.id}`);
