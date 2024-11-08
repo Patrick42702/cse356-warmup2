@@ -22,7 +22,6 @@ def error(err_msg):
     traceback.print_exc()
     resp = json.dumps({"status":"ERROR","error":True,"message": err_msg}), 200, {'Content-Type': 'application/json', 'X-CSE356': SUBMIT_ID}
     resp = make_response(resp)
-    resp.delete_cookie("session_id")
     return resp
 
 # valid response handling
