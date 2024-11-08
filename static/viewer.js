@@ -4,10 +4,12 @@ let currentIndex = 0; // Index of the currently playing video
 
 // Fetch video list on load
 async function loadVideoList() {
-    const response = await fetch('/static/m1.json');
+    const response = await fetch('/api/videos', {
+            method: 'POST', body: JSON.stringify({count: 100})
+        });
     const data = await response.json();
-    videoList = Object.entries(data).map(([title, description]) => {
-        return { id: title.split('-')[0], metadata: { title, description } };
+    videoList = data.videos.map((video) => {
+        return { id: video.id, metadata: video };
     });
 
     // Find initial video based on URL and play it
@@ -52,6 +54,7 @@ function handleScroll(event) {
 // Load video list and set up initial video
 document.addEventListener('DOMContentLoaded', async () => {
     await loadVideoList();
+    await fetch("/api/view", {method: "POST", body: JSON.stringify({id: video_id})});
     window.addEventListener('scroll', handleScroll);
 });
 
@@ -97,6 +100,30 @@ playPauseBtnDiv.addEventListener('click', () => {
         playPauseBtn.innerText = 'Play';
     }
 });
+
+// Like/Dislike Button
+const likeBtn = document.getElementById("like");
+const dislikeBtn = document.getElementById("dislike");
+likeBtn.addEventListener("click", async () => {
+    try {
+        const response = await fetch("/api/like", {
+            method: "POST", body: JSON.stringify({id: video_id, value: true})
+        });
+        console.log(response);
+    } catch (error) {
+        console.error(error);
+    }
+})
+dislikeBtn.addEventListener("click", async () => {
+    try {
+        const response = await fetch("/api/like", {
+            method: "POST", body: JSON.stringify({id: video_id, value: false})
+        });
+        console.log(response);
+    } catch (error) {
+        console.error(error);
+    }
+})
 
 // Seek bar
 const seekBar = document.getElementById('seekBar');

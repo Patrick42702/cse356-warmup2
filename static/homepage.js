@@ -7,13 +7,16 @@ async function generateVideoList() {
 
     try {
         // Fetch video data from JSON file
-        const response = await fetch(jsonPath);
+        const response = await fetch('/api/videos', {
+            method: 'POST', body: JSON.stringify({count: 10})
+        });
         const videoData = await response.json();
+        const videos = videoData.videos;
 
         // Loop through each video entry in the JSON
-        for (const [filename, description] of Object.entries(videoData).slice(0,10)) {
+        for (const video of videos) {
             // Extract video ID from filename
-            const videoId = filename.split('-')[0];
+            const videoId = video.id;
 
             // Create link element for the video
             const videoLink = document.createElement("a");
