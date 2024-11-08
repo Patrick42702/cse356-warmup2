@@ -51,7 +51,7 @@ def play_video(id):
 def view_video_like():
     try:
         user = get_user(request.cookies)
-        video_id = request.form['id']
+        video_id = request.json['id']
         if video_id in user['watched']:
             return success({'viewed': True})
         else:
@@ -65,8 +65,8 @@ def view_video_like():
 def view_video():
     try:
         user = get_user(request.cookies)
-        video_id = request.form['id']
-        value = 1 if request.form['value'] else -1
+        video_id = request.json['id']
+        value = 1 if request.json['value'] else -1
         likes = db.videos.find_one({'_id': video_id})['likes']
         likecount = sum(1 for like in likes if like['value']==1)
         like = next((like for like in likes if like['user'] == user['_id']), None)
