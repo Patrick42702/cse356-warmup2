@@ -5,8 +5,10 @@ let currentIndex = 0; // Index of the currently playing video
 // Fetch video list on load
 async function loadVideoList() {
     const response = await fetch('/api/videos', {
-            method: 'POST', body: JSON.stringify({count: 100})
-        });
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({count: 100})
+    });
     const data = await response.json();
     videoList = data.videos.map((video) => {
         return { id: video.id, metadata: video };
@@ -54,7 +56,7 @@ function handleScroll(event) {
 // Load video list and set up initial video
 document.addEventListener('DOMContentLoaded', async () => {
     await loadVideoList();
-    await fetch("/api/view", {method: "POST", body: JSON.stringify({id: video_id})});
+    await fetch("/api/view", {method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({id: video_id})});
     window.addEventListener('scroll', handleScroll);
 });
 
@@ -107,7 +109,9 @@ const dislikeBtn = document.getElementById("dislike");
 likeBtn.addEventListener("click", async () => {
     try {
         const response = await fetch("/api/like", {
-            method: "POST", body: JSON.stringify({id: video_id, value: true})
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: video_id, value: true})
         });
         console.log(response);
     } catch (error) {
@@ -117,7 +121,9 @@ likeBtn.addEventListener("click", async () => {
 dislikeBtn.addEventListener("click", async () => {
     try {
         const response = await fetch("/api/like", {
-            method: "POST", body: JSON.stringify({id: video_id, value: false})
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: video_id, value: false})
         });
         console.log(response);
     } catch (error) {

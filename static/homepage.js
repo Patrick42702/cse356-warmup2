@@ -8,7 +8,9 @@ async function generateVideoList() {
     try {
         // Fetch video data from JSON file
         const response = await fetch('/api/videos', {
-            method: 'POST', body: JSON.stringify({count: 10})
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({count: 10})
         });
         const videoData = await response.json();
         const videos = videoData.videos;
