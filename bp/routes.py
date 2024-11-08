@@ -92,7 +92,7 @@ def get_videos():
         videos_info = []
         for video in recommended_videos:
             video_id = video['_id']
-            description = 'A video'
+            description = video['description']
             watched = video['_id'] in user['watched']
             liked = next((like == 1 for like in video['likes'] if like['user'] == user['_id']), None)
             likevalues = sum(1 for like in video['likes'] if like['value']==1)
