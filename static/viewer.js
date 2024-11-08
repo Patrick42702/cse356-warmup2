@@ -20,57 +20,93 @@ async function loadVideoList() {
     playVideo(currentIndex);
 }
 
+async function loadMoreVideos() {
+    console.log("Loading more videos");
+    const response = await fetch('/api/videos', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({count: 100})
+    });
+    const data = await response.json();
+    const newVideos = data.videos.map(video => ({ id: video.id, metadata: video }));
+    videoList = [...videoList.slice(currentIndex+1, videoList.length), ...newVideos];
+    currentIndex = 0;
+}
+
+
 // Function to play the video at the given index
 function playVideo(index) {
     if (index < 0 || index >= videoList.length) return; // Check bounds
 
     const video = videoList[index];
     const videoPlayer = document.getElementById('videoPlayer');
-    const player = dashjs.MediaPlayer().create();
-    player.initialize(videoPlayer, `../static/media/${video.id}/${video.id}.mpd`, true);
+
+    // Destroy any previous player instance to clear buffers
+    if (window.player) {
+        window.player.reset();
+    }
+
+    // Create a new Dash.js player instance
+    window.player = dashjs.MediaPlayer().create();
+    window.player.initialize(videoPlayer, `../static/media/${video.id}/${video.id}.mpd`, true);
 
     // Update the URL without reloading the page
     window.history.pushState({}, '', `/play/${video.id}`);
 }
 
 // Handle scroll event for infinite scroll navigation
-function handleScroll(event) {
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-
-    if (scrollY > 0) {  // Scroll down
-        if (currentIndex < videoList.length - 1) {
-            currentIndex++;
-            playVideo(currentIndex);
-        }
-    } else if (scrollY < 0) {  // Scroll up
-        if (currentIndex > 0) {
-            currentIndex--;
-            playVideo(currentIndex);
-        }
-    }
-
-    // Reset scroll position to avoid cumulative scroll effect
-    window.scrollTo(0, 0);
-}
+// function handleScroll(event) {
+//     const scrollY = window.scrollY || document.documentElement.scrollTop;
+//
+//     if (scrollY > 0) {  // Scroll down
+//         if (currentIndex < videoList.length - 1) {
+//             currentIndex++;
+//             playVideo(currentIndex);
+//         }
+//     } else if (scrollY < 0) {  // Scroll up
+//         if (currentIndex > 0) {
+//             currentIndex--;
+//             playVideo(currentIndex);
+//         }
+//     }
+//
+//     // Reset scroll position to avoid cumulative scroll effect
+//     window.scrollTo(0, 0);
+// }
 
 function handleScrollWheel(event) {
     event.preventDefault();
-    if (event.deltaY < 0) {
-        currentIndex = (currentIndex + 1) % videoList.length  // should actually just get more videos
-    } else if (event.deltaY < 0) {
+    if (event.deltaY > 0) { // Scroll down
+        if (currentIndex < videoList.length - 5) {
+            currentIndex++;
+            playVideo(currentIndex);
+        } else if (currentIndex >= videoList.length - 10) {
+            loadMoreVideos();
+            currentIndex++;
+            playVideo(currentIndex);
+        }
+    } else if (event.deltaY < 0) { // Scroll up
         if (currentIndex > 0) {
             currentIndex--;
+            playVideo(currentIndex);
         }
     }
-    playVideo(currentIndex);
 }
+
 
 // Load video list and set up initial video
 document.addEventListener('DOMContentLoaded', async () => {
     await loadVideoList();
-    await fetch("/api/view", {method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({id: video_id})});
-    // window.addEventListener('scroll', handleScroll);
-    window.addEventListener('wheel', handleScrollWheel, {passive:false})
+    // Track view of the initial video
+    const videoId = videoList[currentIndex]?.id;
+    if (videoId) {
+        await fetch("/api/view", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: videoId})
+        });
+    }
+    window.addEventListener('wheel', handleScrollWheel, { passive: false });
 });
 
 
