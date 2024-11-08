@@ -126,7 +126,7 @@ def upload_file():
         user = get_user(request.cookies)
         author = request.form["author"]
         title = request.form["title"]
-        video_id = videos.insert_one({"user": user["_id"], "author": author, "title": title, "status": "processing", "likes": []}).inserted_id
+        video_id = videos.insert_one({"user": user["_id"], "author": author, "title": title, "description": f"{author}'s video: {title}", "status": "processing", "likes": []}).inserted_id
         rec_algo.add_video(video_id)
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
         mp4file = request.files["mp4file"]
