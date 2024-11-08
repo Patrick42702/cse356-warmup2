@@ -35,6 +35,11 @@ services:
     ports:
       - "5050:5050"
       - "5555:5555"
+    volumes:
+      - ./server.py:/app/server.py
+      - ./bp:/app/bp
+      - ./templates:/app/templates
+      - ./static:/app/static:ro
     depends_on:
       redis:
         condition: service_healthy
