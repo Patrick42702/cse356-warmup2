@@ -17,7 +17,7 @@ async function loadVideoList() {
     // Find initial video based on URL and play it
     const videoId = window.location.pathname.split('/').pop();
     currentIndex = videoList.findIndex(video => video.id === videoId) || 0;
-    playVideo(currentIndex);
+    await playVideo(currentIndex);
 }
 
 async function loadMoreVideos() {
@@ -35,15 +35,16 @@ async function loadMoreVideos() {
 
 
 // Function to play the video at the given index
-function playVideo(index) {
+async function playVideo(index) {
     if (index < 0 || index >= videoList.length) return; // Check bounds
 
     const video = videoList[index];
-    fetch("/api/view", {
+    const response = await fetch("/api/view", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({id: video.id})
     });
+    console.log('Viewed: ' + response)
     const videoPlayer = document.getElementById('videoPlayer');
 
     // Destroy any previous player instance to clear buffers
