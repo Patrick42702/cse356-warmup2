@@ -56,7 +56,7 @@ def view_video_like():
         if video_id in user['watched']:
             return success({'viewed': True})
         else:
-            db.users.update_one({'_id': ObjectId(video_id)}, {'$push': {'watched': video_id}})
+            db.users.update_one({'_id': user['_id']}, {'$push': {'watched': video_id}})
             return success({'viewed': False})
     except Exception as e:
         return error(str(e))
