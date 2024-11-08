@@ -95,7 +95,7 @@ def get_videos():
             watched = video['_id'] in user['watched']
             liked = next((like == 1 for like in video['likes'] if like['user'] == user['_id']), None)
             likevalues = sum(1 for like in video['likes'] if like['value']==1)
-            videos_info.append({'id': video_id, 'description': description, 'watched': watched, 'liked': liked, 'likevalues': likevalues})
+            videos_info.append({'id': str(video_id), 'description': description, 'watched': watched, 'liked': liked, 'likevalues': likevalues})
         return success({"videos": videos_info})
     except Exception as e:
         return error(str(e))
