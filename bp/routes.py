@@ -5,6 +5,7 @@ import json
 import jwt
 import os
 from .collaborative_filtering import rec_algo
+from bson import ObjectId
 routes = Blueprint('routes', __name__)
 
 db = connect_db()
@@ -55,7 +56,7 @@ def view_video_like():
         if video_id in user['watched']:
             return success({'viewed': True})
         else:
-            db.users.update_one({'_id': video_id}, {'$push': {'watched': video_id}})
+            db.users.update_one({'_id': ObjectId(video_id)}, {'$push': {'watched': video_id}})
             return success({'viewed': False})
     except Exception as e:
         return error(str(e))
@@ -67,15 +68,15 @@ def view_video():
         user = get_user(request.cookies)
         video_id = request.json['id']
         value = 1 if request.json['value'] else -1
-        likes = db.videos.find_one({'_id': video_id})['likes']
+        likes = db.videos.find_one({'_id': ObjectId(video_id)})['likes']
         likecount = sum(1 for like in likes if like['value']==1)
         like = next((like for like in likes if like['user'] == user['_id']), None)
         if like:
             if like['value'] == value: return error("Video already liked") if value == 1 else error("Video already disliked")
-            db.videos.update_one({'_id': video_id, 'likes.user': like['user']}, {'$set': {'likes.$.value': value}})
+            db.videos.update_one({'_id': ObjectId(video_id), 'likes.user': like['user']}, {'$set': {'likes.$.value': value}})
             likecount += value
         else:
-            db.videos.update_one({'_id': video_id}, {'$push': {'likes': {'user': user['_id'], 'value': value}}})
+            db.videos.update_one({'_id': ObjectId(video_id)}, {'$push': {'likes': {'user': user['_id'], 'value': value}}})
             if value == 1: likecount += 1
         return success({'likes': likecount})
     except Exception as e:
