@@ -65,6 +65,9 @@ class CollaborativeFiltering:
         return predicted_matrix
 
     def get_top_recommendations(self, user_id, watched_video_ids, k):
+        if len(watched_video_ids) == 0: # can't recommend anything if we don't know their preferences
+            return self.video_ids[:k]
+
         watched = np.array([self.video_to_index[vid] for vid in watched_video_ids])
         predictions = self.predicted_likes[self.user_to_index[user_id]]
         num_videos = len(predictions)
