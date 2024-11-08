@@ -27,7 +27,7 @@ function playVideo(index) {
     const video = videoList[index];
     const videoPlayer = document.getElementById('videoPlayer');
     const player = dashjs.MediaPlayer().create();
-    player.initialize(videoPlayer, `../static/media/${video.id}.mpd`, true);
+    player.initialize(videoPlayer, `../static/media${video.id}//${video.id}.mpd`, true);
 
     // Update the URL without reloading the page
     window.history.pushState({}, '', `/play/${video.id}`);
@@ -88,7 +88,7 @@ player.updateSettings({
 
 // Initialize the Dash.js player
 const video_id = window.location.pathname.split('/')[2]
-player.initialize(videoPlayer, `../static/media/${video_id}.mpd`, false);
+player.initialize(videoPlayer, `../static/media/${video_id}/${video_id}.mpd`, false);
 
 // Play/Pause button
 const playPauseBtn = document.getElementById('playPauseBtnButton');

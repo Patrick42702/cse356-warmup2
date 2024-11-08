@@ -131,13 +131,13 @@ def upload_file():
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
         mp4file = request.files["mp4file"]
         if mp4file.filename != '':
-            os.makedirs(f"{current_app.static_folder}/tmp/{video_id}", exist_ok=True)
-            mp4file.save(f"{current_app.static_folder}/tmp/{video_id}/{video_id}.mp4")
+            os.makedirs(f"{current_app.static_folder}/media/{video_id}", exist_ok=True)
+            mp4file.save(f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4")
         # get the file_path of the video we receive and pass it to the celery task so it can do work
         bp_dir = os.path.dirname(__file__)
         project_root = os.path.dirname(bp_dir)
-        tmp_dir = os.path.join(project_root, "static", "tmp")
-        file_name = os.path.join(tmp_dir, f"{video_id}", f"{video_id}.mp4")
+        media_dir = os.path.join(project_root, "static", "media")
+        file_name = os.path.join(media_dir, f"{video_id}", f"{video_id}.mp4")
         current_app.celery.send_task("bp.tasks.process_video", args=[file_name])
         return success({"id": str(video_id)})
     except Exception as e:
