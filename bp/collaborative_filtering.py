@@ -11,8 +11,6 @@ class CollaborativeFiltering:
     def __init__(self):
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))
-        if len(users) == 0 or len(videos) == 0:
-            return 0
         self.video_ids = [video['_id'] for video in videos]
         self.user_to_index = {doc['_id']: idx for idx, doc in enumerate(users)}
         self.video_to_index = {doc['_id']: idx for idx, doc in enumerate(videos)}
@@ -26,7 +24,8 @@ class CollaborativeFiltering:
             for like in video['likes']:
                 self.M[self.user_to_index[like['user']]][self.video_to_index[video['_id']]] = like['value']
 
-        self.predicted_likes = self.predict_missing_values(np.array(self.M, dtype=np.int32))
+        if self.num_users > 0 and self.num_videos > 0:
+            self.predicted_likes = self.predict_missing_values(np.array(self.M, dtype=np.int32))
 
     def add_user(self, user_id):
         self.num_users += 1
