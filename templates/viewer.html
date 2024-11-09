@@ -3,42 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management with Media Player</title>
-    <link rel="stylesheet" href="../static/style.css">
+    <title>FlightStream</title>
+    <link rel="stylesheet" href="../static/viewer.css">
 </head>
 <body>
     <div id="nav">
-        <nav>
-            <ul>
-                <form id="home-form"action="/">
-                    <button type="submit">Home</button>
-                </form>
-                <form id="logout-form">
-                    <button type="submit">Logout</button>
-                </form>
-            </ul>
-        </nav>
+        <form id="home-form" action="/">
+            <button type="submit">Home</button>
+        </form>
+        <form id="logout-form">
+            <button type="submit">Logout</button>
+        </form>
     </div>
-    <h1>Video Player</h1>
-    <div id="message" class="message"></div>
 
-    <div id="media-player-section" class="media-player">
-        <h2>MPEG-DASH Media Player</h2>
-        <div id="media"></div>
-            <video id="videoPlayer" controls width="800"></video>
-        <div id="playPauseBtn"><button id="playPauseBtnButton">Play</button></div>
+    <div class="container">
+        <div id="message" class="message"></div>
+
+        <div id="media-player-section" class="media-player">
+            <video id="videoPlayer" controls></video>
+
+            <div id="likeDislikeDiv">
+                <button id="like" name="like">👍 Like</button>
+                <button id="dislike" name="dislike">👎 Dislike</button>
+            </div>
+
+            <div id="playPauseBtn">
+                <button id="playPauseBtnButton">Play</button>
+            </div>
+
             <input type="range" id="seekBar" value="0" min="0" max="100" step="1">
-            <select id="resolutionSelect"> </select>
+            <select id="resolutionSelect"></select>
         </div>
-        <div id="likeDislikeDiv">
-        <button id="like" name="like">👍 Like</button>
-        <button id="dislike" name="dislike">👎 Dislike</button>
-      </div>
-    </div>
-
-    <div id="next-video">
-        <p>Next video</p>        
-        <p>&#x2193;</p>
     </div>
 
     <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>

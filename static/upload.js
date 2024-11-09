@@ -6,6 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
     submitButton.addEventListener('click', function() {
         document.getElementById('upload-form').submit();
         console.log('Submitted upload form');
-        location.href = "/";
+        // location.href = "/";
     });
 });

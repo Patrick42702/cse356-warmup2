@@ -73,10 +73,10 @@ class CollaborativeFiltering:
         # figure out which new videos were processed
         self.new_videos = [ vid for vid in
             db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
-            if vid['status'] == 'processing']
+            if vid['status'] == 'processing' ]
 
         if len(watched_video_ids) == 0: # we don't know their preferences
-            recommendations =  self.video_ids[:k]
+            return [vid for vid in self.video_ids if vid not in self.new_videos][:k]
         else:
             watched = np.array([self.video_to_index[vid] for vid in watched_video_ids])
             predictions = self.predicted_likes[self.user_to_index[user_id]]
@@ -88,7 +88,7 @@ class CollaborativeFiltering:
             unwatched_predictions = predictions[unwatched_mask]
             sorted_unwatched_indices = np.argsort(unwatched_predictions)[::-1]
             top_unwatched_indices = all_indices[unwatched_mask][sorted_unwatched_indices]
-            recommendations = top_unwatched_indices[:k]
+            recommendations = top_unwatched_indices
 
             if len(recommendations) < k:
                 watched_mask = ~unwatched_mask
@@ -97,6 +97,6 @@ class CollaborativeFiltering:
                 top_watched_indices = all_indices[watched_mask][sorted_watched_indices]
                 recommendations = np.concatenate([recommendations, top_watched_indices[:k-len(recommendations)]])
 
-        return [self.video_ids[i] for i in recommendations if self.video_ids[i] not in self.new_videos]
+        return [self.video_ids[i] for i in recommendations if self.video_ids[i] not in self.new_videos][:k]
 
 rec_algo = CollaborativeFiltering()
