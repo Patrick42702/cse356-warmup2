@@ -88,7 +88,7 @@ def get_videos():
     try:
         user = get_user(request.cookies)
         count = int(request.json["count"])
-        recommended_video_ids = rec_algo.get_top_recommendations(user['_id'], user['watched'], count)
+        recommended_video_ids = rec_algo.get_top_recommendations(str(user['_id']), user['watched'], count)
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
         for video in recommended_videos:
