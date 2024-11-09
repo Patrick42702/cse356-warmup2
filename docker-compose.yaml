@@ -35,7 +35,6 @@ services:
     ports:
       - "5050:5050"
       - "5555:5555"
-      - "25:25"
     volumes:
       - ./server.py:/app/server.py
       - ./bp:/app/bp
