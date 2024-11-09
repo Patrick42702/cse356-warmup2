@@ -40,7 +40,7 @@ class CollaborativeFiltering:
         print(f"Added video {video_id}")
         self.video_to_index[video_id] = self.num_videos
         self.num_videos += 1
-        self.video_ids.append(video_id)
+        self.video_ids.append(ObjectId(video_id))
         self.new_videos.append(video_id)
         for row in self.M: row.append(0)
 
