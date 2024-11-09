@@ -32,8 +32,8 @@ class CollaborativeFiltering:
         self.new_videos = []
 
     def add_user(self, user_id):
-        self.num_users += 1
         self.user_to_index[user_id] = self.num_users
+        self.num_users += 1
         self.M.append([0] * self.num_videos)
 
     def add_video(self, video_id):
@@ -77,7 +77,6 @@ class CollaborativeFiltering:
             db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
             if vid['status'] == 'processing' ]
 
-        print(self.video_to_index)
         if len(watched_video_ids) == 0: # we don't know their preferences
             return [vid for vid in self.video_ids if vid not in self.new_videos][:k]
         else:
