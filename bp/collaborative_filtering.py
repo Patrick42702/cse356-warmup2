@@ -84,11 +84,10 @@ class CollaborativeFiltering:
         else:
             watched = np.array([self.video_to_index[vid] for vid in watched_video_ids])
             predictions = self.predicted_likes[self.user_to_index[user_id]]
-            num_videos = len(predictions)
 
-            all_indices = np.arange(num_videos)
+            all_indices = np.arange(self.num_videos)
             print(all_indices)
-            unwatched_mask = np.ones(num_videos, dtype=bool)
+            unwatched_mask = np.ones(self.num_videos, dtype=bool)
             unwatched_mask[watched] = False
             unwatched_predictions = predictions[unwatched_mask]
             print(unwatched_mask)
