@@ -8,3 +8,5 @@ redis
 celery
 flower
 numpy
+requests
+beautifulsoup4

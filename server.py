@@ -50,4 +50,4 @@ app, celery = create_app()
 if __name__ == "__main__":
     host = os.getenv('HOST', "0.0.0.0")
     port = int(os.getenv('PORT', 5050))
-    app.run(host=host, port=port, debug=True)
+    app.run(host=host, port=port)
