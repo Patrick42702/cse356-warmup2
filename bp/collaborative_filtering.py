@@ -1,6 +1,5 @@
 import numpy as np
 
-from static.media.a_ffmpeg_helper import video_id
 from .util import db
 from bson import ObjectId
 
