@@ -39,7 +39,7 @@ services:
       - ./server.py:/app/server.py
       - ./bp:/app/bp
       - ./templates:/app/templates
-      - ./static:/app/static:ro
+      - ./static:/app/static:rw
     depends_on:
       redis:
         condition: service_healthy
