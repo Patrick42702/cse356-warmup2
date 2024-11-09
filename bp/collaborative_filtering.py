@@ -106,6 +106,6 @@ class CollaborativeFiltering:
                 recommendations = np.concatenate([recommendations, top_watched_indices[:k-len(recommendations)]])
                 print("All recommendations: ", recommendations)
 
-        return [self.video_ids[i] for i in recommendations if self.video_ids[i] not in self.new_videos][:k]
+        return [self.video_ids[i] for i in recommendations if str(self.video_ids[i]) not in self.new_videos][:k]
 
 rec_algo = CollaborativeFiltering()
