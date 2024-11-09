@@ -56,6 +56,8 @@ async function playVideo(index) {
     window.player = dashjs.MediaPlayer().create();
     window.player.initialize(videoPlayer, `../static/media/${video.id}/${video.id}.mpd`, true);
 
+    document.getElementById('playPauseBtnButton').innerText = 'Pause';
+
     // Update the URL without reloading the page
     window.history.pushState({}, '', `/play/${video.id}`);
 }
