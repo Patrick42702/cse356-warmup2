@@ -87,10 +87,13 @@ class CollaborativeFiltering:
             num_videos = len(predictions)
 
             all_indices = np.arange(num_videos)
+            print(all_indices)
             unwatched_mask = np.ones(num_videos, dtype=bool)
             unwatched_mask[watched] = False
             unwatched_predictions = predictions[unwatched_mask]
+            print(unwatched_mask)
             sorted_unwatched_indices = np.argsort(unwatched_predictions)[::-1]
+            print(sorted_unwatched_indices)
             top_unwatched_indices = all_indices[unwatched_mask][sorted_unwatched_indices]
             recommendations = top_unwatched_indices
             print("Unwatched recommendations: ", recommendations)
