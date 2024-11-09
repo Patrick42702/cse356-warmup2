@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
       build-essential \
       curl \
       python3-pip \
-      ffmpeg
+      ffmpeg \
       && rm -rf /var/lib/apt/lists/*
 
 # Install virtualenv instead of relying on built-in venv
