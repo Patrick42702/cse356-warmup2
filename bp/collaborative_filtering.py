@@ -1,5 +1,8 @@
 import numpy as np
+
+from static.media.a_ffmpeg_helper import video_id
 from .util import db
+from bson import ObjectId
 
 def cosine_similarity_matrix(M):
     norm = np.linalg.norm(M, axis=1, keepdims=True)
@@ -27,6 +30,8 @@ class CollaborativeFiltering:
         if self.num_users > 0 and self.num_videos > 0:
             self.predicted_likes = self.predict_missing_values(np.array(self.M, dtype=np.int32))
 
+        self.new_videos = []
+
     def add_user(self, user_id):
         self.num_users += 1
         self.user_to_index[user_id] = self.num_users
@@ -35,6 +40,7 @@ class CollaborativeFiltering:
     def add_video(self, video_id):
         self.num_videos += 1
         self.video_ids.append(video_id)
+        self.new_videos.append(video_id)
         self.video_to_index[video_id] = self.num_videos
         for row in self.M: row.append(0)
 
@@ -65,28 +71,33 @@ class CollaborativeFiltering:
         return predicted_matrix
 
     def get_top_recommendations(self, user_id, watched_video_ids, k):
-        if len(watched_video_ids) == 0: # can't recommend anything if we don't know their preferences
-            return self.video_ids[:k]
+        # figure out which new videos were processed
+        self.new_videos = [ vid for vid in
+            db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
+            if vid['status'] == 'processing']
 
-        watched = np.array([self.video_to_index[vid] for vid in watched_video_ids])
-        predictions = self.predicted_likes[self.user_to_index[user_id]]
-        num_videos = len(predictions)
+        if len(watched_video_ids) == 0: # we don't know their preferences
+            recommendations =  self.video_ids[:k]
+        else:
+            watched = np.array([self.video_to_index[vid] for vid in watched_video_ids])
+            predictions = self.predicted_likes[self.user_to_index[user_id]]
+            num_videos = len(predictions)
 
-        all_indices = np.arange(num_videos)
-        unwatched_mask = np.ones(num_videos, dtype=bool)
-        unwatched_mask[watched] = False
-        unwatched_predictions = predictions[unwatched_mask]
-        sorted_unwatched_indices = np.argsort(unwatched_predictions)[::-1]
-        top_unwatched_indices = all_indices[unwatched_mask][sorted_unwatched_indices]
-        recommendations = top_unwatched_indices[:k]
+            all_indices = np.arange(num_videos)
+            unwatched_mask = np.ones(num_videos, dtype=bool)
+            unwatched_mask[watched] = False
+            unwatched_predictions = predictions[unwatched_mask]
+            sorted_unwatched_indices = np.argsort(unwatched_predictions)[::-1]
+            top_unwatched_indices = all_indices[unwatched_mask][sorted_unwatched_indices]
+            recommendations = top_unwatched_indices[:k]
 
-        if len(recommendations) < k:
-            watched_mask = ~unwatched_mask
-            watched_predictions = predictions[watched_mask]
-            sorted_watched_indices = np.argsort(watched_predictions)[::-1]
-            top_watched_indices = all_indices[watched_mask][sorted_watched_indices]
-            recommendations = np.concatenate([recommendations, top_watched_indices[:k-len(recommendations)]])
+            if len(recommendations) < k:
+                watched_mask = ~unwatched_mask
+                watched_predictions = predictions[watched_mask]
+                sorted_watched_indices = np.argsort(watched_predictions)[::-1]
+                top_watched_indices = all_indices[watched_mask][sorted_watched_indices]
+                recommendations = np.concatenate([recommendations, top_watched_indices[:k-len(recommendations)]])
 
-        return [self.video_ids[i] for i in recommendations]
+        return [self.video_ids[i] for i in recommendations if self.video_ids[i] not in self.new_videos]
 
 rec_algo = CollaborativeFiltering()
