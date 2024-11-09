@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add click event listener to the button
     submitButton.addEventListener('click', function() {
         document.getElementById('upload-form').submit();
-        location.href = "/";
+        console.log('Submitted upload form');
+        // location.href = "/";
     });
 });
