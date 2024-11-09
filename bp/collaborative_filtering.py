@@ -38,10 +38,10 @@ class CollaborativeFiltering:
 
     def add_video(self, video_id):
         print(f"Added video {video_id}")
+        self.video_to_index[video_id] = self.num_videos
         self.num_videos += 1
         self.video_ids.append(video_id)
         self.new_videos.append(video_id)
-        self.video_to_index[video_id] = self.num_videos
         for row in self.M: row.append(0)
 
     def add_like(self, user_id, video_id, value):
