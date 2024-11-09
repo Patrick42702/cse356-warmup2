@@ -42,6 +42,7 @@ class CollaborativeFiltering:
         self.num_videos += 1
         self.video_ids.append(ObjectId(video_id))
         self.new_videos.append(video_id)
+        self.predicted_likes = np.hstack((self.predicted_likes, np.zeros((self.num_users,1))))
         for row in self.M: row.append(0)
 
     def add_like(self, user_id, video_id, value):
