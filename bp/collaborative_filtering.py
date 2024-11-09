@@ -14,7 +14,6 @@ class CollaborativeFiltering:
         self.video_ids = [video['_id'] for video in videos]
         self.user_to_index = {str(doc['_id']): idx for idx, doc in enumerate(users)}
         self.video_to_index = {str(doc['_id']): idx for idx, doc in enumerate(videos)}
-        print(self.video_to_index)
 
         self.num_users = len(users)
         self.num_videos = len(videos)
