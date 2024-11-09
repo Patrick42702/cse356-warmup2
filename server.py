@@ -21,23 +21,25 @@ def create_app():
 
     @app.before_request
     def log_request_info():
-        app.logger.debug("-" * 110)
-        app.logger.debug('--- REQUEST --- ')
-        if (len(request.get_data()) < 2 ** 15):
-            app.logger.debug('Body: %s', request.get_data())
-            # app.logger.debug('Body: %s', request.get_data())
-        app.logger.debug('Cookies: %s', request.cookies)
+        if not request.path.startswith('/static/media/'):
+            app.logger.info("-" * 110)
+            app.logger.info('--- REQUEST --- ')
+            if (len(request.get_data()) < 2 ** 15):
+                app.logger.info('Body: %s', request.get_data())
+                # app.logger.debug('Body: %s', request.get_data())
+            app.logger.info('Cookies: %s', request.cookies)
 
     @app.after_request
     def log_response(response):
-        try:
-            app.logger.debug('--- RESPONSE --- ')
-            app.logger.debug('Status: %s', response.status)
-            app.logger.debug('Cookies set: %s', response.headers.getlist("Set-Cookie"))
-            app.logger.debug('Body: %s', response.get_data())
-        except Exception:
-            app.logger.debug("Can't display response.")
-        app.logger.debug("-" * 110)
+        if not request.path.startswith('/static/media/'):
+            try:
+                app.logger.info('--- RESPONSE --- ')
+                app.logger.info('Status: %s', response.status)
+                app.logger.info('Cookies set: %s', response.headers.getlist("Set-Cookie"))
+                app.logger.info('Body: %s', response.get_data())
+            except Exception:
+                app.logger.info("Can't display response.")
+            app.logger.info("-" * 110)
         return response
 
     app.celery = celery
