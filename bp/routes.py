@@ -49,7 +49,7 @@ def play_video(id):
 
 @routes.route('/api/view', methods=["POST"])
 @check_session
-def view_video_like():
+def view_video():
     try:
         user = get_user(request.cookies)
         video_id = request.json['id']
@@ -63,7 +63,7 @@ def view_video_like():
 
 @routes.route('/api/like', methods=["POST"])
 @check_session
-def view_video():
+def like_video():
     try:
         user = get_user(request.cookies)
         video_id = request.json['id']
@@ -78,6 +78,7 @@ def view_video():
         else:
             db.videos.update_one({'_id': ObjectId(video_id)}, {'$push': {'likes': {'user': user['_id'], 'value': value}}})
             if value == 1: likecount += 1
+        rec_algo.add_like(str(user['_id']), video_id, value)
         return success({'likes': likecount})
     except Exception as e:
         return error(str(e))
@@ -128,7 +129,7 @@ def upload_file():
         author = request.form["author"]
         title = request.form["title"]
         video_id = videos.insert_one({"user": user["_id"], "author": author, "title": title, "description": f"{author}'s video: {title}", "status": "processing", "likes": []}).inserted_id
-        rec_algo.add_video(video_id)
+        rec_algo.add_video(str(video_id))
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
         mp4file = request.files["mp4file"]
         if mp4file.filename != '':

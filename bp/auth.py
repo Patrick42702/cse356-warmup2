@@ -59,7 +59,7 @@ def add_user():
                               "videos": [],
                               "watched": [],
                               "verify-key": verify_key}).inserted_id
-            rec_algo.add_user(user_id)
+            rec_algo.add_user(str(user_id))
 
             cs = charset.Charset('utf-8')
             cs.body_encoding = charset.QP
