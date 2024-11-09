@@ -77,6 +77,8 @@ class CollaborativeFiltering:
             db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
             if vid['status'] == 'processing' ]
 
+        print(self.video_to_index)
+
         if len(watched_video_ids) == 0: # we don't know their preferences
             return [vid for vid in self.video_ids if vid not in self.new_videos][:k]
         else:
