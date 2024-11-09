@@ -23,7 +23,7 @@ class CollaborativeFiltering:
 
         for video in videos:
             for like in video['likes']:
-                self.M[self.user_to_index[str(like['user'])]][self.video_to_index[video['_id']]] = like['value']
+                self.M[self.user_to_index[str(like['user'])]][self.video_to_index[str(video['_id'])]] = like['value']
 
         if self.num_users > 0 and self.num_videos > 0:
             self.predicted_likes = self.predict_missing_values(np.array(self.M, dtype=np.int32))
