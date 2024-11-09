@@ -70,7 +70,7 @@ def add_user():
             msg = MIMEText(body, 'plain', cs)
             msg['Subject'] = "Verify your email with ESKPJ"
             print(msg.as_string())
-            s = smtplib.SMTP('host.docker.internal', 25)
+            s = smtplib.SMTP('0.0.0.0', 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
             return success({'message': "Email sent"})
