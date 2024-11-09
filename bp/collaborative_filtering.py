@@ -73,7 +73,7 @@ class CollaborativeFiltering:
     def get_top_recommendations(self, user_id, watched_video_ids, k):
         # figure out which new videos were processed
         print(f"Processing new videos: {self.new_videos}")
-        self.new_videos = [ vid for vid in
+        self.new_videos = [ str(vid['_id']) for vid in
             db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
             if vid['status'] == 'processing' ]
 
