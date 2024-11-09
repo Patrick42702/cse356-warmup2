@@ -68,7 +68,7 @@ def add_user():
             body = f"Please verify your email for eskpj-airplanes video viewer at the following link: http://{DOMAIN}/api/verify?email={quote(email)}&key={verify_key}"
             msg = MIMEText(body, 'plain', cs)
             msg['Subject'] = "Verify your email with ESKPJ"
-            msg['Message-ID'] = str(os.urandom(12).hex()@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu})
+            msg['Message-ID'] = f"<{os.urandom(12).hex()@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu}>"
             print(msg.as_string())
             s = smtplib.SMTP('10.0.0.83', 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
