@@ -3,7 +3,7 @@ from flask import Flask, request
 from bp.celery import make_celery
 from bp.auth import auth
 from bp.routes import routes
-
+import logging
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -12,7 +12,7 @@ def create_app():
         result_backend='redis://redis:6379/0',
         include=['bp.tasks']
     )
-
+    app.logger.setLevel(logging.INFO)
     celery = make_celery(app)
 
     #config env variables
