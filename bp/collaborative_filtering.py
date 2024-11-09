@@ -12,8 +12,8 @@ class CollaborativeFiltering:
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))
         self.video_ids = [video['_id'] for video in videos]
-        self.user_to_index = {doc['_id']: idx for idx, doc in enumerate(users)}
-        self.video_to_index = {doc['_id']: idx for idx, doc in enumerate(videos)}
+        self.user_to_index = {str(doc['_id']): idx for idx, doc in enumerate(users)}
+        self.video_to_index = {str(doc['_id']): idx for idx, doc in enumerate(videos)}
         print(self.video_to_index)
 
         self.num_users = len(users)
