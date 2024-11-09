@@ -37,6 +37,7 @@ class CollaborativeFiltering:
         self.M.append([0] * self.num_videos)
 
     def add_video(self, video_id):
+        print(f"Added video {video_id}")
         self.num_videos += 1
         self.video_ids.append(video_id)
         self.new_videos.append(video_id)
@@ -71,6 +72,7 @@ class CollaborativeFiltering:
 
     def get_top_recommendations(self, user_id, watched_video_ids, k):
         # figure out which new videos were processed
+        print(f"Processing new videos: {self.new_videos}")
         self.new_videos = [ vid for vid in
             db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
             if vid['status'] == 'processing' ]
