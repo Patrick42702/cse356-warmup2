@@ -4,7 +4,7 @@ module.exports = {
       name: 'server',
       script: './server.py',
       interpreter: './venv/bin/python',
-      watch: true,  // Optional: Enable if you want pm2 to watch for file changes
+      watch: false,  // Optional: Enable if you want pm2 to watch for file changes
       autorestart: true,  // Optional: Enable auto-restart if the app crashes
     },
     {
