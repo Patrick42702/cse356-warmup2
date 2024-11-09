@@ -92,12 +92,12 @@ def get_videos():
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
         for video in recommended_videos:
-            video_id = video['_id']
+            video_id = str(video['_id'])
             description = video['description']
-            watched = video['_id'] in user['watched']
+            watched = str(video['_id']) in user['watched']
             liked = next((like == 1 for like in video['likes'] if like['user'] == user['_id']), None)
             likevalues = sum(1 for like in video['likes'] if like['value']==1)
-            videos_info.append({'id': str(video_id), 'description': description, 'watched': watched, 'liked': liked, 'likevalues': likevalues})
+            videos_info.append({'id': video_id, 'description': description, 'watched': watched, 'liked': liked, 'likevalues': likevalues})
         return success({"videos": videos_info})
     except Exception as e:
         return error(str(e))

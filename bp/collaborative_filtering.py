@@ -77,6 +77,7 @@ class CollaborativeFiltering:
             db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
             if vid['status'] == 'processing' ]
 
+        print(self.video_to_index)
         if len(watched_video_ids) == 0: # we don't know their preferences
             return [vid for vid in self.video_ids if vid not in self.new_videos][:k]
         else:
@@ -91,6 +92,7 @@ class CollaborativeFiltering:
             sorted_unwatched_indices = np.argsort(unwatched_predictions)[::-1]
             top_unwatched_indices = all_indices[unwatched_mask][sorted_unwatched_indices]
             recommendations = top_unwatched_indices
+            print("Unwatched recommendations: ", recommendations)
 
             if len(recommendations) < k:
                 watched_mask = ~unwatched_mask
@@ -98,6 +100,7 @@ class CollaborativeFiltering:
                 sorted_watched_indices = np.argsort(watched_predictions)[::-1]
                 top_watched_indices = all_indices[watched_mask][sorted_watched_indices]
                 recommendations = np.concatenate([recommendations, top_watched_indices[:k-len(recommendations)]])
+                print("All recommendations: ", recommendations)
 
         return [self.video_ids[i] for i in recommendations if self.video_ids[i] not in self.new_videos][:k]
 
