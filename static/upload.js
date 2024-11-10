@@ -18,3 +18,17 @@ document.addEventListener('DOMContentLoaded', function() {
         location.href = "/";
     });
 });
+
+document.getElementById('logout-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const response = await fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${document.cookie.split('=')[1]}`  // Fetch JWT token from cookie
+        }
+    });
+    const result = await response.json();
+    console.log(`Logout response: ${result}`);
+    location.href = "/";
+});
