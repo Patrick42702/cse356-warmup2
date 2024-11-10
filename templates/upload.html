@@ -2,17 +2,23 @@
 <html>
   <head>
     <title>File Upload</title>
+    <link rel="stylesheet" href="../static/upload.css">
   </head>
   <body>
+    <div id="home">
+      <button id="home-button">Home</button>
+    </div>
+    <div id="input-form">
     <h1>File Upload</h1>
-    <form method="POST" id="upload-form" action="/api/upload" enctype="multipart/form-data">
-      <label for="">Please enter the name of the author of the video</label>
-      <p><input type="text" name="author"></p>
-      <label for="">Please enter a title for your video</label>
-      <p><input type="text" name="title"></p>
-      <p><input type="file" name="mp4file" accept=".mp4"></p>
-      <button type="button" id="submit-button">Submit</button>
-    </form>
+      <form method="POST" id="upload-form" action="/api/upload" enctype="multipart/form-data">
+        <label for="" ></label>
+        <p><input type="text" name="author" placeholder="author"></p>
+        <label for=""></label>
+        <p><input type="text" name="title" placeholder="title"></p>
+        <p><input type="file" name="mp4file" accept=".mp4"></p>
+        <button type="button" id="submit-button">Submit</button>
+      </form>
+    </div>
   </body>
 
   <script src="../static/upload.js"></script>

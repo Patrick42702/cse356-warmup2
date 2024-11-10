@@ -6,6 +6,15 @@ document.addEventListener('DOMContentLoaded', function() {
     submitButton.addEventListener('click', function() {
         document.getElementById('upload-form').submit();
         console.log('Submitted upload form');
-        // location.href = "/";
+        location.href = "/";
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const homebutton = document.getElementById('home-button');
+
+    // Add click event listener to the button
+    homebutton.addEventListener('click', function() {
+        location.href = "/";
     });
 });
