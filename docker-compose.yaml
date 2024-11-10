@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
     command: pm2-runtime start ecosystem.config.js
     ports:
-      - "5050:5050"
+      - "80:80"
       - "5555:5555"
     volumes:
       - ./server.py:/app/server.py
