@@ -55,7 +55,9 @@ async function playVideo(index) {
     // Create a new Dash.js player instance
     window.player = dashjs.MediaPlayer().create();
     window.player.initialize(videoPlayer, `../static/media/${video.id}/${video.id}.mpd`, true);
-
+    const resolutionSelect = document.getElementById('resolutionSelect');
+    const quality = parseInt(resolutionSelect.value);
+    player.setQualityFor('video', quality);
     document.getElementById('playPauseBtnButton').innerText = 'Pause';
 
     // Update the URL without reloading the page
