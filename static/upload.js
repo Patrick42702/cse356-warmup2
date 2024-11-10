@@ -3,9 +3,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submit-button');
 
     // Add click event listener to the button
-    submitButton.addEventListener('click', function() {
-        document.getElementById('upload-form').submit();
-        console.log('Submitted upload form');
+    submitButton.addEventListener('click', async function(e) {
+        e.preventDefault();
+
+       const form = document.getElementById('upload-form');
+
+        // Create a FormData object from the form
+        const formData = new FormData(form);
+
+        const response = await fetch('/api/upload', {
+          method: "POST",
+          body: formData,
+        })
         location.href = "/";
     });
 });
