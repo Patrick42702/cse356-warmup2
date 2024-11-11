@@ -1,6 +1,9 @@
 let videoList = []; // Holds all loaded videos
 let currentIndex = 0; // Tracks the current video index
 let playerInstances = []; // Stores Dash.js player instances for each video
+const resolutionSelect = document.getElementById("resolutionSelect");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const seekBar = document.getElementById("seekBar");
 
 // Extract Video ID from URL
 function getVideoIdFromUrl() {
@@ -16,25 +19,24 @@ function initializeDashPlayer(videoElement, videoId) {
     // Add resolution selection
     player.updateSettings({ streaming: { abr: { autoSwitchBitrate: false } } });
 
-    // Create a dropdown for manual resolution selection
-    const qualitySelect = document.createElement("select");
-    qualitySelect.addEventListener("change", () => {
-        const selectedQualityIndex = parseInt(qualitySelect.value, 10);
-        player.setQualityFor("video", selectedQualityIndex);
-    });
-
-    // Populate the resolution dropdown
-    player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
+    player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function () {
         const availableQualities = player.getBitrateInfoListFor("video");
+        resolutionSelect.innerHTML = ''; // Clear existing options
+
         availableQualities.forEach((quality, index) => {
             const option = document.createElement("option");
             option.value = index;
             option.textContent = `${quality.height}p`;
-            qualitySelect.appendChild(option);
+            resolutionSelect.appendChild(option);
         });
     });
 
-    videoElement.parentNode.insertBefore(qualitySelect, videoElement.nextSibling); // Place it below the video
+    // Event listener for resolution selection
+    resolutionSelect.addEventListener("change", () => {
+        const selectedQualityIndex = parseInt(resolutionSelect.value, 10);
+        playerInstances[currentIndex].setQualityFor("video", selectedQualityIndex);
+    });
+
     return player;
 }
 
@@ -108,6 +110,10 @@ function playVideoAtIndex(index) {
         newVideo.style.display = "block"; // Show and play new video
         currentIndex = index;
         window.history.pushState({}, '', `/play/${videoList[currentIndex].id}`);
+
+         playerInstances[currentIndex].on(dashjs.MediaPlayer.events.PLAYBACK_METADATA_LOADED, () => {
+            seekBar.max = playerInstances[currentIndex].duration();
+         });
     }
 }
 
@@ -127,8 +133,36 @@ function handleScroll(event) {
     }
 }
 
+// Play/pause button functionality
+playPauseBtn.addEventListener("click", () => {
+    const currentPlayer = playerInstances[currentIndex];
+    if (currentPlayer.isPaused()) {
+        currentPlayer.play();
+        playPauseBtn.textContent = "Pause";
+    } else {
+        currentPlayer.pause();
+        playPauseBtn.textContent = "Play";
+    }
+});
+
+// Seek bar functionality
+seekBar.addEventListener("input", () => {
+    const currentPlayer = playerInstances[currentIndex];
+    currentPlayer.seek(seekBar.value);
+});
+
+// Update seek bar as video plays
+function updateSeekBar() {
+    const currentPlayer = playerInstances[currentIndex];
+    if (currentPlayer) {
+        seekBar.value = currentPlayer.time();
+        requestAnimationFrame(updateSeekBar);
+    }
+}
+
 // Initialize video list and set up scroll event
 document.addEventListener("DOMContentLoaded", async () => {
     await loadVideoList();
     window.addEventListener("wheel", handleScroll, { passive: false });
+    updateSeekBar();
 });
