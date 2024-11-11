@@ -42,7 +42,7 @@ def process_video(filepath):
 
     # Start constructing the FFmpeg command
     ffmpeg_cmd = [
-        'ffmpeg', '-y', '-i', input_path,
+        'ffmpeg', '-y', '-i', '-hide_banner', '-loglevel', 'error', input_path,
         '-vf', scale_filter, '-report'
     ]
 
@@ -72,7 +72,7 @@ def process_video(filepath):
     scale_thumbnails = "scale='if(gt(a,16/9),320,-2)':'if(gt(a,16/9),-2,180)',pad=320:180:(ow-iw)/2:(oh-ih)/2:black"
     thumbnail_path = f"thumbnail_{file_id}.jpg"
     thumbnail_cmd = [
-        'ffmpeg', '-y', '-i', filepath,
+        'ffmpeg', '-y', '-i', '-hide_banner', '-loglevel', 'error', filepath,
         '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path
     ]
     print(f"Generating thumbnail for {filename} with video ID {file_id}")
