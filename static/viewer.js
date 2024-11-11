@@ -83,6 +83,7 @@ async function loadVideoList() {
 }
 
 // Fetch and add more videos when near the end of the list
+mysql.py
 async function loadMoreVideos() {
     const response = await fetch('/api/videos', {
         method: 'POST',
@@ -167,3 +168,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.addEventListener("wheel", handleScroll, { passive: false });
     updateSeekBar();
 });
+
+// Like/Dislike Button
+const likeBtn = document.getElementById("like");
+const dislikeBtn = document.getElementById("dislike");
+likeBtn.addEventListener("click", async () => {
+    try {
+        const response = await fetch("/api/like", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: getVideoIdFromUrl(), value: true})
+        });
+        console.log(response);
+    } catch (error) {
+        console.error(error);
+    }
+})
+dislikeBtn.addEventListener("click", async () => {
+    try {
+        const response = await fetch("/api/like", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: getVideoIdFromUrl(), value: false})
+        });
+        console.log(response);
+    } catch (error) {
+        console.error(error);
+    }
+})
+
