@@ -46,7 +46,7 @@ function populateVideos(videos) {
 
     videos.forEach((video, index) => {
         const videoElement = document.createElement("video");
-        videoElement.setAttribute("data-index", index + videoList.length);
+        videoElement.setAttribute("data-index", index + videoList.length - 20);
         videoElement.controls = true;
         videoElement.muted = true;
         videoElement.pause();
