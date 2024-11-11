@@ -35,6 +35,7 @@ class CollaborativeFiltering:
         self.user_to_index[user_id] = self.num_users
         self.num_users += 1
         self.M.append([0] * self.num_videos)
+        self.predicted_likes = np.vstack((self.predicted_likes, np.zeros(self.num_videos)))
 
     def add_video(self, video_id):
         print(f"Added video {video_id}")
