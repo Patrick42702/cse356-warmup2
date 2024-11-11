@@ -4,6 +4,7 @@ let playerInstances = []; // Stores Dash.js player instances for each video
 const resolutionSelect = document.getElementById("resolutionSelect");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const seekBar = document.getElementById("seekBar");
+const num_fetch_videos = 20;
 
 // Extract Video ID from URL
 function getVideoIdFromUrl() {
@@ -46,7 +47,7 @@ function populateVideos(videos) {
 
     videos.forEach((video, index) => {
         const videoElement = document.createElement("video");
-        videoElement.setAttribute("data-index", index + videoList.length - 20);
+        videoElement.setAttribute("data-index", index + videoList.length - num_fetch_videos);
         videoElement.controls = true;
         videoElement.muted = true;
         videoElement.pause();
@@ -64,7 +65,7 @@ async function loadVideoList() {
     const response = await fetch('/api/videos', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 20 })
+        body: JSON.stringify({ count: num_fetch_videos })
     });
     const data = await response.json();
     videoList = data.videos.map(video => ({ id: video.id, metadata: video }));
@@ -86,7 +87,7 @@ async function loadMoreVideos() {
     const response = await fetch('/api/videos', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 20 })
+        body: JSON.stringify({ count: num_fetch_videos })
     });
     const data = await response.json();
     const newVideos = data.videos.map(video => ({ id: video.id, metadata: video }));
