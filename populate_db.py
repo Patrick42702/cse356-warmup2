@@ -34,7 +34,7 @@ def get_mp4_urls(url):
 # Function to download a single video
 def add_video(url, dest_folder, user_id):
     video_name = os.path.basename(url)
-    video_id = db.videos.insert_one({"user": user_id, "author": "admin", "title": video_name, "status": "complete", "likes": []}).inserted_id
+    video_id = db.videos.insert_one({"user": user_id, "author": "admin", "title": video_name, "description": f"admin : {video_name}", "status": "complete", "likes": []}).inserted_id
     dest_path = f"{dest_folder}/{video_id}/{video_id}.mp4"
 
     print(f"Downloading {video_name}...")
