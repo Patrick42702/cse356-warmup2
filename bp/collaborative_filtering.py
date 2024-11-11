@@ -40,7 +40,6 @@ class CollaborativeFiltering:
         self.video_to_index[video_id] = self.num_videos
         self.num_videos += 1
         self.video_ids.append(ObjectId(video_id))
-        self.new_videos.append(video_id)
         print("PREDICTED LIKES, NUM USERS")
         print(self.predicted_likes)
         print(self.predicted_likes.shape)
@@ -78,7 +77,7 @@ class CollaborativeFiltering:
         processing_videos = [str(vid['_id']) for vid in db.videos.find({'status':'processing'})]
 
         if len(watched_video_ids) == 0: # we don't know their preferences
-            return [vid for vid in self.video_ids if vid not in self.new_videos][:k]
+            return [vid for vid in self.video_ids if vid not in processing_videos][:k]
         else:
             watched = np.array([self.video_to_index[vid] for vid in watched_video_ids])
             predictions = self.predicted_likes[self.user_to_index[user_id]]
