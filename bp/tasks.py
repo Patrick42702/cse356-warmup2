@@ -57,7 +57,8 @@ def process_video(filepath):
     # Set segment names with video_id
     ffmpeg_cmd.extend([
         '-init_seg_name', f"init_{file_id}_$RepresentationID$.mp4",
-        '-media_seg_name', f"chunk_{file_id}_$Bandwidth$_$Number$.m4s"
+        '-media_seg_name', f"chunk_{file_id}_$Bandwidth$_$Number$.m4s", '-hide_banner', '-loglevel', 'error'
+ 
     ])
 
     # Add DASH options and output MPD file path
@@ -73,7 +74,7 @@ def process_video(filepath):
     thumbnail_path = f"thumbnail_{file_id}.jpg"
     thumbnail_cmd = [
         'ffmpeg', '-y', '-i', filepath,
-        '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path
+        '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path, '-hide_banner', '-loglevel', 'error'
     ]
     print(f"Generating thumbnail for {filename} with video ID {file_id}")
     subprocess.run(thumbnail_cmd)
