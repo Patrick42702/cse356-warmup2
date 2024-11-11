@@ -29,8 +29,6 @@ class CollaborativeFiltering:
         if self.num_users > 0 and self.num_videos > 0:
             self.predicted_likes = self.predict_missing_values(np.array(self.M, dtype=np.int32))
 
-        self.new_videos = []
-
     def add_user(self, user_id):
         self.user_to_index[user_id] = self.num_users
         self.num_users += 1
@@ -77,13 +75,7 @@ class CollaborativeFiltering:
         return predicted_matrix
 
     def get_top_recommendations(self, user_id, watched_video_ids, k):
-        # figure out which new videos were processed
-        print(f"Processing new videos: {self.new_videos}")
-        self.new_videos = [ str(vid['_id']) for vid in
-            db.videos.find({'_id': {'$in': [ObjectId(video) for video in self.new_videos]}})
-            if vid['status'] == 'processing' ]
-
-        print(self.video_to_index)
+        processing_videos = [str(vid['_id']) for vid in db.videos.find({'status':'processing'})]
 
         if len(watched_video_ids) == 0: # we don't know their preferences
             return [vid for vid in self.video_ids if vid not in self.new_videos][:k]
@@ -111,6 +103,6 @@ class CollaborativeFiltering:
                 recommendations = np.concatenate([recommendations, top_watched_indices[:k-len(recommendations)]])
                 print("All recommendations: ", recommendations)
 
-        return [self.video_ids[i] for i in recommendations if str(self.video_ids[i]) not in self.new_videos][:k]
+        return [self.video_ids[i] for i in recommendations if str(self.video_ids[i]) not in processing_videos][:k]
 
 rec_algo = CollaborativeFiltering()
