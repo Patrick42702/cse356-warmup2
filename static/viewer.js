@@ -83,7 +83,6 @@ async function loadVideoList() {
 }
 
 // Fetch and add more videos when near the end of the list
-mysql.py
 async function loadMoreVideos() {
     const response = await fetch('/api/videos', {
         method: 'POST',
