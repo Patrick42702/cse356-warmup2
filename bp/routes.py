@@ -131,7 +131,7 @@ def upload_file():
         video_id = videos.insert_one({"user": user["_id"], "author": author, "title": title, "description": f"{author}'s video: {title}", "status": "processing", "likes": []}).inserted_id
         rec_algo.add_video(str(video_id))
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
-        mp4file = request.files["mp4file"]
+        mp4file = request.files["mp4File"]
         if mp4file.filename != '':
             os.makedirs(f"{current_app.static_folder}/media/{video_id}", exist_ok=True)
             mp4file.save(f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4")
