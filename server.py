@@ -24,6 +24,12 @@ def create_app():
         if not request.path.startswith('/static/media/'):
             app.logger.info("-" * 110)
             app.logger.info('--- REQUEST --- ')
+            app.logger.info('Mimetype: %s', request.mimetype)
+            if (len(request.get_data()) < 2 ** 15):
+                app.logger.info('Body: %s', request.get_data())
+            else:
+                app.logger.info('Form: %s', request.form)
+                app.logger.info('JSON: %s', request.json)
             app.logger.info('Cookies: %s', request.cookies)
 
     @app.after_request
