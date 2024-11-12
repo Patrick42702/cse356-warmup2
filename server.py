@@ -24,9 +24,6 @@ def create_app():
         if not request.path.startswith('/static/media/'):
             app.logger.info("-" * 110)
             app.logger.info('--- REQUEST --- ')
-            if (len(request.get_data()) < 2 ** 15):
-                app.logger.info('Body: %s', request.get_data())
-                # app.logger.debug('Body: %s', request.get_data())
             app.logger.info('Cookies: %s', request.cookies)
 
     @app.after_request

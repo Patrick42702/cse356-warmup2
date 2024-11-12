@@ -134,7 +134,7 @@ def upload_file():
         # rec_algo.add_video(str(video_id))
         # users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
         # current_app.logger.info("Inserted info into database, now pulling file and saving")
-        mp4file = request.files["mp4File"]
+        # mp4file = request.files["mp4File"]
         # if mp4file.filename != '':
         #     os.makedirs(f"{current_app.static_folder}/media/{video_id}", exist_ok=True)
         #     current_app.logger.info(f"Saving video with id {video_id} in upload")
