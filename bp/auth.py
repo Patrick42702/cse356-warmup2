@@ -87,6 +87,8 @@ def login():
     try:
         username = request.json['username']
         password = request.json['password']
+        if "token" in request.cookies and validate_session(request.cookies["token"]):
+            return success({"message": "login successful"}, jwt.encode({"username": username}, current_app.config["SECRET_KEY"], algorithm="HS256"))
         if username and password and users.find_one({"username": username}):
             user = users.find_one({"username": username})
         else:
@@ -114,6 +116,8 @@ def verify():
         email = request.args["email"]
         verify_key = request.args["key"]
         user = users.find_one({"email": email})
+        if not user:
+            raise Exception("User not found")
         saved_token = user["verify-key"]
         if saved_token == verify_key:
             users.update_one({"email": email}, {"$set": {"validated": True}})
