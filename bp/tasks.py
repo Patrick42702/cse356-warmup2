@@ -87,4 +87,4 @@ def process_video(filepath):
 @celery.task
 def save_video(filepath, video):
     video.save(filepath)
-    return
+    return filepath

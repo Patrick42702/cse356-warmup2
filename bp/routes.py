@@ -129,15 +129,18 @@ def upload_file():
         user = get_user(request.cookies)
         author = request.form["author"]
         title = request.form["title"]
+        current_app.logger.info("got info from forms")
         video_id = videos.insert_one({"user": user["_id"], "author": author, "title": title, "description": f"{author}'s video: {title}", "status": "processing", "likes": []}).inserted_id
         rec_algo.add_video(str(video_id))
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
+        current_app.logger.info("Inserted info into database, now pulling file and saving")
         mp4file = request.files["mp4File"]
         if mp4file.filename != '':
             os.makedirs(f"{current_app.static_folder}/media/{video_id}", exist_ok=True)
-            # mp4file.save(f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4")
             current_app.logger.info(f"Saving video with id {video_id} in upload")
-            current_app.celery.send_task("bp.tasks.save_video", args=[f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4", mp4file])
+            mp4file.save(f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4")
+            # current_app.logger.info(f"Saving video with id {video_id} in upload")
+            # current_app.celery.send_task("bp.tasks.save_video", args=[f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4", mp4file])
         # get the file_path of the video we receive and pass it to the celery task so it can do work
         bp_dir = os.path.dirname(__file__)
         project_root = os.path.dirname(bp_dir)
