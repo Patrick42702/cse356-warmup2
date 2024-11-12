@@ -135,7 +135,9 @@ def upload_file():
         mp4file = request.files["mp4File"]
         if mp4file.filename != '':
             os.makedirs(f"{current_app.static_folder}/media/{video_id}", exist_ok=True)
-            mp4file.save(f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4")
+            # mp4file.save(f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4")
+            current_app.logger.info(f"Saving video with id {video_id} in upload")
+            current_app.celery.send_task("bp.tasks.save_video", args=[f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4", mp4file])
         # get the file_path of the video we receive and pass it to the celery task so it can do work
         bp_dir = os.path.dirname(__file__)
         project_root = os.path.dirname(bp_dir)

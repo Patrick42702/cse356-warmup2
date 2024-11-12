@@ -83,3 +83,8 @@ def process_video(filepath):
     print(file_id)
     db.videos.update_one({"_id": ObjectId(file_id)}, {"$set": {"status": "complete"}})
     return filepath
+
+@celery.task
+def save_video(filepath, video):
+    video.save(filepath)
+    return
