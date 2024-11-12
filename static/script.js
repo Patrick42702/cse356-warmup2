@@ -64,6 +64,6 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     else{
         console.log(`Login response: ${result}`);
         document.getElementById('message').innerText = result.message;
-        // location.reload();
+        location.reload();
     }
 });
