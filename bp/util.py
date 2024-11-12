@@ -26,28 +26,28 @@ def error(err_msg):
 
 # valid response handling
 # @param data: dictionary of data to be returned
-# @param session_id: session_id to be set in the cookie
-def success(data, session_id=None):
+# @param token: token to be set in the cookie
+def success(data, token=None):
     data["status"]="OK"
     body = json.dumps(data, separators=(',', ':')) # take out any spaces in json response
     response = make_response(body)
-    if session_id:
-        response.set_cookie("session_id", session_id)
+    if token:
+        response.set_cookie("token", token)
     response.headers["X-CSE356"] = SUBMIT_ID
     return response
 
 # validate session
-def validate_session(session_id):
+def validate_session(token):
     with current_app.app_context():
-        identity = jwt.decode(session_id, current_app.config["SECRET_KEY"], algorithms=["HS256"])
+        identity = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
         username = identity["username"]
         user = db.users.find_one({"username": username})
-        if user["session_id"] == request.cookies["session_id"]:
+        if user["token"] == request.cookies["token"]:
             return True
         else:
             return False
 
 def get_user(cookies):
-    identity = jwt.decode(cookies["session_id"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
+    identity = jwt.decode(cookies["token"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
     user = db.users.find_one({"username": identity["username"]})
     return user

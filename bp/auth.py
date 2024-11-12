@@ -95,7 +95,7 @@ def login():
             success_msg = {"message" :"Login successful"}
             # access_token = create_access_token(identity=username)
             access_token = jwt.encode({"username": username}, current_app.config["SECRET_KEY"], algorithm="HS256")
-            users.update_one({"username": username}, {"$set": {"session_id": access_token, "login": True}})
+            users.update_one({"username": username}, {"$set": {"token": access_token, "login": True}})
             return success(success_msg, access_token)
         else:
             if user["password"] != password:
@@ -131,12 +131,12 @@ def logout():
     cookies = request.cookies
     users = db.users
     try:
-        identity = jwt.decode(cookies["session_id"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
+        identity = jwt.decode(cookies["token"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
         # user = users.find_one({"username": identity["username"]})
-        # if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
-        users.update_one({"username": identity["username"]}, {"$set": {"session_id": None, "login": False}})
+        # if "token" in request.cookies and validate_session(request.cookies["token"]):
+        users.update_one({"username": identity["username"]}, {"$set": {"token": None, "login": False}})
         response = success({"message": "Logout successful"})
-        response.delete_cookie("session_id")
+        response.delete_cookie("token")
         return response
         # else:
         #     raise Exception("There was an error verifying that you were already logged in")
@@ -149,10 +149,10 @@ def check_auth():
     cookies = request.cookies
     users = db.users
     try:
-        if "session_id" not in request.cookies:
+        if "token" not in request.cookies:
             raise Exception("You do not have an active session token")
-        identity = jwt.decode(cookies["session_id"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
-        if validate_session(cookies["session_id"]):
+        identity = jwt.decode(cookies["token"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
+        if validate_session(cookies["token"]):
             user = users.find_one({"username": identity["username"]})
             return success({"isLoggedIn": user["login"], "userId": str(user["_id"])})
             raise Exception("")

@@ -14,7 +14,7 @@ db = connect_db()
 def check_session(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
+        if "token" in request.cookies and validate_session(request.cookies["token"]):
             return f(*args, **kwargs)
         else:
             return error("User not logged in")
@@ -24,7 +24,7 @@ def check_session(f):
 @routes.route('/')
 def user_interface():
     try:
-        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
+        if "token" in request.cookies and validate_session(request.cookies["token"]):
             resp = make_response(render_template("homepage.html"))
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
@@ -172,7 +172,7 @@ def api_media(path):
     elif ftype == "thumbnail":
         fpath += f"thumbnail_{id}.jpg"
     try:
-        if "session_id" in request.cookies and validate_session(request.cookies["session_id"]):
+        if "token" in request.cookies and validate_session(request.cookies["token"]):
             resp = make_response(send_from_directory(f"{current_app.static_folder}/media", fpath))
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
