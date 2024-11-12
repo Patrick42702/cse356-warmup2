@@ -85,6 +85,8 @@ def add_user():
 def login():
     users = db.users
     try:
+        if "token" in request.cookies:
+            return error("You are already logged in")
         username = request.json['username']
         password = request.json['password']
         if username and password and users.find_one({"username": username}):
