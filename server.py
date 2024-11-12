@@ -28,8 +28,11 @@ def create_app():
             if (len(request.get_data()) < 2 ** 15):
                 app.logger.info('Body: %s', request.get_data())
             else:
-                app.logger.info('Form: %s', request.form)
-                app.logger.info('JSON: %s', request.json)
+                if request.mimetype == 'application/json':
+                    app.logger.info('JSON: %s', request.json)
+                else:
+                    app.logger.info('Form: %s', request.form)
+
             app.logger.info('Cookies: %s', request.cookies)
 
     @app.after_request
