@@ -87,8 +87,6 @@ def login():
     try:
         username = request.json['username']
         password = request.json['password']
-        if "token" in request.cookies and validate_session(request.cookies["token"]):
-            return success({"message": "login successful"}, jwt.encode({"username": username}, current_app.config["SECRET_KEY"], algorithm="HS256"))
         if username and password and users.find_one({"username": username}):
             user = users.find_one({"username": username})
         else:
