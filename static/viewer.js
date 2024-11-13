@@ -75,10 +75,10 @@ async function loadVideoList() {
     if (initialVideoId) {
         const initialIndex = videoList.findIndex(video => video.id === initialVideoId);
         if (initialIndex !== -1) {
-            playVideoAtIndex(initialIndex);
+            playInitialVideo(initialIndex);
         }
     } else {
-        playVideoAtIndex(0); // Play the first video by default if no ID is in the URL
+        playInitialVideo(0); // Play the first video by default if no ID is in the URL
     }
 }
 
@@ -93,6 +93,14 @@ async function loadMoreVideos() {
     const newVideos = data.videos.map(video => ({ id: video.id, metadata: video }));
     videoList = [...videoList, ...newVideos];
     populateVideos(newVideos);
+}
+
+function playInitialVideo(index) {
+    const videosDiv = document.getElementById("videos");
+    const newVideo = videosDiv.querySelector(`[data-index="${index}"]`);
+    newVideo.style.display = "block"; // Show and play new video
+    currentIndex = index;
+    playPauseBtn.click();
 }
 
 // Play the video at the given index, pause others, update the URL, and control visibility
