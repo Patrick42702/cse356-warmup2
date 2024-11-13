@@ -103,12 +103,11 @@ function playVideoAtIndex(index) {
     const newVideo = videosDiv.querySelector(`[data-index="${index}"]`);
 
     if (currentVideo) {
-        playerInstances[currentIndex].pause();
         currentVideo.style.display = "none"; // Hide previous video
     }
 
     if (newVideo) {
-        playerInstances[index].play();
+        // playerInstances[index].play();
         newVideo.style.display = "block"; // Show and play new video
         currentIndex = index;
         window.history.pushState({}, '', `/play/${videoList[currentIndex].id}`);
@@ -123,6 +122,11 @@ function playVideoAtIndex(index) {
 function handleScroll(event) {
     event.preventDefault();
 
+    const currentPlayer = playerInstances[currentIndex];
+    if (!currentPlayer.isPaused()) {
+        playPauseBtn.click();
+    }
+
     if (event.deltaY > 0) { // Scroll down
         if (currentIndex < videoList.length - 1) {
             playVideoAtIndex(currentIndex + 1);
@@ -135,10 +139,8 @@ function handleScroll(event) {
     }
 }
 
-// Play/pause button functionality
-document.addEventListener("DOMContentLoaded", () => {
-    playPauseBtn.addEventListener("click", () => {
-        const playPauseRealBtn = document.getElementById("playPauseBtnButton");
+function clickPlayPauseBtn() {
+    const playPauseRealBtn = document.getElementById("playPauseBtnButton");
         const currentPlayer = playerInstances[currentIndex];
         if (currentPlayer.isPaused()) {
             playPauseRealBtn.textContent = "Pause";
@@ -147,19 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
             playPauseRealBtn.textContent = "Play";
             currentPlayer.pause();
         }
-    });
-})
-
-// playPauseBtn.addEventListener("click", () => {
-//     const currentPlayer = playerInstances[currentIndex];
-//     if (currentPlayer.isPaused()) {
-//         currentPlayer.play();
-//         playPauseBtn.textContent = "Pause";
-//     } else {
-//         currentPlayer.pause();
-//         playPauseBtn.textContent = "Play";
-//     }
-// });
+}
 
 // Seek bar functionality
 seekBar.addEventListener("input", () => {
@@ -181,6 +171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadVideoList();
     window.addEventListener("wheel", handleScroll, { passive: false });
     updateSeekBar();
+    playPauseBtn.addEventListener("click", () => clickPlayPauseBtn());
 });
 
 // Like/Dislike Button
