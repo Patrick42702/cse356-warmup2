@@ -74,7 +74,6 @@ async function loadVideoList() {
     if (initialIndex !== -1) {
         const [initialVideo] = videoList.splice(initialIndex, 1);
         videoList.unshift(initialVideo);
-        playInitialVideo(initialIndex);
     }
     populateVideos(videoList);
     playInitialVideo(0); // Play the first video
