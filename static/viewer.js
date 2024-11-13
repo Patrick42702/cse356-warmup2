@@ -95,6 +95,13 @@ async function loadMoreVideos() {
 function playInitialVideo(index) {
     const videosDiv = document.getElementById("videos");
     const newVideo = videosDiv.querySelector(`[data-index="${index}"]`);
+    const newVideoId = videoList[index].id;
+
+    fetch("/api/view", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: newVideoId})
+    }).then((response) => console.log('Viewed: ' + response));
     newVideo.style.display = "block"; // Show and play new video
     currentIndex = index;
     playPauseBtn.click();
@@ -105,6 +112,13 @@ function playVideoAtIndex(index) {
     const videosDiv = document.getElementById("videos");
     const currentVideo = videosDiv.querySelector(`[data-index="${currentIndex}"]`);
     const newVideo = videosDiv.querySelector(`[data-index="${index}"]`);
+    const newVideoId = videoList[index].id;
+
+    fetch("/api/view", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({id: newVideoId})
+    }).then((response) => console.log('Viewed: ' + response));
 
     if (currentVideo) {
         currentVideo.style.display = "none"; // Hide previous video
@@ -113,7 +127,7 @@ function playVideoAtIndex(index) {
     if (newVideo) {
         newVideo.style.display = "block"; // Show and play new video
         currentIndex = index;
-        window.history.pushState({}, '', `/play/${videoList[currentIndex].id}`);
+        window.history.pushState({}, '', `/play/${newVideoId}`);
 
         playPauseBtn.click();
 
