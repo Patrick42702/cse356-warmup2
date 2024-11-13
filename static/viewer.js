@@ -138,13 +138,14 @@ function handleScroll(event) {
 // Play/pause button functionality
 document.addEventListener("DOMContentLoaded", () => {
     playPauseBtn.addEventListener("click", () => {
+        const playPauseRealBtn = document.getElementById("playPauseBtnButton");
         const currentPlayer = playerInstances[currentIndex];
         if (currentPlayer.isPaused()) {
             currentPlayer.play();
-            playPauseBtn.textContent = "Pause";
+            playPauseRealBtn.textContent = "Pause";
         } else {
             currentPlayer.pause();
-            playPauseBtn.textContent = "Play";
+            playPauseRealBtn.textContent = "Play";
         }
     });
 })
