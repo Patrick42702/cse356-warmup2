@@ -141,11 +141,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const playPauseRealBtn = document.getElementById("playPauseBtnButton");
         const currentPlayer = playerInstances[currentIndex];
         if (currentPlayer.isPaused()) {
-            currentPlayer.play();
             playPauseRealBtn.textContent = "Pause";
+            currentPlayer.play();
         } else {
-            currentPlayer.pause();
             playPauseRealBtn.textContent = "Play";
+            currentPlayer.pause();
         }
     });
 })
