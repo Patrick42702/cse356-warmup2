@@ -165,7 +165,7 @@ def processing_status():
     except Exception as e:
         return error(str(e))
 
-@routes.route('/api/thumbnail/<id>', methods=["POST"])
+@routes.route('/api/thumbnail/<id>')
 def get_thumbnail(id):
     thumbnail = current_app.static_folder + f"/media/{id}/thumbnail_{id}.jpg"
 
