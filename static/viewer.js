@@ -135,7 +135,8 @@ function handleScroll(event) {
 }
 
 // Play/pause button functionality
-playPauseBtn.addEventListener("click", () => {
+document.addEventListener("DOMContentLoaded", () => {
+ playPauseBtn.addEventListener("click", () => {
     const currentPlayer = playerInstances[currentIndex];
     if (currentPlayer.isPaused()) {
         currentPlayer.play();
@@ -145,6 +146,18 @@ playPauseBtn.addEventListener("click", () => {
         playPauseBtn.textContent = "Play";
     }
 });
+}
+
+// playPauseBtn.addEventListener("click", () => {
+//     const currentPlayer = playerInstances[currentIndex];
+//     if (currentPlayer.isPaused()) {
+//         currentPlayer.play();
+//         playPauseBtn.textContent = "Pause";
+//     } else {
+//         currentPlayer.pause();
+//         playPauseBtn.textContent = "Play";
+//     }
+// });
 
 // Seek bar functionality
 seekBar.addEventListener("input", () => {
