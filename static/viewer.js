@@ -69,17 +69,15 @@ async function loadVideoList() {
     });
     const data = await response.json();
     videoList = data.videos.map(video => ({ id: video.id, metadata: video }));
-    populateVideos(videoList);
-
     const initialVideoId = getVideoIdFromUrl();
-    if (initialVideoId) {
-        const initialIndex = videoList.findIndex(video => video.id === initialVideoId);
-        if (initialIndex !== -1) {
-            playInitialVideo(initialIndex);
-        }
-    } else {
-        playInitialVideo(0); // Play the first video by default if no ID is in the URL
+    const initialIndex = videoList.findIndex(video => video.id === initialVideoId);
+    if (initialIndex !== -1) {
+        const [initialVideo] = videoList.splice(initialIndex, 1);
+        videoList.unshift(initialVideo);
+        playInitialVideo(initialIndex);
     }
+    populateVideos(videoList);
+    playInitialVideo(0); // Play the first video
 }
 
 // Fetch and add more videos when near the end of the list
