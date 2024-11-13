@@ -49,8 +49,7 @@ function populateVideos(videos) {
         const videoElement = document.createElement("video");
         videoElement.setAttribute("data-index", index + videoList.length - num_fetch_videos);
         videoElement.controls = true;
-        videoElement.muted = true;
-        // videoElement.pause();
+        videoElement.preload = true;
         videoElement.style.display = "none"; // Hide video initially
         videosDiv.appendChild(videoElement);
 
