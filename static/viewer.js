@@ -50,12 +50,13 @@ function populateVideos(videos) {
         videoElement.setAttribute("data-index", index + videoList.length - num_fetch_videos);
         videoElement.controls = true;
         videoElement.muted = true;
-        videoElement.pause();
+        // videoElement.pause();
         videoElement.style.display = "none"; // Hide video initially
         videosDiv.appendChild(videoElement);
 
         // Initialize the Dash.js player and store it in playerInstances
         const playerInstance = initializeDashPlayer(videoElement, video.id);
+        playerInstance.pause();
         playerInstances.push(playerInstance);
     });
 }
