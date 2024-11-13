@@ -95,10 +95,6 @@ h1, h2 {
 }
 
 #playPauseBtn {
-    margin-top: 16px;
-}
-
-#playPauseBtnButton {
     padding: 8px 20px;
     font-size: 14px;
     border: none;
@@ -108,7 +104,7 @@ h1, h2 {
     cursor: pointer;
 }
 
-#playPauseBtnButton:hover {
+#playPauseBtn:hover {
     background-color: #218838;
 }
 

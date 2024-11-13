@@ -140,15 +140,14 @@ function handleScroll(event) {
 }
 
 function clickPlayPauseBtn() {
-    const playPauseRealBtn = document.getElementById("playPauseBtnButton");
-        const currentPlayer = playerInstances[currentIndex];
-        if (currentPlayer.isPaused()) {
-            playPauseRealBtn.textContent = "Pause";
-            currentPlayer.play();
-        } else {
-            playPauseRealBtn.textContent = "Play";
-            currentPlayer.pause();
-        }
+    const currentPlayer = playerInstances[currentIndex];
+    if (currentPlayer.isPaused()) {
+        playPauseBtn.textContent = "Pause";
+        currentPlayer.play();
+    } else {
+        playPauseBtn.textContent = "Play";
+        currentPlayer.pause();
+    }
 }
 
 // Seek bar functionality
