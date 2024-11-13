@@ -49,7 +49,7 @@ function populateVideos(videos) {
         const videoElement = document.createElement("video");
         videoElement.setAttribute("data-index", index + videoList.length - num_fetch_videos);
         videoElement.controls = true;
-        videoElement.preload = true;
+        videoElement.preload = "auto";
         videoElement.style.display = "none"; // Hide video initially
         videosDiv.appendChild(videoElement);
 
@@ -106,10 +106,11 @@ function playVideoAtIndex(index) {
     }
 
     if (newVideo) {
-        // playerInstances[index].play();
         newVideo.style.display = "block"; // Show and play new video
         currentIndex = index;
         window.history.pushState({}, '', `/play/${videoList[currentIndex].id}`);
+
+        playPauseBtn.click();
 
          playerInstances[currentIndex].on(dashjs.MediaPlayer.events.PLAYBACK_METADATA_LOADED, () => {
             seekBar.max = playerInstances[currentIndex].duration();
