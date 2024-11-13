@@ -15,7 +15,7 @@ function getVideoIdFromUrl() {
 // Initialize Dash.js player with resolution selection
 function initializeDashPlayer(videoElement, videoId) {
     const player = dashjs.MediaPlayer().create();
-    player.initialize(videoElement, `../static/media/${videoId}/${videoId}.mpd`, true);
+    player.initialize(videoElement, `../static/media/${videoId}/${videoId}.mpd`, false);
 
     // Add resolution selection
     player.updateSettings({ streaming: { abr: { autoSwitchBitrate: false } } });
