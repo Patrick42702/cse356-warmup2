@@ -27,7 +27,7 @@ async function generateVideoList() {
 
             // Create image element for the thumbnail
             const thumbnail = document.createElement("img");
-            thumbnail.src = `/static/media/${videoId}/thumbnail_${videoId}.jpg`;
+            thumbnail.src = `/api/thumbnail/${videoId}`;
             thumbnail.alt = `Thumbnail for video ${videoId}`;
             thumbnail.className = "thumbnail";
 

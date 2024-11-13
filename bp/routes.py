@@ -165,6 +165,16 @@ def processing_status():
     except Exception as e:
         return error(str(e))
 
+@routes.route('/api/thumbnail/<id>', methods=["POST"])
+def get_thumbnail(id):
+    thumbnail = current_app.static_folder + f"/media/{id}/thumbnail_{id}.jpg"
+
+    # Verify if the file exists
+    if not os.path.exists(file_path):
+        return error("File not found")
+
+    # Serve the file using `send_from_directory`
+    return send_from_directory(f"{current_app.static_folder}/media/{id}", f"thumbnail_{id}.jpg")
 
 @routes.route('/api/<path:path>', methods=["GET"])
 def api_media(path):
