@@ -170,7 +170,7 @@ def get_thumbnail(id):
     thumbnail = current_app.static_folder + f"/media/{id}/thumbnail_{id}.jpg"
 
     # Verify if the file exists
-    if not os.path.exists(file_path):
+    if not os.path.exists(thumbnail):
         return error("File not found")
 
     # Serve the file using `send_from_directory`
