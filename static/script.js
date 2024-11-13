@@ -26,23 +26,23 @@
 //     registerform.style.setProperty("--display", "flex")
 // })
 
-document.getElementById('register-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const username = document.getElementById('register-username').value;
-    const password = document.getElementById('register-password').value;
-    const email = document.getElementById('register-email').value;
-
-    const response = await fetch('/api/adduser', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password, email })
-    });
-    const result = await response.json();
-    document.getElementById('message').innerText = result.message;
-    document.getElementById('message').style.display = "block";
-});
+// document.getElementById('register-form').addEventListener('submit', async (e) => {
+//     e.preventDefault();
+//     const username = document.getElementById('register-username').value;
+//     const password = document.getElementById('register-password').value;
+//     const email = document.getElementById('register-email').value;
+//
+//     const response = await fetch('/api/adduser', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ username, password, email })
+//     });
+//     const result = await response.json();
+//     document.getElementById('message').innerText = result.message;
+//     document.getElementById('message').style.display = "block";
+// });
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
