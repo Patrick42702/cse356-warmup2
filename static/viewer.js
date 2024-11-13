@@ -175,10 +175,9 @@ function updateSeekBar() {
 
 // Initialize video list and set up scroll event
 document.addEventListener("DOMContentLoaded", async () => {
-    await loadVideoList();
     window.addEventListener("wheel", handleScroll, { passive: false });
-    updateSeekBar();
     playPauseBtn.addEventListener("click", () => clickPlayPauseBtn());
+    await loadVideoList();
 });
 
 // Like/Dislike Button
