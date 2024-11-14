@@ -163,6 +163,7 @@ function playVideoAtIndex(index) {
 function handleScroll() {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const currentPlayer = playerInstances[currentIndex];
+    console.log(scrollY);
 
     if (!currentPlayer.isPaused()) {
         playPauseBtn.click();
@@ -179,7 +180,7 @@ function handleScroll() {
     }
 
     // Reset scroll position to avoid cumulative scroll effect
-    window.scrollTo(0, 1);
+    window.scrollTo(0, 10);
 }
 function clickPlayPauseBtn() {
     const currentPlayer = playerInstances[currentIndex];
