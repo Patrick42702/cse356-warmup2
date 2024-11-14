@@ -51,6 +51,7 @@ function populateVideos(videos) {
         videoElement.controls = true;
         videoElement.preload = "auto";
         videoElement.style.display = "none"; // Hide video initially
+        videoElement.style.vh = "100vh";
         videosDiv.appendChild(videoElement);
 
         // Initialize the Dash.js player and store it in playerInstances
@@ -138,24 +139,47 @@ function playVideoAtIndex(index) {
 }
 
 // Handle scroll event to navigate through videos
-function handleScroll(event) {
-    event.preventDefault();
+// function handleScroll(event) {
+//     event.preventDefault();
+//
+    // const currentPlayer = playerInstances[currentIndex];
+    // if (!currentPlayer.isPaused()) {
+    //     playPauseBtn.click();
+    // }
+//
+//     if (event.deltaY > 0) { // Scroll down
+//         if (currentIndex < videoList.length - 1) {
+//             playVideoAtIndex(currentIndex + 1);
+//         }
+//         if (currentIndex >= videoList.length - 5) {
+//             loadMoreVideos(); // Fetch more videos when near the end of the list
+//         }
+//     } else if (event.deltaY < 0 && currentIndex > 0) { // Scroll up
+//         playVideoAtIndex(currentIndex - 1);
+//     }
+// }
 
+// Handle scroll event for infinite scroll navigation
+function handleScroll() {
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
     const currentPlayer = playerInstances[currentIndex];
+
     if (!currentPlayer.isPaused()) {
         playPauseBtn.click();
     }
-
-    if (event.deltaY > 0) { // Scroll down
+    if (scrollY > 0) {  // Scroll down
         if (currentIndex < videoList.length - 1) {
             playVideoAtIndex(currentIndex + 1);
         }
         if (currentIndex >= videoList.length - 5) {
             loadMoreVideos(); // Fetch more videos when near the end of the list
         }
-    } else if (event.deltaY < 0 && currentIndex > 0) { // Scroll up
+    } else if (scrollY < 0 && currentIndex > 0) {  // Scroll up
         playVideoAtIndex(currentIndex - 1);
     }
+
+    // Reset scroll position to avoid cumulative scroll effect
+    window.scrollTo(0, 0);
 }
 
 function clickPlayPauseBtn() {
@@ -184,9 +208,11 @@ function updateSeekBar() {
     }
 }
 
+
 // Initialize video list and set up scroll event
 document.addEventListener("DOMContentLoaded", async () => {
-    window.addEventListener("wheel", handleScroll, { passive: false });
+    // window.addEventListener("wheel", handleScroll, { passive: false });
+    window.addEventListener("scroll", handleScroll);
     playPauseBtn.addEventListener("click", () => clickPlayPauseBtn());
     await loadVideoList();
 });
