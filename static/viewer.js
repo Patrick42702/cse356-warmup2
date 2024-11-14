@@ -167,21 +167,20 @@ function handleScroll() {
     if (!currentPlayer.isPaused()) {
         playPauseBtn.click();
     }
-    if (scrollY > 0) {  // Scroll up
+    if (scrollY > 0) {  // Scroll down
         if (currentIndex < videoList.length - 1) {
             playVideoAtIndex(currentIndex + 1);
         }
         if (currentIndex >= videoList.length - 5) {
             loadMoreVideos(); // Fetch more videos when near the end of the list
         }
-    } else if (scrollY === 0 && currentIndex > 0) { // scroll down
+    } else if (scrollY < 0 && currentIndex > 0) {  // Scroll up
         playVideoAtIndex(currentIndex - 1);
     }
 
     // Reset scroll position to avoid cumulative scroll effect
     window.scrollTo(0, 0);
 }
-
 function clickPlayPauseBtn() {
     const currentPlayer = playerInstances[currentIndex];
     if (currentPlayer.isPaused()) {
