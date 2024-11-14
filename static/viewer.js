@@ -179,7 +179,7 @@ function handleScroll() {
     }
 
     // Reset scroll position to avoid cumulative scroll effect
-    window.scrollTo(0, 1);
+    window.scrollTo(0, 0);
 }
 
 function clickPlayPauseBtn() {
