@@ -107,8 +107,9 @@ def get_videos():
 @routes.route('/media/<path:path>', methods=["GET"])
 @check_session
 def get_media(path):
+    id = path.split("_")[1]
     try:
-        resp = make_response(send_from_directory(f"{current_app.static_folder}/media", path))
+        resp = make_response(send_from_directory(f"{current_app.static_folder}/media/{id}", path))
         resp.headers["X-CSE356"] = SUBMIT_ID
         return resp
     except Exception as e:
