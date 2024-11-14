@@ -175,7 +175,9 @@ def get_thumbnail(id):
         return error("File not found")
 
     # Serve the file using `send_from_directory`
-    return send_from_directory(f"{current_app.static_folder}/media/{id}", f"thumbnail_{id}.jpg")
+    resp = make_response(send_from_directory(f"{current_app.static_folder}/media/{id}", f"thumbnail_{id}.jpg"))
+    resp.headers["X-CSE356"] = SUBMIT_ID
+    return resp
 
 @routes.route('/api/<path:path>', methods=["GET"])
 def api_media(path):
