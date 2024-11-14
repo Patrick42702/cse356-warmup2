@@ -159,12 +159,9 @@ function playVideoAtIndex(index) {
 //     }
 // }
 
-let lastscrollY = window.scrollY || document.documentElement.scrollTop;
 function handleScroll() {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const currentPlayer = playerInstances[currentIndex];
-    console.log(scrollY);
-    console.log(lastScrollY + "-----------------");
 
     if (!currentPlayer.isPaused()) {
         playPauseBtn.click();
@@ -182,7 +179,7 @@ function handleScroll() {
 
 
     // Reset scroll position to avoid cumulative scroll effect
-    window.scrollTo(0, scrollY + 10);
+    window.scrollTo(0, 0);
 }
 
 function clickPlayPauseBtn() {
