@@ -74,6 +74,10 @@ class CollaborativeFiltering:
         return predicted_matrix
 
     def get_top_recommendations(self, user_id, watched_video_ids, k):
+        all_videos = [vid for vid in db.videos.find()]
+        sorted_videos = sorted(all_videos, key=lambda vid: len(vid['likes']), reverse=True)
+        return [str(vid['_id']) for vid in sorted_videos[:k]]
+
         processing_videos = [str(vid['_id']) for vid in db.videos.find({'status':'processing'})]
 
         if len(watched_video_ids) == 0: # we don't know their preferences
