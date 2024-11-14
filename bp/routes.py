@@ -178,17 +178,14 @@ def get_thumbnail(id):
 
 @routes.route('/api/<path:path>', methods=["GET"])
 def api_media(path):
-    ftype = path.split("/")[0]
-    file = path.split("/")[-1]
-    id = file.split("-")[0]
+    ftype = path.split("/")[0] #manifest
+    id = path.split("/")[-1] #id
     fpath = ""
     if ftype == "manifest":
         fpath += f"{id}.mpd"
-    elif ftype == "thumbnail":
-        fpath += f"thumbnail_{id}.jpg"
     try:
         if "token" in request.cookies and validate_session(request.cookies["token"]):
-            resp = make_response(send_from_directory(f"{current_app.static_folder}/media", fpath))
+            resp = make_response(send_from_directory(f"{current_app.static_folder}/media/{id}", fpath))
             resp.headers["X-CSE356"] = SUBMIT_ID
             return resp
         else:
