@@ -167,14 +167,14 @@ function handleScroll() {
     if (!currentPlayer.isPaused()) {
         playPauseBtn.click();
     }
-    if (scrollY === 0) {  // Scroll down
+    if (scrollY === 2) {  // Scroll up
         if (currentIndex < videoList.length - 1) {
             playVideoAtIndex(currentIndex + 1);
         }
         if (currentIndex >= videoList.length - 5) {
             loadMoreVideos(); // Fetch more videos when near the end of the list
         }
-    } else if (scrollY !== 0 && currentIndex > 0) {  // Scroll up
+    } else if (scrollY === 0 && currentIndex > 0) { // scroll down
         playVideoAtIndex(currentIndex - 1);
     }
 
