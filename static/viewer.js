@@ -185,7 +185,7 @@ function handleScroll() {
     lastScrollY = scrollY;
 
     // Reset scroll position to avoid cumulative scroll effect
-    window.scrollTo(0, scrollY + 10);
+    window.scrollTo(0, 0);
 }
 
 function clickPlayPauseBtn() {
@@ -221,7 +221,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.addEventListener("scroll", handleScroll);
     playPauseBtn.addEventListener("click", () => clickPlayPauseBtn());
     await loadVideoList();
-    window.scrollTo(0, 10);
 });
 
 // Like/Dislike Button
