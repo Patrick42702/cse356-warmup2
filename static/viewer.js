@@ -160,6 +160,8 @@ function playVideoAtIndex(index) {
 // }
 
 // Handle scroll event for infinite scroll navigation
+let lastScrollY = window.scrollY || document.documentElement.scrollTop;
+
 function handleScroll() {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const currentPlayer = playerInstances[currentIndex];
@@ -168,20 +170,23 @@ function handleScroll() {
     if (!currentPlayer.isPaused()) {
         playPauseBtn.click();
     }
-    if (scrollY > 0) {  // Scroll down
+    if (scrollY > lastScrollY) {  // Scroll down
         if (currentIndex < videoList.length - 1) {
             playVideoAtIndex(currentIndex + 1);
         }
         if (currentIndex >= videoList.length - 5) {
             loadMoreVideos(); // Fetch more videos when near the end of the list
         }
-    } else if (scrollY <= 0 && currentIndex > 0) {  // Scroll up
+    } else if (scrollY < lastScrollY ) {  // Scroll up
         playVideoAtIndex(currentIndex - 1);
     }
 
+    lastScrollY = scrollY;
+
     // Reset scroll position to avoid cumulative scroll effect
-    window.scrollTo(0, 10);
+    window.scrollTo(0, scrollY + 10);
 }
+
 function clickPlayPauseBtn() {
     const currentPlayer = playerInstances[currentIndex];
     if (currentPlayer.isPaused()) {
