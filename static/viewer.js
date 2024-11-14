@@ -4,7 +4,7 @@ let playerInstances = []; // Stores Dash.js player instances for each video
 const resolutionSelect = document.getElementById("resolutionSelect");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const seekBar = document.getElementById("seekBar");
-const num_fetch_videos = 20;
+const num_fetch_videos = 10;
 
 // Extract Video ID from URL
 function getVideoIdFromUrl() {
@@ -179,7 +179,7 @@ function handleScroll() {
     }
 
     // Reset scroll position to avoid cumulative scroll effect
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function clickPlayPauseBtn() {
