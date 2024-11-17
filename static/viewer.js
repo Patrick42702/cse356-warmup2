@@ -1,10 +1,11 @@
-let videoList = []; // Holds all loaded videos
+let videoIdList = []; // Holds all loaded video ids
 let currentIndex = 0; // Tracks the current video index
 let playerInstances = []; // Stores Dash.js player instances for each video
 const resolutionSelect = document.getElementById("resolutionSelect");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const seekBar = document.getElementById("seekBar");
-const num_fetch_videos = 10;
+const numFetchVideos = 10;
+const initialVideoId = getVideoIdFromUrl()
 
 // Extract Video ID from URL
 function getVideoIdFromUrl() {
@@ -42,12 +43,12 @@ function initializeDashPlayer(videoElement, videoId) {
 }
 
 // Populate videos div with initialized Dash.js video players, keeping them paused initially and hidden
-function populateVideos(videos) {
+function populateVideos(videoIds) {
     const videosDiv = document.getElementById("videos");
 
-    videos.forEach((video, index) => {
+    videoIds.forEach((videoId, index) => {
         const videoElement = document.createElement("video");
-        videoElement.setAttribute("data-index", index + videoList.length - num_fetch_videos);
+        videoElement.setAttribute("data-index", index + videoIdList.length - numFetchVideos);
         videoElement.controls = true;
         videoElement.preload = "auto";
         videoElement.style.display = "none"; // Hide video initially
@@ -55,28 +56,25 @@ function populateVideos(videos) {
         videosDiv.appendChild(videoElement);
 
         // Initialize the Dash.js player and store it in playerInstances
-        const playerInstance = initializeDashPlayer(videoElement, video.id);
+        const playerInstance = initializeDashPlayer(videoElement, videoId);
         playerInstance.pause();
         playerInstances.push(playerInstance);
     });
 }
 
 // Fetch initial list of videos on load
-async function loadVideoList() {
+async function initialVideoLoad() {
     const response = await fetch('/api/videos', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: num_fetch_videos })
+        body: JSON.stringify({ count: numFetchVideos, videoId: initialVideoId })
     });
     const data = await response.json();
-    videoList = data.videos.map(video => ({ id: video.id, metadata: video }));
-    const initialVideoId = getVideoIdFromUrl();
-    const initialIndex = videoList.findIndex(video => video.id === initialVideoId);
-    if (initialIndex !== -1) {
-        const [initialVideo] = videoList.splice(initialIndex, 1);
-        videoList.unshift(initialVideo);
-    }
-    populateVideos(videoList);
+    videoIdList = data.videos.map(video => video.id);
+    const initialIndex = videoIdList.indexOf(initialVideoId);
+    initialIndex === -1 ? videoIdList.pop() : videoIdList.splice(initialIndex, 1);
+    videoIdList.unshift(initialVideoId); // Put initialVideoId in front of list
+    populateVideos(videoIdList);
     playInitialVideo(0); // Play the first video
 }
 
@@ -85,18 +83,18 @@ async function loadMoreVideos() {
     const response = await fetch('/api/videos', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: num_fetch_videos })
+        body: JSON.stringify({ count: numFetchVideos })
     });
     const data = await response.json();
-    const newVideos = data.videos.map(video => ({ id: video.id, metadata: video }));
-    videoList = [...videoList, ...newVideos];
-    populateVideos(newVideos);
+    const newVideoIds = data.videos.map(video => video.id);
+    videoIdList = [...videoIdList, ...newVideoIds];
+    populateVideos(newVideoIds);
 }
 
 function playInitialVideo(index) {
     const videosDiv = document.getElementById("videos");
     const newVideo = videosDiv.querySelector(`[data-index="${index}"]`);
-    const newVideoId = videoList[index].id;
+    const newVideoId = videoIdList[index];
 
     fetch("/api/view", {
             method: "POST",
@@ -113,7 +111,7 @@ function playVideoAtIndex(index) {
     const videosDiv = document.getElementById("videos");
     const currentVideo = videosDiv.querySelector(`[data-index="${currentIndex}"]`);
     const newVideo = videosDiv.querySelector(`[data-index="${index}"]`);
-    const newVideoId = videoList[index].id;
+    const newVideoId = videoIdList[index];
 
     fetch("/api/view", {
             method: "POST",
@@ -138,27 +136,6 @@ function playVideoAtIndex(index) {
     }
 }
 
-// Handle scroll event to navigate through videos
-// function handleScroll(event) {
-//     event.preventDefault();
-//
-    // const currentPlayer = playerInstances[currentIndex];
-    // if (!currentPlayer.isPaused()) {
-    //     playPauseBtn.click();
-    // }
-//
-//     if (event.deltaY > 0) { // Scroll down
-//         if (currentIndex < videoList.length - 1) {
-//             playVideoAtIndex(currentIndex + 1);
-//         }
-//         if (currentIndex >= videoList.length - 5) {
-//             loadMoreVideos(); // Fetch more videos when near the end of the list
-//         }
-//     } else if (event.deltaY < 0 && currentIndex > 0) { // Scroll up
-//         playVideoAtIndex(currentIndex - 1);
-//     }
-// }
-
 function handleScroll() {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const currentPlayer = playerInstances[currentIndex];
@@ -168,10 +145,10 @@ function handleScroll() {
         playPauseBtn.click();
     }
     if (scrollY > 10) {  // Scroll down
-        if (currentIndex < videoList.length - 1) {
+        if (currentIndex < videoIdList.length - 1) {
             playVideoAtIndex(currentIndex + 1);
         }
-        if (currentIndex >= videoList.length - 5) {
+        if (currentIndex >= videoIdList.length - 5) {
             loadMoreVideos(); // Fetch more videos when near the end of the list
         }
     } else if (scrollY < 10 && currentIndex > 0) {  // Scroll up
@@ -211,11 +188,10 @@ function updateSeekBar() {
 
 // Initialize video list and set up scroll event
 document.addEventListener("DOMContentLoaded", async () => {
-    // window.addEventListener("wheel", handleScroll, { passive: false });
     window.scrollTo(0, 10);
     window.addEventListener("scroll", handleScroll);
     playPauseBtn.addEventListener("click", () => clickPlayPauseBtn());
-    await loadVideoList();
+    await initialVideoLoad();
 });
 
 // Like/Dislike Button
