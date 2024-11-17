@@ -88,7 +88,11 @@ def get_videos():
     try:
         user = get_user(request.cookies)
         count = int(request.json["count"])
-        recommended_video_ids = rec_algo.get_top_recommendations(str(user['_id']), user['watched'], count)
+        video_id = request.json.get("video_id")
+        if video_id:
+            recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count)
+        else:
+            recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count)
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
         for video in recommended_videos:
@@ -132,7 +136,7 @@ def upload_file():
         title = request.form["title"]
         current_app.logger.info("got info from forms")
         video_id = videos.insert_one({"user": user["_id"], "author": author, "title": title, "description": f"{author}'s video: {title}", "status": "processing", "likes": []}).inserted_id
-        rec_algo.add_video(str(video_id))
+        rec_algo.add_video(video_id)
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
         current_app.logger.info("Inserted info into database, now pulling file and saving")
         mp4file = request.files["mp4File"]
