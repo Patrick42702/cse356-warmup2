@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Create a FormData object from the form
         const formData = new FormData(form);
+        formData.append('description', `${formData.get('author')}: ${formData.get('title')}`)
 
         const response = await fetch('/api/upload', {
           method: "POST",

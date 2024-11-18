@@ -21,7 +21,7 @@ def create_app():
 
     @app.before_request
     def log_request_info():
-        if not request.path.startswith('/static/media/'):
+        if not request.path.startswith('/static/media/') and request.remote_addr != "127.0.0.1":
             app.logger.info("-" * 110)
             app.logger.info('--- REQUEST --- ')
             app.logger.info('Mimetype: %s', request.mimetype)
@@ -37,7 +37,7 @@ def create_app():
 
     @app.after_request
     def log_response(response):
-        if not request.path.startswith('/static/media/'):
+        if not request.path.startswith('/static/media/') and request.remote_addr != "127.0.0.1":
             try:
                 app.logger.info('--- RESPONSE --- ')
                 app.logger.info('Status: %s', response.status)
@@ -57,5 +57,5 @@ app, celery = create_app()
 
 if __name__ == "__main__":
     host = os.getenv('HOST', "0.0.0.0")
-    port = int(os.getenv('PORT', 80))
+    port = int(os.getenv('PORT', 5050))
     app.run(host=host, port=port)
