@@ -4,9 +4,12 @@ from bp.celery import make_celery
 from bp.auth import auth
 from bp.routes import routes
 import logging
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1, x_port=1, x_prefix=1)
     app.config.update(
         broker_url='redis://redis:6379/0',
         result_backend='redis://redis:6379/0',
