@@ -1,0 +1,13 @@
+# this yaml file assumes that the volume's fs have been created
+- name: Mount volumes
+  hosts: remote_server
+  become: yes  # Run tasks as root
+
+  tasks:
+    - name: Install Python 3 and pip3
+      apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+

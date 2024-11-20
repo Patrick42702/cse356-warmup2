@@ -92,20 +92,10 @@
         state: present
         update_cache: yes
 
-    - name: Configure postfix for sending emails
-      copy:
+    - name: Copy postfix config file
+      ansible.builtin.copy:
+        src: ./main.cf
         dest: /etc/postfix/main.cf
-        content: |
-          # Basic Postfix configuration
-          myhostname = your.server.com
-          mydomain = your.server.com
-          myorigin = $mydomain
-          inet_interfaces = all
-          mydestination = $myhostname, localhost.$mydomain, localhost
-          relayhost =
-          mailbox_size_limit = 0
-          recipient_delimiter = +
-          inet_protocols = all
         owner: root
         group: root
         mode: '0644'
