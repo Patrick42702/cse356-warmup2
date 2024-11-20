@@ -11,6 +11,8 @@ services:
       - html:/usr/share/nginx/html:rw
     environment:
       - DEFAULT_HOST=esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
+    labels:
+      - "com.github.nginx-proxy.nginx"
     restart: always
 
   acme-companion:
@@ -25,6 +27,7 @@ services:
       - acme:/etc/acme.sh
     environment:
       - DEFAULT_EMAIL=patrick.muller.1@stonybrook.edu
+      - NGINX_PROXY_CONTAINER=nginx-proxy
     restart: always
 
   redis:
