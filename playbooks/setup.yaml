@@ -92,6 +92,14 @@
         state: present
         update_cache: yes
 
+    - name: Set /etc/mailname
+      ansible.builtin.copy:
+        content: "esk-pj-airplanes.cse356.compas.cs.stonybrook.edu\n"
+        dest: /etc/mailname
+        owner: root
+        group: root
+        mode: '0644'
+
     - name: Copy postfix config file
       ansible.builtin.copy:
         src: ./main.cf
