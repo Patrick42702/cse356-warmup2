@@ -51,3 +51,15 @@ def get_user(cookies):
     identity = jwt.decode(cookies["token"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
     user = db.users.find_one({"username": identity["username"]})
     return user
+
+def get_ens3_ip():
+    try:
+        # Get addresses associated with 'ens3'
+        addresses = netifaces.ifaddresses('ens3')
+        # Get the IPv4 address
+        ip_info = addresses.get(netifaces.AF_INET, [{}])
+        if ip_info:
+            return ip_info[0]['addr']
+    except ValueError as e:
+        print(f"Error fetching IP for 'ens3': {e}")
+    return None
