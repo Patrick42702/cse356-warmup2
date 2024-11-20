@@ -3,6 +3,7 @@ from flask import make_response, request, current_app, render_template
 import traceback
 import json
 import jwt
+import netifaces
 
 DOMAIN = "esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
 SUBMIT_ID = "66d216517f77bf55c5005074"
