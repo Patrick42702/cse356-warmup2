@@ -8,7 +8,6 @@
     - name: Ensure system packages are up to date
       apt:
         update_cache: yes
-        force_apt_get: yes
         upgrade: dist
 
     - name: Install Python 3 and pip3
