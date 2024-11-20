@@ -1,0 +1,134 @@
+- name: Deploy Flask Application Environment
+  hosts: remote_server
+  become: yes  # Run tasks as root
+  vars:
+    docker_compose_version: "1.29.2"
+
+  tasks:
+    - name: Ensure system packages are up to date
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        upgrade: dist
+
+    - name: Install Python 3 and pip3
+      apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+
+    - name: Copy pub keys to auth_keys
+      copy:
+        src: ./authorized_keys
+        dest: ~/.ssh/authorized_keys
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Ensure Docker is running and enabled at boot
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Add user to Docker group
+      user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: yes
+        state: present
+
+    - name: Verify Docker installation
+      shell: docker --version
+      register: docker_version
+
+    - debug:
+        var: docker_version.stdout
+
+    - name: Verify Docker Compose installation
+      shell: docker-compose --version
+      register: docker_compose_version
+
+    - debug:
+        var: docker_compose_version.stdout
+
+    - name: Ensure mailutils and postfix are installed
+      apt:
+        name:
+          - mailutils
+          - postfix
+        state: present
+        update_cache: yes
+
+    - name: Configure postfix for sending emails
+      copy:
+        dest: /etc/postfix/main.cf
+        content: |
+          # Basic Postfix configuration
+          myhostname = your.server.com
+          mydomain = your.server.com
+          myorigin = $mydomain
+          inet_interfaces = all
+          mydestination = $myhostname, localhost.$mydomain, localhost
+          relayhost =
+          mailbox_size_limit = 0
+          recipient_delimiter = +
+          inet_protocols = all
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart postfix
+
+    - name: Ensure postfix is enabled and started
+      systemd:
+        name: postfix
+        enabled: true
+        state: started
+
+    - name: Run the ipv6 tables command
+      ansible.builtin.command:
+        cmd: ip6tables -I OUTPUT -p tcp -m tcp --dport 25 -j DROP
+
+    - name: Run the ip tables command
+      ansible.builtin.command:
+        cmd: iptables -t nat -I OUTPUT -o ens3 -p tcp -m tcp --dport 25 -j DNAT --to-destination 130.245.136.123:11587
+
+
+  handlers:
+    - name: restart postfix
+      systemd:
+        name: postfix
+        state: restarted
