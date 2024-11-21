@@ -6,12 +6,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - ./confs:/etc/nginx/vhost.d:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - certs:/etc/nginx/certs:rw
       - html:/usr/share/nginx/html:rw
     environment:
       - DEFAULT_HOST=esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
-      - CLIENT_MAX_BODY_SIZE=100M  # Set the desired upload limit
     labels:
       - "com.github.nginx-proxy.nginx"
     restart: always
