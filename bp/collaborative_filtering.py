@@ -7,7 +7,7 @@ class CollaborativeFiltering:
     def __init__(self):
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))
-        self.video_ids = [str(video['_id']) for video in videos]  # ObjectId
+        self.video_ids = [video['_id'] for video in videos]  # ObjectId
         self.u2i = {str(doc['_id']): idx for idx, doc in enumerate(users)}  # String ID
         self.v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
 
