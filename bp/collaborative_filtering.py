@@ -45,6 +45,8 @@ class CollaborativeFiltering:
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         print(f"Top {count}:  {recommendations[:count]}")
         processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})}
+        print(f"Remove processing videos: {processing_videos}")
+        print(f"Final list: {list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))}")
         return list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))
 
     def video_based_recommendations(self, video_id, watched, count):
