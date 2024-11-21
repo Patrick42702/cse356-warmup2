@@ -35,6 +35,7 @@ class CollaborativeFiltering:
         self.M[self.u2i[user_id], self.v2i[video_id]] = value
 
     def user_based_recommendations(self, user_id, watched, count):
+        print(f"Received request for {count} videos based on user {user_id}")
         user_idx = self.u2i[user_id]
         similarities = np.dot(self.M, self.M[user_idx])  # might need to change to cosine similarity
         predictions = np.dot(similarities, self.M)  # how our user would rate each video
@@ -42,16 +43,19 @@ class CollaborativeFiltering:
         watched = [self.v2i[vid] for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
+        print(f"Top {count}:  {recommendations[:count]}")
         processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})}
         return list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))
 
     def video_based_recommendations(self, video_id, watched, count):
+        print(f"Received request for {count} videos based on user {video_id}")
         video_idx = self.v2i[video_id]
         similarities = np.dot(self.M[:, video_idx], self.M)  # how similar is each video to our video
         recommendations = np.argsort(similarities)[::-1]  # sort indices from highest to lowest rating
         watched = [self.v2i[vid] for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
+        print(f"Top {count}:  {recommendations[:count]}")
         processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})}
         return list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))
 
