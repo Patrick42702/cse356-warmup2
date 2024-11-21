@@ -82,8 +82,6 @@ services:
       - VIRTUAL_PORT=5050
       - LETSENCRYPT_HOST=esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
       - LETSENCRYPT_EMAIL=patrick.muller.1@stonybrook.edu
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5050/"]
       interval: 5s
