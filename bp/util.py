@@ -4,7 +4,7 @@ import traceback
 import json
 import jwt
 
-DOMAIN = "esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
+DOMAIN = "esk-pj.cse356.compas.cs.stonybrook.edu"
 SUBMIT_ID = "66d216517f77bf55c5005074"
 
 def connect_db():

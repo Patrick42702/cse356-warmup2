@@ -94,7 +94,7 @@
 
     - name: Set /etc/mailname
       ansible.builtin.copy:
-        content: "esk-pj-airplanes.cse356.compas.cs.stonybrook.edu\n"
+        content: "esk-pj.cse356.compas.cs.stonybrook.edu\n"
         dest: /etc/mailname
         owner: root
         group: root

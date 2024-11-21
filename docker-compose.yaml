@@ -11,7 +11,7 @@ services:
       - certs:/etc/nginx/certs:rw
       - html:/usr/share/nginx/html:rw
     environment:
-      - DEFAULT_HOST=esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
+      - DEFAULT_HOST=esk-pj.cse356.compas.cs.stonybrook.edu
     labels:
       - "com.github.nginx-proxy.nginx"
     restart: always
@@ -78,9 +78,9 @@ services:
       mongo:
         condition: service_healthy
     environment:
-      - VIRTUAL_HOST=esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
+      - VIRTUAL_HOST=esk-pj.cse356.compas.cs.stonybrook.edu
       - VIRTUAL_PORT=5050
-      - LETSENCRYPT_HOST=esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
+      - LETSENCRYPT_HOST=esk-pj.cse356.compas.cs.stonybrook.edu
       - LETSENCRYPT_EMAIL=patrick.muller.1@stonybrook.edu
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5050/"]

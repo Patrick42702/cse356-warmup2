@@ -22,7 +22,7 @@ def testmail():
     try:
         email = request.args["email"]
         print(email + '\n')
-        from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
+        from_addr = "root@esk-pj.cse356.compas.cs.stonybrook.edu"
         to_addr = email
         verify_key = os.urandom(12).hex()
         body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
@@ -70,7 +70,7 @@ def add_user():
             msg['From'] = from_addr
             msg['To'] = to_addr
             msg['Subject'] = "Verify your email with ESKPJ"
-            msg['Message-ID'] = f"<{os.urandom(12).hex()}@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu>"
+            msg['Message-ID'] = f"<{os.urandom(12).hex()}@esk-pj.cse356.compas.cs.stonybrook.edu>"
             s = smtplib.SMTP('10.0.1.186', 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
