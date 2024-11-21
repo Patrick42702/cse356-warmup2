@@ -65,7 +65,7 @@ def add_user():
             cs.body_encoding = charset.QP
             from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
             to_addr = email
-            body = f"Please verify your email for eskpj-airplanes video viewer at the following link: http://{DOMAIN}/api/verify?email={quote(email)}&key={verify_key}"
+            body = f"Please verify your email for eskpj-airplanes video viewer at the following link: https://{DOMAIN}/api/verify?email={quote(email)}&key={verify_key}"
             msg = MIMEText(body, 'plain', cs)
             msg['From'] = from_addr
             msg['To'] = to_addr
