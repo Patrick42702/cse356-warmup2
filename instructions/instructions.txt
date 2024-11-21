@@ -1,9 +1,15 @@
-This will be the instructions file on setting the project up on the server.
-STEP 0. Configure our DNS to point to the IP of our server
+On a fresh new instance:
 
-STEP 1. CONFIGURE THE MAIL SERVER
-    - sudo apt install mailutils
-    - select "Internet Site" and press enter
-    - enter esk-pj-airplanes.cse356.compas.cs.stonybrook.edu
-    - test with echo "This is the body" | mail -s "test" testemail@domain.com
+1. Add the ip of new instance to the DNS esk-pj...... on the grading site
 
+2. Add the ip of new instance to /etc/ansible/hosts
+
+3. Run ansible-playbook playbooks/setup.yaml. this may take 5-10 minutes
+
+4. Run ip addr on the command line. Look for "ens3" . That ip address needs to be updated in bp/auth.py on line 74. I wanted to figure out a way to do this dynamically but it was too cumbersome.
+
+5. run ansible-playbook playbooks/repo.yaml . This will install the repostiory, build the images, and run the application
+
+The application should be running and accessible after a bit. It takes time for the app to build the certs from the CA and begin with HTTPS.
+
+TODO: mount volumes to the filesystem for storing videos and the mongo data
