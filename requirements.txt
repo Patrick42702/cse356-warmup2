@@ -10,3 +10,4 @@ flower
 numpy
 requests
 beautifulsoup4
+netifaces
