@@ -9,7 +9,7 @@ from urllib.parse import quote
 import smtplib
 from email.mime.text import MIMEText
 from email import charset
-from .util import db, error, success, validate_session, DOMAIN, get_ens3_ip
+from .util import db, error, success, validate_session, DOMAIN
 from .routes import check_session
 from .collaborative_filtering import rec_algo
 
@@ -71,8 +71,7 @@ def add_user():
             msg['To'] = to_addr
             msg['Subject'] = "Verify your email with ESKPJ"
             msg['Message-ID'] = f"<{os.urandom(12).hex()}@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu>"
-            ens3_ip = get_ens3_ip()
-            s = smtplib.SMTP(ens3_ip, 25)
+            s = smtplib.SMTP('host.docker.internal', 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
             return success({'message': "Email sent"})
