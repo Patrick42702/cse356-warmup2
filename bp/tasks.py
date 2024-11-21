@@ -11,14 +11,9 @@ def process_video(filepath):
 
     # FFmpeg resolution and bitrate options
     ffmpeg_options = [
-        ('254k', '320x180'),
-        ('507k', '320x180'),
-        ('759k', '480x270'),
-        ('1013k', '640x360'),
-        ('1254k', '640x360'),
-        ('1883k', '768x432'),
-        ('3134k', '1024x576'),
-        ('4952k', '1280x720')
+        ('512k', '640x360'),
+        ('768k', '960x540'),
+        ('1024', '1280x720')
     ]
 
     # DASH options
