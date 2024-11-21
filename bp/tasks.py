@@ -13,7 +13,7 @@ def process_video(filepath):
     ffmpeg_options = [
         ('512k', '640x360'),
         ('768k', '960x540'),
-        ('1024', '1280x720')
+        ('1024k', '1280x720')
     ]
 
     # DASH options
