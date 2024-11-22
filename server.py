@@ -3,7 +3,7 @@ from flask import Flask, request
 from bp.celery import make_celery
 from bp.auth import auth
 from bp.routes import routes
-import logging
+from log_util import get_logger
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
@@ -15,7 +15,6 @@ def create_app():
         result_backend='redis://redis:6379/0',
         include=['bp.tasks']
     )
-    app.logger.setLevel(logging.INFO)
     celery = make_celery(app)
 
     #config env variables
@@ -25,30 +24,31 @@ def create_app():
     @app.before_request
     def log_request_info():
         if not request.path.startswith('/static/media/') and request.remote_addr != "127.0.0.1":
-            app.logger.info("-" * 110)
-            app.logger.info('--- REQUEST --- ')
-            app.logger.info('Mimetype: %s', request.mimetype)
+            logger = get_logger(request.path)
+            logger.info("-" * 80)
+            logger.info('--- REQUEST --- ')
+            logger.info('Mimetype: %s', request.mimetype)
             if (len(request.get_data()) < 2 ** 15):
-                app.logger.info('Body: %s', request.get_data())
+                logger.info('Body: %s', request.get_data())
             else:
                 if request.mimetype == 'application/json':
-                    app.logger.info('JSON: %s', request.json)
+                    logger.info('JSON: %s', request.json)
                 else:
-                    app.logger.info('Form: %s', request.form)
-
-            app.logger.info('Cookies: %s', request.cookies)
+                    logger.info('Form: %s', request.form)
+            logger.info('Cookies: %s', request.cookies)
 
     @app.after_request
     def log_response(response):
         if not request.path.startswith('/static/media/') and request.remote_addr != "127.0.0.1":
+            logger = get_logger(request.path)
             try:
-                app.logger.info('--- RESPONSE --- ')
-                app.logger.info('Status: %s', response.status)
-                app.logger.info('Cookies set: %s', response.headers.getlist("Set-Cookie"))
-                app.logger.info('Body: %s', response.get_data())
+                logger.info('--- RESPONSE --- ')
+                logger.info('Status: %s', response.status)
+                logger.info('Cookies set: %s', response.headers.getlist("Set-Cookie"))
+                logger.info('Body: %s', response.get_data())
             except Exception:
-                app.logger.info("Can't display response.")
-            app.logger.info("-" * 110)
+                logger.info("Can't display response.")
+            logger.info("-" * 80)
         return response
 
     app.celery = celery

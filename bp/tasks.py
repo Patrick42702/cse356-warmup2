@@ -3,6 +3,7 @@ from .util import connect_db
 import subprocess
 import os
 from bson import ObjectId
+from log_util import celery_logger
 
 @celery.task
 def process_video(filepath):
@@ -32,7 +33,7 @@ def process_video(filepath):
     file_id = filename.split('.')[0]
     output_mpd = f"{file_id}.mpd"
     input_path = os.path.join(cwd, filename)
-    print(f"{filename} is the filename, {input_path} is the input path, and {file_id} is the file id")
+    celery_logger(f"{filename} is the filename, {input_path} is the input path, and {file_id} is the file id")
 
 
     # Start constructing the FFmpeg command
@@ -60,7 +61,7 @@ def process_video(filepath):
     ffmpeg_cmd.append(output_mpd)
 
     # Run the FFmpeg command for DASH
-    print(f"Processing {filename} with video ID {file_id}")
+    celery_logger(f"Processing {filename} with video ID {file_id}")
     subprocess.run(ffmpeg_cmd)
 
     # Generate thumbnail
@@ -70,12 +71,11 @@ def process_video(filepath):
         'ffmpeg','-hide_banner', '-loglevel', 'error', '-y', '-i', input_path,
         '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path
     ]
-    print(f"Generating thumbnail for {filename} with video ID {file_id}")
+    celery_logger(f"Generating thumbnail for {filename} with video ID {file_id}")
     subprocess.run(thumbnail_cmd)
 
-    print("Processing complete.")
+    celery_logger(f"Processing complete. [{file_id}]")
     db = connect_db()
-    print(file_id)
     db.videos.update_one({"_id": ObjectId(file_id)}, {"$set": {"status": "complete"}})
     return filepath
 
