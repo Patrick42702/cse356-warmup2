@@ -6,8 +6,9 @@ import jwt
 import os
 from .collaborative_filtering import rec_algo
 from bson import ObjectId
+from .log_util import request_loggers
 routes = Blueprint('routes', __name__)
-
+video_interaction_logger, get_videos_logger, upload_file_logger, processing_status_logger, auth_logger = request_loggers
 db = connect_db()
 
 # decorator to check if user is logged in
@@ -91,8 +92,10 @@ def get_videos():
         video_id = request.json.get("video_id")
         if video_id:
             if isinstance(video_id, dict): video_id = video_id['id']
+            get_videos_logger.info(f'Getting {count} recommendations for user {user} based on video {video_id}\nwatched: {user['watched']}')
             recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count)
         else:
+            get_videos_logger.info(f'Getting {count} recommendations for user {user}\nwatched: {user['watched']}')
             recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count)
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
