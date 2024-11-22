@@ -90,7 +90,7 @@ def get_videos():
         user = get_user(request.cookies)
         get_videos_logger.debug(f"User liked: {[doc['_id'] for doc in db.videos.find({ 'likes': { '$elemMatch': { 'user': user['_id'] } } })]}")
         count = int(request.json["count"])
-        video_id = request.json.get("video_id")
+        video_id = request.json.get("videoId")
         if video_id:
             if isinstance(video_id, dict): video_id = video_id['id']
             get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}")
