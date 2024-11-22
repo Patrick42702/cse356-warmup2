@@ -26,7 +26,7 @@ def process_video(filepath):
         '-adaptation_sets', 'id=0,streams=v',
         '-f', 'dash'
     ]
-    # /Users/patrickmuller/school/sb356/cse356-warmup2/static/tmp/6728f0dd8289003926090026/6728f0dd8289003926090026.mp4
+    # /root/cse356-warmup2/static/tmp/6728f0dd8289003926090026/6728f0dd8289003926090026.mp4
     cwd = os.path.dirname(filepath)
     os.chdir(cwd)
 

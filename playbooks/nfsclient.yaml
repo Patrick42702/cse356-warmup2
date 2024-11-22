@@ -8,10 +8,10 @@
         name:
           - nfs-common
 
-    - name: make example directory
-      ansible.builtin.command:
-        cmd: mkdir -p ~/example
-
-    - name: make mount example directory
-      ansible.builtin.command:
-        cmd: sudo mount 10.0.1.150:/root/shared ~/example
+    # - name: make example directory
+    #   ansible.builtin.command:
+    #     cmd: mkdir -p ~/example
+    #
+    # - name: make mount example directory
+    #   ansible.builtin.command:
+    #     cmd: sudo mount 10.0.1.150:/root/shared ~/example
