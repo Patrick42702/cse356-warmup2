@@ -33,7 +33,7 @@ def create_app():
             logger = get_logger(request.path)
             logger.info("-" * 80)
             logger.info('--- REQUEST --- ')
-            logger.info('User: %s (%s)', user['username'], user['id'])
+            logger.info('User: %s (%s)', user['username'], user['_id'])
             if (len(request.get_data()) < 2 ** 15):
                 logger.info('Body: %s', request.get_data())
             else:

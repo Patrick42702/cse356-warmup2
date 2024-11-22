@@ -1,7 +1,9 @@
 import numpy as np
 from itertools import islice
-
+from .log_util import get_logger
 from .util import db
+
+logger = get_logger("/api/videos")
 
 class CollaborativeFiltering:
     def __init__(self):
@@ -36,6 +38,7 @@ class CollaborativeFiltering:
 
     def user_based_recommendations(self, user_id, watched, count):
         user_idx = self.u2i[user_id]
+        logger.debug(f'[Colab Filter] User {user_id} has liked the following videos: {[self.video_ids[i] for i, val in enumerate(self.M[user_idx]) if val==1]}')
         similarities = np.dot(self.M, self.M[user_idx])  # might need to change to cosine similarity
         predictions = np.dot(similarities, self.M)  # how our user would rate each video
         recommendations = np.argsort(predictions)[::-1]  # sort indices from highest to lowest rating
