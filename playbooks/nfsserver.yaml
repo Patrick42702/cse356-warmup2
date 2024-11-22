@@ -1,0 +1,46 @@
+- name: Setup NFS server filesystem instance
+  hosts: nfs-server
+  become: yes  # Run tasks as root
+
+  tasks:
+    - name: Ensure system packages are up to date
+      apt:
+        upgrade: yes
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install NFS server software
+      apt:
+        name:
+          - nfs-kernel-server
+          - nfs-common
+        state: present
+
+    - name: copy exports file
+      copy:
+        src: ./exports
+        dest: /etc/exports
+        owner: root
+        group: root
+        mode: '0600'
+ 
+    - name: setup shared directory
+      ansible.builtin.command:
+        cmd: mkdir -p ~/shared
+
+    - name: set permissions
+      ansible.builtin.command:
+        cmd: sudo chmod 777 ~/shared
+
+    - name: export the new shared directory
+      ansible.builtin.command:
+        cmd: sudo exportfs -ra
+
+
+    - name: start the nfs server
+      ansible.builtin.command:
+        cmd: sudo systemctl start nfs-kernel-server
+
+    - name: enable the service on restart
+      ansible.builtin.command:
+        cmd: sudo systemctl enable nfs-kernel-server

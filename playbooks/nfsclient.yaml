@@ -1,0 +1,17 @@
+- name: Setup NFS on client instances
+  hosts: nfs-client
+  become: yes  # Run tasks as root
+
+  tasks:
+    - name: make sure nfs software installed
+      apt:
+        name:
+          - nfs-common
+
+    - name: make example directory
+      ansible.builtin.command:
+        cmd: mkdir -p ~/example
+
+    - name: make mount example directory
+      ansible.builtin.command:
+        cmd: sudo mount 10.0.1.150:/root/shared ~/example

@@ -1,5 +1,5 @@
 - name: Deploy Flask Application Environment
-  hosts: remote_server
+  hosts: vagrant
   become: yes  # Run tasks as root
   vars:
     docker_compose_version: "1.29.2"
@@ -7,6 +7,7 @@
   tasks:
     - name: Ensure system packages are up to date
       apt:
+        upgrade: yes
         update_cache: yes
         upgrade: dist
 
