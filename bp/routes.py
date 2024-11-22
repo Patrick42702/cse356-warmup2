@@ -88,7 +88,7 @@ def like_video():
 def get_videos():
     try:
         user = get_user(request.cookies)
-        get_videos_logger.debug(f"User liked: {list(db.videos.find({ 'likes': { '$elemMatch': { 'user': user['_id'] } } }))}")
+        get_videos_logger.debug(f"User liked: {[doc['_id'] for doc in db.videos.find({ 'likes': { '$elemMatch': { 'user': user['_id'] } } })]}")
         count = int(request.json["count"])
         video_id = request.json.get("video_id")
         if video_id:
