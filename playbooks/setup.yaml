@@ -1,5 +1,5 @@
 - name: Deploy Flask Application Environment
-  hosts: vagrant
+  hosts: remote_server
   become: yes  # Run tasks as root
   vars:
     docker_compose_version: "1.29.2"
