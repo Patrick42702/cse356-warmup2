@@ -9,3 +9,4 @@ services:
       - "5555:5555"
     volumes:
       - ./bp:/app/bp
+      - ./static:/app/static
