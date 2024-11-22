@@ -92,10 +92,10 @@ def get_videos():
         video_id = request.json.get("video_id")
         if video_id:
             if isinstance(video_id, dict): video_id = video_id['id']
-            get_videos_logger.info(f'Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}')
+            get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}")
             recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count)
         else:
-            get_videos_logger.info(f'Getting {count} recommendations for user {user['username']} ({user['_id']})\nwatched: {user['watched']}')
+            get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']})\nwatched: {user['watched']}")
             recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count)
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
