@@ -3,7 +3,7 @@ from .util import connect_db
 import subprocess
 import os
 from bson import ObjectId
-from log_util import celery_logger
+from .log_util import celery_logger
 
 @celery.task
 def process_video(filepath):
