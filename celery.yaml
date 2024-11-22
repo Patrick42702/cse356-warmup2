@@ -1,0 +1,11 @@
+services:
+  celery:
+    container_name: celery_worker
+    build:
+      context: .
+      dockerfile: celery.Dockerfile
+    command: pm2-runtime start celery.config.js
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./bp:/app/bp

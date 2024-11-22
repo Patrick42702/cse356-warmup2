@@ -1,11 +1,12 @@
-from server import celery
-from .util import connect_db
+from .celery_worker import app, celery_conndb
 import subprocess
 import os
 from bson import ObjectId
-from .log_util import celery_logger
 
-@celery.task
+
+db = celery_conndb()
+
+@app.task
 def process_video(filepath):
     # Video filter for padding to 16:9 aspect ratio
     scale_filter = "scale='if(gt(a,16/9),1280,-2)':'if(gt(a,16/9),-2,720)',pad=1280:720:(ow-iw)/2:(oh-ih)/2:black"
@@ -33,7 +34,6 @@ def process_video(filepath):
     file_id = filename.split('.')[0]
     output_mpd = f"{file_id}.mpd"
     input_path = os.path.join(cwd, filename)
-    celery_logger.info(f"{filename} is the filename, {input_path} is the input path, and {file_id} is the file id")
 
 
     # Start constructing the FFmpeg command
@@ -61,7 +61,6 @@ def process_video(filepath):
     ffmpeg_cmd.append(output_mpd)
 
     # Run the FFmpeg command for DASH
-    celery_logger.info(f"Processing {filename} with video ID {file_id}")
     subprocess.run(ffmpeg_cmd)
 
     # Generate thumbnail
@@ -71,15 +70,7 @@ def process_video(filepath):
         'ffmpeg','-hide_banner', '-loglevel', 'error', '-y', '-i', input_path,
         '-vf', scale_thumbnails, '-vframes', '1', thumbnail_path
     ]
-    celery_logger.info(f"Generating thumbnail for {filename} with video ID {file_id}")
     subprocess.run(thumbnail_cmd)
 
-    celery_logger.info(f"Processing complete. [{file_id}]")
-    db = connect_db()
     db.videos.update_one({"_id": ObjectId(file_id)}, {"$set": {"status": "complete"}})
-    return filepath
-
-@celery.task
-def save_video(filepath, video):
-    video.save(filepath)
     return filepath

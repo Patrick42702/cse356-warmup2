@@ -58,15 +58,13 @@ services:
       start_period: 5s
 
   flask:
-    image: python:3.11
     container_name: flask_app
     build:
       context: .
       dockerfile: Dockerfile
-    command: pm2-runtime start ecosystem.config.js
+    command: pm2-runtime start flask.config.js
     ports:
       - "5050:5050"
-      - "5555:5555"
     volumes:
       - ./server.py:/app/server.py
       - ./bp:/app/bp

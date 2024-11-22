@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
       build-essential \
       curl \
       python3-pip \
+      ffmpeg \
       && rm -rf /var/lib/apt/lists/*
 
 # Install virtualenv instead of relying on built-in venv
@@ -28,8 +29,9 @@ COPY . .
 # Activate the virtual environment and install Python dependencies
 RUN /bin/bash -c "source venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"
 
-# Expose necessary ports for Flask and Celery Flower
-EXPOSE 5050 5555
+# Expose necessary ports for Celery Flower
+EXPOSE 5555
 
 # Copy the PM2 configuration file
-COPY flask.config.js /app/flask.config.js
+COPY celery.config.js /app/celery.config.js
+
