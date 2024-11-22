@@ -15,4 +15,4 @@ def celery_conndb():
 # Replace "main_machine_ip" with the actual IP address of your main machine.
 REDIS_URL = f"redis://{ip}:6379/0"
 
-app = Celery('tasks', broker=REDIS_URL, backend=REDIS_URL)
+app = Celery('tasks', broker=REDIS_URL, backend=REDIS_URL, include=['bp.tasks'])
