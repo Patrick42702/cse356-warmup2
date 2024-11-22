@@ -1,4 +1,6 @@
+import sys
 import numpy as np
+np.set_printoptions(threshold=sys.maxsize)
 from itertools import islice
 from .log_util import get_logger
 from .util import db
