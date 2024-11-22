@@ -22,5 +22,6 @@ for video_id in non_original_video_ids:
         print(f"Directory not found: {dir_path}")
 
 print("Removing non-admin users: " + str(users.delete_many({ 'username': { '$ne': 'admin' } })))
+print("Removing watches from admin" + str(users.update_many({}, {'$set':{'viewed':[]}})))
 print("Removing non-existent videos: " + str(videos.delete_many({"_id": {"$in": [ObjectId(vid) for vid in non_original_video_ids]}})))
 print("Removing remaining likes: " + str(videos.update_many({}, {'$set':{'likes':[]}})))
