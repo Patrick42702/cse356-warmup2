@@ -9,7 +9,7 @@ SUBMIT_ID = "66d216517f77bf55c5005074"
 
 def connect_db():
     try:
-        client = MongoClient("mongo", 27017)
+        client = MongoClient("localhost", 27017)
         db = client.eskpj_airplanes
         return db
     except Exception as e:
