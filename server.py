@@ -6,6 +6,8 @@ from bp.routes import routes
 from bp.log_util import get_logger
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from bp.util import get_user
+
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -24,10 +26,14 @@ def create_app():
     @app.before_request
     def log_request_info():
         if not request.path.startswith('/static/media/') and request.remote_addr != "127.0.0.1":
+            try:
+                user = get_user(request.cookies)
+            except Exception as e:
+                user = {'username':'not logged in', '_id':'not logged in'}
             logger = get_logger(request.path)
             logger.info("-" * 80)
             logger.info('--- REQUEST --- ')
-            logger.info('Mimetype: %s', request.mimetype)
+            logger.info('User: %s (%s)', user['username'], user['id'])
             if (len(request.get_data()) < 2 ** 15):
                 logger.info('Body: %s', request.get_data())
             else:
