@@ -90,6 +90,7 @@ def get_videos():
         count = int(request.json["count"])
         video_id = request.json.get("video_id")
         if video_id:
+            if isinstance(video_id, dict): video_id = video_id['id']
             recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count)
         else:
             recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count)

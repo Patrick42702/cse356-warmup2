@@ -1,0 +1,9 @@
+use eskpj_airplanes
+db.users.deleteMany({ username: { $ne: 'admin' } })
+db.videos.updateMany({}, {$set:{'likes':[]}})
+
+-- COPY DATABASE TO LOCAL --
+wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb
+sudo apt install ./mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb
+mongodump --db eskpj_airplanes --collection [col]
+scp -r root@130.245.136.188:~/dump ./Downloads/dump
