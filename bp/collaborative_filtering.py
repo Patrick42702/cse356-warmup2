@@ -50,6 +50,7 @@ class CollaborativeFiltering:
 
     def video_based_recommendations(self, video_id, watched, count):
         video_idx = self.v2i[video_id]
+        logger.debug(f'[Colab Filter] Video {video_id} liked column: {self.M[:, video_idx]}')
         similarities = np.dot(self.M[:, video_idx], self.M)  # how similar is each video to our video
         recommendations = np.argsort(similarities)[::-1]  # sort indices from highest to lowest rating
         watched = [self.v2i[vid] for vid in watched]

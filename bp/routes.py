@@ -94,6 +94,7 @@ def get_videos():
         if video_id:
             if isinstance(video_id, dict): video_id = video_id['id']
             get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}")
+            get_videos_logger.debug(f"Video: {list(db.videos.find({'_id': ObjectId(video_id)}))}")
             recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count)
         else:
             get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']})\nwatched: {user['watched']}")
