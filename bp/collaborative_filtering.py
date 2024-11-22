@@ -57,6 +57,8 @@ class CollaborativeFiltering:
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})}
-        return list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))
+        final_video_list = list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))
+        logger.debug(f"{self.M}\nSimilarities: {similarities}\nRecommendations: {recommendations}\nFinal: {final_video_list}")
+        return final_video_list
 
 rec_algo = CollaborativeFiltering()
