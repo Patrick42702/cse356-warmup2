@@ -155,7 +155,7 @@ def upload_file():
         project_root = os.path.dirname(bp_dir)
         media_dir = os.path.join(project_root, "static", "media")
         file_name = os.path.join(media_dir, f"{video_id}", f"{video_id}.mp4")
-        current_app.celery.send_task("tasks.process_video", args=[file_name])
+        current_app.celery.send_task("bp.tasks.process_video", args=[file_name])
         return success({"id": str(video_id)})
     except Exception as e:
         return error("Failed to upload file")
