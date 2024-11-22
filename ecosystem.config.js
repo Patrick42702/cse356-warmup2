@@ -17,7 +17,7 @@ module.exports = {
     {
       name: 'worker',
       script: './venv/bin/celery',
-      args: ['-A', 'server.celery', 'worker', 'concurreny=3', '--loglevel=info'],
+      args: ['-A', 'server.celery', 'worker', '--concurrency=3', '--loglevel=info'],
       interpreter: 'none',  // Don't use any interpreter since celery is executable
       autorestart: true
     }
