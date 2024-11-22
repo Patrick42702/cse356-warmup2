@@ -3,7 +3,7 @@ from flask import Flask, request
 from bp.celery import make_celery
 from bp.auth import auth
 from bp.routes import routes
-from .log_util import get_logger
+from bp.log_util import get_logger
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
