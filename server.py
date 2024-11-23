@@ -5,7 +5,6 @@ from bp.auth import auth
 from bp.routes import routes
 from bp.log_util import get_logger
 from werkzeug.middleware.proxy_fix import ProxyFix
-
 from bp.util import get_user
 
 

@@ -88,17 +88,17 @@ def like_video():
 def get_videos():
     try:
         user = get_user(request.cookies)
-        get_videos_logger.debug(f"User liked: {[doc['_id'] for doc in db.videos.find({ 'likes': { '$elemMatch': { 'user': user['_id'] } } })]}")
+        # get_videos_logger.debug(f"User liked: {[doc['_id'] for doc in db.videos.find({ 'likes': { '$elemMatch': { 'user': user['_id'] } } })]}")
         count = int(request.json["count"])
         video_id = request.json.get("videoId")
         ready_to_watch = request.json.get("readyToWatch")
         if video_id:
             if isinstance(video_id, dict): video_id = video_id['id']
-            get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}")
-            get_videos_logger.debug(f"Video: {list(db.videos.find({'_id': ObjectId(video_id)}))}")
+            # get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}")
+            # get_videos_logger.debug(f"Video: {list(db.videos.find({'_id': ObjectId(video_id)}))}")
             recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count, ready_to_watch=ready_to_watch)
         else:
-            get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']})\nwatched: {user['watched']}")
+            # get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']})\nwatched: {user['watched']}")
             recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count, ready_to_watch=ready_to_watch)
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
@@ -141,15 +141,13 @@ def upload_file():
         author = request.form["author"]
         title = request.form["title"]
         description = request.form["description"]
-        current_app.logger.info("got info from forms")
         video_id = videos.insert_one({"user": user["_id"], "author": author, "title": title, "description": description, "status": "processing", "likes": []}).inserted_id
-        rec_algo.add_video(video_id)
+        rec_algo.add_video(str(video_id))
         users.update_one({"_id": user["_id"]}, {"$push": {"videos": video_id}})
-        current_app.logger.info("Inserted info into database, now pulling file and saving")
         mp4file = request.files["mp4File"]
         if mp4file.filename != '':
             os.makedirs(f"{current_app.static_folder}/media/{video_id}", exist_ok=True)
-            current_app.logger.info(f"Saving video with id {video_id} in upload")
+            upload_file_logger.info(f"Saving video with id {video_id} in upload")
             mp4file.save(f"{current_app.static_folder}/media/{video_id}/{video_id}.mp4")
         # get the file_path of the video we receive and pass it to the celery task so it can do work
         bp_dir = os.path.dirname(__file__)
