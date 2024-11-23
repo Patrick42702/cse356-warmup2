@@ -12,7 +12,7 @@ logger = get_logger("/api/videos")
 class CollaborativeFiltering:
     def __init__(self):
         self.redis_client = redis.Redis(host='redis')
-        self.lock = self.redis_client.lock('M', timeout=10)
+        self.lock = self.redis_client.lock('M_lock', timeout=10)
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))
         video_ids = [str(video['_id']) for video in videos]  # String ID
@@ -23,7 +23,7 @@ class CollaborativeFiltering:
             for like in video['likes']:
                 M[u2i[str(like['user'])], v2i[str(video['_id'])]] = like['value']
 
-        self.redis_client.delete('M', 'video_ids', 'u2i', 'v2i')
+        self.redis_client.delete('M_lock', 'M', 'video_ids', 'u2i', 'v2i')
         self.save_to_redis(M)
         self.redis_client.rpush('video_ids', *video_ids)
         self.redis_client.hset('u2i', mapping=u2i)
@@ -62,8 +62,8 @@ class CollaborativeFiltering:
     def add_like(self, user_id, video_id, value):
         with self.lock:
             M = self.read_from_redis()
-            user_idx = self.redis_client.hget('u2i', user_id)
-            video_idx = self.redis_client.hget('v2i', video_id)
+            user_idx = int(self.redis_client.hget('u2i', user_id))
+            video_idx = int(self.redis_client.hget('v2i', video_id))
             M[user_idx, video_idx] = value
             self.save_to_redis(M)
 

@@ -1,3 +1,5 @@
+import logging
+
 from flask import Blueprint, current_app, render_template, make_response
 import os
 import json
@@ -5,7 +7,7 @@ import json
 from flask import request
 from email_validator import validate_email
 from urllib.parse import quote
-
+from .log_util import get_logger
 import smtplib
 from email.mime.text import MIMEText
 from email import charset
@@ -16,6 +18,7 @@ from .collaborative_filtering import rec_algo
 import jwt
 
 auth = Blueprint('auth', __name__)
+logger = get_logger("/api/adduser")
 
 @auth.route('/testmail', methods=['GET'])
 def testmail():
