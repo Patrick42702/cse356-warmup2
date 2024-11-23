@@ -23,6 +23,7 @@ class CollaborativeFiltering:
             for like in video['likes']:
                 M[u2i[str(like['user'])], v2i[str(video['_id'])]] = like['value']
 
+        self.redis_client.delete('M', 'video_ids', 'u2i', 'v2i')
         self.save_to_redis(M)
         self.redis_client.rpush('video_ids', *video_ids)
         self.redis_client.hset('u2i', mapping=u2i)
