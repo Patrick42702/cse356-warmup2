@@ -24,13 +24,13 @@
         group: root
         mode: '0600'
  
-    - name: setup shared directory
-      ansible.builtin.command:
-        cmd: mkdir -p ~/shared
+    # - name: setup shared directory
+    #   ansible.builtin.command:
+    #     cmd: mkdir -p ~/shared
 
     - name: set permissions
       ansible.builtin.command:
-        cmd: sudo chmod 777 ~/shared
+        cmd: sudo chmod 777 /root/cse356-warmup2/static/media
 
     - name: export the new shared directory
       ansible.builtin.command:
