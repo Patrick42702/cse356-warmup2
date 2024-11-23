@@ -87,7 +87,7 @@ class CollaborativeFiltering:
         # logger.debug(f'[Colab Filter] Video {video_id} liked column: {M[:, video_idx]}')
         similarities = np.dot(M[:, video_idx], M)  # how similar is each video to our video
         recommendations = np.argsort(similarities)[::-1]  # sort indices from highest to lowest rating
-        watched = [v2i[vid] for vid in watched]
+        watched = [int(v2i[vid.encode()]) for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
