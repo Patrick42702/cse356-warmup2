@@ -21,7 +21,7 @@ class CollaborativeFiltering:
         M = np.zeros((len(users), len(videos)), dtype=np.int8)
         for video in videos:
             for like in video['likes']:
-                M[self.u2i[str(like['user'])], self.v2i[str(video['_id'])]] = like['value']
+                M[u2i[str(like['user'])], v2i[str(video['_id'])]] = like['value']
 
         self.save_to_redis(M)
         self.redis_client.rpush('video_ids', *video_ids)
