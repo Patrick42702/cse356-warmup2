@@ -11,3 +11,4 @@ numpy
 requests
 beautifulsoup4
 netifaces
+gunicorn
