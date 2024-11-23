@@ -13,24 +13,20 @@ class CollaborativeFiltering:
     def __init__(self):
         self.redis_client = redis.Redis(host='redis')
         self.lock = self.redis_client.lock('M', timeout=10)
-        if self.lock.acquire(blocking=False):
-            try:
-                users = list(db.users.find({}))
-                videos = list(db.videos.find({}))
-                video_ids = [str(video['_id']) for video in videos]  # String ID
-                u2i = {str(doc['_id']): idx for idx, doc in enumerate(users)}  # String ID
-                v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
-                M = np.zeros((len(users), len(videos)), dtype=np.int8)
-                for video in videos:
-                    for like in video['likes']:
-                        M[self.u2i[str(like['user'])], self.v2i[str(video['_id'])]] = like['value']
+        users = list(db.users.find({}))
+        videos = list(db.videos.find({}))
+        video_ids = [str(video['_id']) for video in videos]  # String ID
+        u2i = {str(doc['_id']): idx for idx, doc in enumerate(users)}  # String ID
+        v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
+        M = np.zeros((len(users), len(videos)), dtype=np.int8)
+        for video in videos:
+            for like in video['likes']:
+                M[self.u2i[str(like['user'])], self.v2i[str(video['_id'])]] = like['value']
 
-                self.save_to_redis(M)
-                self.redis_client.rpush('video_ids', *video_ids)
-                self.redis_client.hset('u2i', mapping=u2i)
-                self.redis_client.hset('v2i', mapping=v2i)
-            finally:
-                self.lock.release()
+        self.save_to_redis(M)
+        self.redis_client.rpush('video_ids', *video_ids)
+        self.redis_client.hset('u2i', mapping=u2i)
+        self.redis_client.hset('v2i', mapping=v2i)
 
     def save_to_redis(self, M):
         buffer = io.BytesIO()
