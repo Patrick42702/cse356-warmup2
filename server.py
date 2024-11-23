@@ -19,7 +19,8 @@ def create_app():
     celery = make_celery(app)
 
     #config env variables
-    os.environ['SECRET_KEY'] = os.urandom(12).hex()
+    # os.environ['SECRET_KEY'] = os.urandom(12).hex()
+    os.environ['SECRET_KEY'] = "MY SECRET KEY"
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
     @app.before_request
