@@ -45,7 +45,9 @@ class CollaborativeFiltering:
         return M
 
     def add_user(self, user_id):
+        logger.info("Add user: locking")
         with self.lock:
+            logger.info("Locked: modifying data")
             M = self.read_from_redis()
             self.redis_client.hset('u2i', user_id, M.shape[0])
             M = np.vstack((M, np.zeros(M.shape[1], np.int8)))
