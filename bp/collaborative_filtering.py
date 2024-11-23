@@ -62,8 +62,8 @@ class CollaborativeFiltering:
     def add_like(self, user_id, video_id, value):
         with self.lock:
             M = self.read_from_redis()
-            user_idx = self.redis_client.hget('u2i', user_id)
-            video_idx = self.redis_client.hget('v2i', video_id)
+            user_idx = int(self.redis_client.hget('u2i', user_id))
+            video_idx = int(self.redis_client.hget('v2i', video_id))
             M[user_idx, video_idx] = value
             self.save_to_redis(M)
 
