@@ -38,7 +38,7 @@ class CollaborativeFiltering:
     def add_like(self, user_id, video_id, value):
         self.M[self.u2i[user_id], self.v2i[video_id]] = value
 
-    def user_based_recommendations(self, user_id, watched, count):
+    def user_based_recommendations(self, user_id, watched, count, ready_to_watch=False):
         user_idx = self.u2i[user_id]
         logger.debug(f'[Colab Filter] User {user_id} has liked the following videos: {[self.video_ids[i] for i, val in enumerate(self.M[user_idx]) if val==1]}')
         similarities = np.dot(self.M, self.M[user_idx])  # might need to change to cosine similarity
@@ -47,10 +47,10 @@ class CollaborativeFiltering:
         watched = [self.v2i[vid] for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
-        processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})}
+        processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
         return list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))
 
-    def video_based_recommendations(self, video_id, watched, count):
+    def video_based_recommendations(self, video_id, watched, count, ready_to_watch=False):
         video_idx = self.v2i[video_id]
         logger.debug(f'[Colab Filter] Video {video_id} liked column: {self.M[:, video_idx]}')
         similarities = np.dot(self.M[:, video_idx], self.M)  # how similar is each video to our video
@@ -58,7 +58,7 @@ class CollaborativeFiltering:
         watched = [self.v2i[vid] for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
-        processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})}
+        processing_videos = {vid['_id'] for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
         final_video_list = list(islice((vid_id for vid_idx in recommendations if (vid_id := self.video_ids[vid_idx]) not in processing_videos), count))
         logger.debug(f"{self.M}\nSimilarities: {similarities}\nRecommendations: {recommendations}\nFinal: {final_video_list}")
         return final_video_list

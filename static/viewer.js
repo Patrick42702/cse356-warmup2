@@ -67,7 +67,7 @@ async function initialVideoLoad() {
     const response = await fetch('/api/videos', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: numFetchVideos, videoId: initialVideoId })
+        body: JSON.stringify({ count: numFetchVideos, videoId: initialVideoId, readyToWatch: true })
     });
     const data = await response.json();
     videoIdList = data.videos.map(video => video.id);
@@ -83,7 +83,7 @@ async function loadMoreVideos() {
     const response = await fetch('/api/videos', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: numFetchVideos })
+        body: JSON.stringify({ count: numFetchVideos, videoId: initialVideoId, readyToWatch: true })
     });
     const data = await response.json();
     const newVideoIds = data.videos.map(video => video.id);

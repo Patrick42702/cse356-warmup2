@@ -91,14 +91,15 @@ def get_videos():
         get_videos_logger.debug(f"User liked: {[doc['_id'] for doc in db.videos.find({ 'likes': { '$elemMatch': { 'user': user['_id'] } } })]}")
         count = int(request.json["count"])
         video_id = request.json.get("videoId")
+        ready_to_watch = request.json.get("readyToWatch")
         if video_id:
             if isinstance(video_id, dict): video_id = video_id['id']
             get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}")
             get_videos_logger.debug(f"Video: {list(db.videos.find({'_id': ObjectId(video_id)}))}")
-            recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count)
+            recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count, ready_to_watch=ready_to_watch)
         else:
             get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']})\nwatched: {user['watched']}")
-            recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count)
+            recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count, ready_to_watch=ready_to_watch)
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
         for video in recommended_videos:
