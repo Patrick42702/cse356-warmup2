@@ -48,7 +48,6 @@ def add_user():
         username = request.json['username']
         password = request.json['password']
         email = request.json['email']
-        logger.info("Adding user %s", username)
         if username and password and validate_email(email):
             existing_user = users.find_one({"username": username})
             existing_email = users.find_one({"email": email})
@@ -63,7 +62,6 @@ def add_user():
                               "videos": [],
                               "watched": [],
                               "verify-key": verify_key}).inserted_id
-            logger.info("Adding to rec_algo")
             rec_algo.add_user(str(user_id))
 
             cs = charset.Charset('utf-8')

@@ -23,7 +23,7 @@ class CollaborativeFiltering:
             for like in video['likes']:
                 M[u2i[str(like['user'])], v2i[str(video['_id'])]] = like['value']
 
-        self.redis_client.delete('M', 'video_ids', 'u2i', 'v2i')
+        self.redis_client.delete('M_lock', 'M', 'video_ids', 'u2i', 'v2i')
         self.save_to_redis(M)
         self.redis_client.rpush('video_ids', *video_ids)
         self.redis_client.hset('u2i', mapping=u2i)
@@ -45,14 +45,7 @@ class CollaborativeFiltering:
         return M
 
     def add_user(self, user_id):
-        logger.info("Add user: locking")
-        lock_status = self.redis_client.get('M_lock')
-        if lock_status:
-            logger.info(f"Lock is currently held by: {lock_status}")
-        else:
-            logger.info("Lock is not held.")
         with self.lock:
-            logger.info("Locked: modifying data")
             M = self.read_from_redis()
             self.redis_client.hset('u2i', user_id, M.shape[0])
             M = np.vstack((M, np.zeros(M.shape[1], np.int8)))
