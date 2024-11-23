@@ -12,7 +12,7 @@ logger = get_logger("/api/videos")
 class CollaborativeFiltering:
     def __init__(self):
         self.redis_client = redis.Redis(host='redis')
-        self.lock = self.redis_client.lock('M', timeout=10)
+        self.lock = self.redis_client.lock('M_lock', timeout=10)
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))
         video_ids = [str(video['_id']) for video in videos]  # String ID
@@ -46,6 +46,11 @@ class CollaborativeFiltering:
 
     def add_user(self, user_id):
         logger.info("Add user: locking")
+        lock_status = self.redis_client.get('M_lock')
+        if lock_status:
+            logger.info(f"Lock is currently held by: {lock_status}")
+        else:
+            logger.info("Lock is not held.")
         with self.lock:
             logger.info("Locked: modifying data")
             M = self.read_from_redis()
