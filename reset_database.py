@@ -17,7 +17,6 @@ for video_id in non_original_video_ids:
     dir_path = os.path.join(base_path, video_id)
     if os.path.exists(dir_path) and os.path.isdir(dir_path):
         shutil.rmtree(dir_path)
-        print(f"Deleted: {dir_path}")
     else:
         print(f"Directory not found: {dir_path}")
 
