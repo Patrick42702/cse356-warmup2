@@ -1,5 +1,5 @@
 - name: Setup NFS server filesystem instance
-  hosts: nfs-server
+  hosts: compute
   become: yes  # Run tasks as root
 
   tasks:
@@ -23,10 +23,6 @@
         owner: root
         group: root
         mode: '0600'
- 
-    # - name: setup shared directory
-    #   ansible.builtin.command:
-    #     cmd: mkdir -p ~/shared
 
     - name: set permissions
       ansible.builtin.command:
