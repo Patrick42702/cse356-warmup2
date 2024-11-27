@@ -17,38 +17,38 @@ logging_config = {
             "formatter": "default",
         },
         "celery": {
-            "level": "INFO",
+            "level": "ERROR",
             "class": "logging.FileHandler",
             "formatter": "default",
             "filename": "/var/log/celery.log",
         },
         "other": {
-            "level": "INFO",
+            "level": "ERROR",
             "class": "logging.FileHandler",
             "formatter": "default",
             "filename": "/var/log/other.log",
         }
     },
     "root": {
-        "level": "INFO",
+        "level": "ERROR",
         "handlers": ["console"],
     },
     "loggers": {
         "celery": {
-            "level": "INFO",
+            "level": "ERROR",
             "handlers": ["celery"],
         },
         "other": {
-            "level": "INFO",
+            "level": "ERROR",
             "handlers": ['other']
         }
     }
 }
 for rlt in request_logger_types:
     logging_config['handlers'][rlt] = {
-        'level': 'DEBUG', "class": "logging.FileHandler", "formatter": "default", "filename": f"/var/log/{rlt}.log"
+        'level': 'ERROR', "class": "logging.FileHandler", "formatter": "default", "filename": f"/var/log/{rlt}.log"
     }
-    logging_config['loggers'][rlt] = {'level': 'DEBUG', 'handlers': [rlt]}
+    logging_config['loggers'][rlt] = {'level': 'ERROR', 'handlers': [rlt]}
 
 dictConfig(logging_config)
 celery_logger = getLogger("celery")
