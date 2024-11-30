@@ -55,7 +55,7 @@ class CollaborativeFiltering:
     def user_based_recommendations(self, user_id, watched, count, ready_to_watch=False):
         user_idx = int(self.con.hget('u2i', user_id))
         v2i = self.con.hgetall('v2i')
-        video_ids = self.redis_client.lrange('video_ids', 0, -1)
+        video_ids = self.con.lrange('video_ids', 0, -1)
         M = self.build_matrix()
         similarities = np.dot(M, M[user_idx])  # might need to change to cosine similarity
         predictions = np.dot(similarities, M)  # how our user would rate each video
@@ -68,7 +68,7 @@ class CollaborativeFiltering:
 
     def video_based_recommendations(self, video_id, watched, count, ready_to_watch=False):
         v2i = self.con.hgetall('v2i')
-        video_ids = self.redis_client.lrange('video_ids', 0, -1)
+        video_ids = self.con.lrange('video_ids', 0, -1)
         M = self.build_matrix()
         video_idx = int(v2i[video_id])
         similarities = np.dot(M[:, video_idx], M)  # how similar is each video to our video
