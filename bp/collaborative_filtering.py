@@ -50,7 +50,7 @@ class CollaborativeFiltering:
     def add_like(self, user_id, video_id, value):
         user_idx = int(self.con.hget('u2i', user_id))
         video_idx = int(self.con.hget('v2i', video_id))
-        set_like(user_idx, video_idx, value)
+        self.set_like(user_idx, video_idx, value)
 
     def user_based_recommendations(self, user_id, watched, count, ready_to_watch=False):
         user_idx = int(self.con.hget('u2i', user_id))
