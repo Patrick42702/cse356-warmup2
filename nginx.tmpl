@@ -17,6 +17,8 @@ server {
     server_name esk-pj.cse356.compas.cs.stonybrook.edu;
     http2 on;
     listen 443 ssl default_server;
+    client_max_body_size 200m;
+    client_body_buffer_size 200m;
     ssl_session_timeout 5m;
     ssl_session_cache shared:SSL:50m;
     ssl_session_tickets off;
