@@ -109,6 +109,7 @@ def get_videos():
             liked = next((like == 1 for like in video['likes'] if like['user'] == user['_id']), None)
             likevalues = sum(1 for like in video['likes'] if like['value']==1)
             videos_info.append({'id': video_id, 'description': description, 'watched': watched, 'liked': liked, 'likevalues': likevalues})
+        get_videos_logger.info(f"Returning {len(videos_info)} videos")
         return success({"videos": videos_info})
     except Exception as e:
         return error(str(e))

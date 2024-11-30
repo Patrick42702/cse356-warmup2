@@ -65,8 +65,11 @@ class CollaborativeFiltering:
         watched = [int(v2i[vid]) for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
+        logger.info(f"Total of {len(recommendations)} videos retrieved")
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
-        return list(islice((ObjectId(vid_id) for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
+        final_video_list = list(islice((ObjectId(vid_id) for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
+        logger.info(f"Total of {len(final_video_list)} videos returned")
+        return final_video_list
 
     def video_based_recommendations(self, video_id, watched, count, ready_to_watch=False):
         v2i = self.con.hgetall('v2i')
@@ -78,8 +81,10 @@ class CollaborativeFiltering:
         watched = [int(v2i[vid]) for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
+        logger.info(f"Total of {len(recommendations)} videos retrieved")
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
         final_video_list = list(islice((ObjectId(vid_id) for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
+        logger.info(f"Total of {len(final_video_list)} videos returned")
         return final_video_list
 
 rec_algo = CollaborativeFiltering()
