@@ -1,6 +1,8 @@
 from logging.config import dictConfig
 from logging import getLogger
 
+LOG_LEVEL = "INFO"
+
 request_logger_types = ["video_interaction", "get_videos", "upload_file", "processing_status", "auth"]
 
 logging_config = {
@@ -17,38 +19,38 @@ logging_config = {
             "formatter": "default",
         },
         "celery": {
-            "level": "ERROR",
+            "level": LOG_LEVEL,
             "class": "logging.FileHandler",
             "formatter": "default",
             "filename": "/var/log/celery.log",
         },
         "other": {
-            "level": "ERROR",
+            "level": LOG_LEVEL,
             "class": "logging.FileHandler",
             "formatter": "default",
             "filename": "/var/log/other.log",
         }
     },
     "root": {
-        "level": "ERROR",
+        "level": LOG_LEVEL,
         "handlers": ["console"],
     },
     "loggers": {
         "celery": {
-            "level": "ERROR",
+            "level": LOG_LEVEL,
             "handlers": ["celery"],
         },
         "other": {
-            "level": "ERROR",
+            "level": LOG_LEVEL,
             "handlers": ['other']
         }
     }
 }
 for rlt in request_logger_types:
     logging_config['handlers'][rlt] = {
-        'level': 'ERROR', "class": "logging.FileHandler", "formatter": "default", "filename": f"/var/log/{rlt}.log"
+        'level': LOG_LEVEL, "class": "logging.FileHandler", "formatter": "default", "filename": f"/var/log/{rlt}.log"
     }
-    logging_config['loggers'][rlt] = {'level': 'ERROR', 'handlers': [rlt]}
+    logging_config['loggers'][rlt] = {'level': LOG_LEVEL, 'handlers': [rlt]}
 
 dictConfig(logging_config)
 celery_logger = getLogger("celery")
