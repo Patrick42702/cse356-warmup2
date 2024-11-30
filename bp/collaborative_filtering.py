@@ -20,7 +20,7 @@ class CollaborativeFiltering:
         v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
         for video in videos:
             for like in video['likes']:
-                set_like(u2i[str(like['user'])], v2i[str(video['_id'])], like['value'])
+                self.set_like(u2i[str(like['user'])], v2i[str(video['_id'])], like['value'])
         self.con.rpush('video_ids', *video_ids)
         self.con.hset('u2i', mapping=u2i)
         self.con.hset('v2i', mapping=v2i)
