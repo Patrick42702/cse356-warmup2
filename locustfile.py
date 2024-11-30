@@ -5,7 +5,7 @@ class UserBehavior(TaskSet):
     def on_start(self):
         """Executed when a simulated user starts a session."""
         # Login to the app (if needed)
-        self.client.post("/login", json={"username": "testuser", "password": "testpass"})
+        self.client.post("/login", json={"username": "admin", "password": "padmen"})
 
         # Initialize video ID list
         response = self.client.post("/api/videos", json={"count": 50})
@@ -16,7 +16,7 @@ class UserBehavior(TaskSet):
             self.video_ids = []  # Fallback if the request fails
             print(f"Failed to fetch video IDs: {response.text}")
 
-    @task(1)
+    # @task(1)
     def post_video(self):
         """Test the /api/videos route."""
         if self.video_ids:  # Ensure the list is not empty
