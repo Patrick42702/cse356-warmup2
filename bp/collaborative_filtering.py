@@ -12,7 +12,7 @@ logger = get_logger("/api/videos")
 class CollaborativeFiltering:
     def __init__(self):
         self.con = redis.Redis(host='redis', decode_responses=True)
-        self.con.delete('likes', 'video_ids', 'u2i', 'v2i')
+        self.con.delete('likes', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))
         video_ids = [str(video['_id']) for video in videos]  # String ID
@@ -24,6 +24,8 @@ class CollaborativeFiltering:
         self.con.rpush('video_ids', *video_ids)
         self.con.hset('u2i', mapping=u2i)
         self.con.hset('v2i', mapping=v2i)
+        self.con.set('num_users', len(users))
+        self.con.set('num_videos', len(videos))
 
     def set_like(self, user_idx, video_idx, value):
         self.con.hset('likes', str(user_idx) + "," + str(video_idx), value)
