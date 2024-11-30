@@ -12,7 +12,7 @@ from bp.util import get_user
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1, x_port=1, x_prefix=1)
-    app.wsgi_app = ProfilerMiddleware(app.wsgi_app)
+    app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir='profiler', restrictions=[5])
     app.config.update(
         broker_url='redis://redis:6379/0',
         result_backend='redis://redis:6379/0',
