@@ -5,7 +5,7 @@ class UserBehavior(TaskSet):
     def on_start(self):
         """Executed when a simulated user starts a session."""
         # Login to the app (if needed)
-        self.client.post("/login", json={"username": "admin", "password": "padmen"})
+        self.client.post("/api/login", json={"username": "admin", "password": "padmen"})
 
         # Initialize video ID list
         response = self.client.post("/api/videos", json={"count": 50})
