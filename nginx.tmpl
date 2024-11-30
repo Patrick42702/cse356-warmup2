@@ -1,0 +1,101 @@
+upstream esk-pj.cse356.compas.cs.stonybrook.edu {
+    server 10.0.2.45:5050;
+}
+
+server {
+    server_name esk-pj.cse356.compas.cs.stonybrook.edu;
+
+    listen 80;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+}
+
+server {
+    server_name esk-pj.cse356.compas.cs.stonybrook.edu;
+    http2 on;
+    listen 443 ssl default_server;
+    ssl_session_timeout 5m;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+    ssl_certificate /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.crt;
+    ssl_certificate_key /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.key;
+    ssl_dhparam /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.dhparam.pem;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    ssl_trusted_certificate /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.chain.pem;
+    set $sts_header "";
+    if ($https) {
+        set $sts_header "max-age=31536000";
+    }
+    add_header Strict-Transport-Security $sts_header always;
+
+    location / {
+        proxy_pass http://esk-pj.cse356.compas.cs.stonybrook.edu;
+        set $upstream_keepalive false;
+    }
+}
+
+
+
+
+
+
+###### EXAMPLE CONFIG
+## upstream esk-pj.cse356.compas.cs.stonybrook.edu {
+##     # Container: flask_app
+##     #     networks:
+##     #         cse356-warmup2_default (reachable)
+##     #     IP address: 172.18.0.6
+##     #     exposed ports (first ten): 5050/tcp 5555/tcp 8080/tcp
+##     #     default port: 80
+##     #     using port: 5050
+##     #         /!\ WARNING: Virtual port published on host.  Clients
+##     #                      might be able to bypass nginx-proxy and
+##     #                      access the container's server directly.
+##     server 172.18.0.6:5050;
+## }
+## server {
+##     server_name esk-pj.cse356.compas.cs.stonybrook.edu;
+##     access_log /var/log/nginx/access.log vhost;
+##     listen 80 default_server;
+##     # Do not HTTPS redirect Let's Encrypt ACME challenge
+##     location ^~ /.well-known/acme-challenge/ {
+##         auth_basic off;
+##         auth_request off;
+##         allow all;
+##         root /usr/share/nginx/html;
+##         try_files $uri =404;
+##         break;
+##     }
+##     location / {
+##         return 301 https://$host$request_uri;
+##     }
+## }
+## server {
+##     server_name esk-pj.cse356.compas.cs.stonybrook.edu;
+##     access_log /var/log/nginx/access.log vhost;
+##     http2 on;
+##     listen 443 ssl default_server;
+##     ssl_session_timeout 5m;
+##     ssl_session_cache shared:SSL:50m;
+##     ssl_session_tickets off;
+##     ssl_certificate /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.crt;
+##     ssl_certificate_key /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.key;
+##     ssl_dhparam /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.dhparam.pem;
+##     ssl_stapling on;
+##     ssl_stapling_verify on;
+##     ssl_trusted_certificate /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.chain.pem;
+##     set $sts_header "";
+##     if ($https) {
+##         set $sts_header "max-age=31536000";
+##     }
+##     add_header Strict-Transport-Security $sts_header always;
+##     include /etc/nginx/vhost.d/esk-pj.cse356.compas.cs.stonybrook.edu;
+##     location / {
+##         proxy_pass http://esk-pj.cse356.compas.cs.stonybrook.edu;
+##         set $upstream_keepalive false;
+##     }
+## }
