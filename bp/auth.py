@@ -74,7 +74,7 @@ def add_user():
             msg['To'] = to_addr
             msg['Subject'] = "Verify your email with ESKPJ"
             msg['Message-ID'] = f"<{os.urandom(12).hex()}@esk-pj-air.cse356.compas.cs.stonybrook.edu>"
-            s = smtplib.SMTP('10.0.1.19', 25)
+            s = smtplib.SMTP('10.0.3.220', 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
             return success({'message': "Email sent"})
