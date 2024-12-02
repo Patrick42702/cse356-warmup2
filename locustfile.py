@@ -1,5 +1,6 @@
 from locust import HttpUser, TaskSet, task, constant
 import random
+import httpx
 
 class UserBehavior(TaskSet):
     def on_start(self):
