@@ -25,14 +25,7 @@ server {
     ssl_certificate /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.crt;
     ssl_certificate_key /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.key;
     ssl_dhparam /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.dhparam.pem;
-    ssl_stapling on;
-    ssl_stapling_verify on;
     ssl_trusted_certificate /etc/nginx/certs/esk-pj.cse356.compas.cs.stonybrook.edu.chain.pem;
-    set $sts_header "";
-    if ($https) {
-        set $sts_header "max-age=31536000";
-    }
-    add_header Strict-Transport-Security $sts_header always;
 
     location / {
         proxy_pass http://esk-pj.cse356.compas.cs.stonybrook.edu;
