@@ -1,12 +1,10 @@
 from locust import HttpUser, TaskSet, task, constant
 import random
-import httpx
 
 class UserBehavior(TaskSet):
     def on_start(self):
         """Executed when a simulated user starts a session."""
         # Login to the app (if needed)
-        self.client = httpx.Client(http2=True, base_url=self.parent.host)
         self.client.post("/api/login", json={"username": "admin", "password": "padmen"})
 
         # Initialize video ID list
@@ -26,9 +24,9 @@ class UserBehavior(TaskSet):
                 "videoId": video_id,
                 "count": 10
             }
-            response = self.client.post("/api/videos", json=payload, catch_response=True)
-            if response.status_code != 200:
-                response.failure(f"Failed to post video: {response.text}")
+            with self.client.post("/api/videos", json=payload, catch_response=True) as response:
+                if response.status_code != 200:
+                    response.failure(f"Failed to post video: {response.text}")
         else:
             print("No video IDs available to post.")
 
@@ -42,9 +40,9 @@ class UserBehavior(TaskSet):
                 "id": like_id,
                 "value": value
             }
-            response = self.client.post("/api/like", json=payload, catch_response=True)
-            if response.status_code != 200:
-                response.failure(f"Failed to post like: {response.text}")
+            with self.client.post("/api/like", json=payload, catch_response=True) as response:
+                if response.status_code != 200:
+                    response.failure(f"Failed to post like: {response.text}")
         else:
             print("No video IDs available to like.")
 
