@@ -1,5 +1,5 @@
 - name: Deploy Flask Application Environment
-  hosts: remote_server
+  hosts: application
   become: yes  # Run tasks as root
   vars:
     docker_compose_version: "1.29.2"
@@ -95,7 +95,7 @@
 
     - name: Set /etc/mailname
       ansible.builtin.copy:
-        content: "esk-pj.cse356.compas.cs.stonybrook.edu\n"
+        content: "esk-pj-air.cse356.compas.cs.stonybrook.edu\n"
         dest: /etc/mailname
         owner: root
         group: root

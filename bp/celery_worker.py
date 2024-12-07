@@ -1,7 +1,7 @@
 from celery import Celery
 from pymongo import MongoClient
 
-ip = "10.0.1.19"
+ip = "10.0.3.220"
 
 def celery_conndb():
     try:

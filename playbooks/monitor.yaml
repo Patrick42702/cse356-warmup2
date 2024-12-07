@@ -1,0 +1,138 @@
+- name: install and run grafana monitoring software on nodes
+  hosts: all
+  become: yes  # Run tasks as root
+
+  tasks:
+    - name: create directory to store apps
+      ansible.builtin.command:
+        cmd: mkdir -p ~/downloads
+
+    - name: Download node_exporter
+      ansible.builtin.shell: >
+        wget -P ~/downloads https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+      args:
+        executable: /bin/bash
+
+    - name: Download prometheus
+      ansible.builtin.shell: >
+        wget -P ~/downloads https://github.com/prometheus/prometheus/releases/download/v3.0.0/prometheus-3.0.0.linux-amd64.tar.gz
+      args:
+        executable: /bin/bash
+
+    - name: make prometheus directory
+      ansible.builtin.command:
+        cmd: mkdir -p ~/downloads/prometheus
+
+    - name: extract prometheus directory
+      ansible.builtin.command:
+        cmd: tar -xzf ~/downloads/prometheus-3.0.0.linux-amd64.tar.gz -C ~/downloads/prometheus --strip-components=1
+
+    - name: make node exporter directory
+      ansible.builtin.command:
+        cmd: mkdir -p ~/downloads/node_exporter
+
+    - name: extract node exporter directory
+      ansible.builtin.command:
+        cmd: tar -xzf ~/downloads/node_exporter-1.8.2.linux-amd64.tar.gz -C ~/downloads/node_exporter --strip-components=1
+
+    - name: adduser libfontconfig1
+      ansible.builtin.command:
+        cmd: sudo apt-get install -y adduser libfontconfig1 musl
+
+    - name: get grafana package
+      ansible.builtin.command:
+        cmd: wget https://dl.grafana.com/enterprise/release/grafana-enterprise_11.3.1_amd64.deb
+
+    - name: install grafana with dpkg
+      ansible.builtin.command:
+        cmd: sudo dpkg -i grafana-enterprise_11.3.1_amd64.deb
+
+    - name: Create directory for node_exporter binary
+      ansible.builtin.file:
+        path: /usr/local/bin
+        state: directory
+
+    - name: Move node_exporter binary to system-wide location
+      ansible.builtin.copy:
+        src: ~/downloads/node_exporter/node_exporter
+        dest: /usr/local/bin/node_exporter
+        mode: '0755'
+        remote_src: true
+
+    - name: Create systemd service file for node_exporter
+      ansible.builtin.blockinfile:
+        path: /etc/systemd/system/node_exporter.service
+        create: yes
+        mode: '0644'
+        block: |
+          [Unit]
+          Description=Node Exporter
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          User=root
+          ExecStart=/usr/local/bin/node_exporter
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Start and enable node_exporter service
+      ansible.builtin.systemd:
+        name: node_exporter
+        enabled: true
+        state: started
+
+    - name: copy my promethus yml file
+      copy:
+        src: ./prometheus.yml
+        dest: ~/downloads/prometheus/prometheus.yml
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Move prometheus binary to system-wide location
+      ansible.builtin.copy:
+        src: ~/downloads/prometheus/prometheus
+        dest: /usr/local/bin/prometheus
+        mode: '0755'
+        remote_src: true
+
+    - name: Create systemd service file for node_exporter
+      ansible.builtin.blockinfile:
+        path: /etc/systemd/system/prometheus.service
+        create: yes
+        mode: '0644'
+        block: |
+          [Unit]
+          Description=prometheus
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          User=root
+          ExecStart=/usr/local/bin/prometheus --config.file=/root/downloads/prometheus/prometheus.yml
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Start and enable node_exporter service
+      ansible.builtin.systemd:
+        name: prometheus
+        enabled: true
+        state: started
+
+
+    - name: run grafana service
+      ansible.builtin.command:
+        cmd: sudo systemctl start grafana-server.service

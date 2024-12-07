@@ -9,7 +9,10 @@ users = db["users"]
 videos = db["videos"]
 
 all_video_ids = [str(vid['_id']) for vid in videos.find({}, {"_id": 1}).sort("_id", 1)]
-non_original_video_ids = all_video_ids[50:]
+original_video_ids = set(all_video_ids[:50])
+
+non_original_video_ids = [x for x in os.listdir("static/media") if x not in original_video_ids]
+
 
 print(f"Deleting {len(non_original_video_ids)} video folders.")
 base_path = "static/media"

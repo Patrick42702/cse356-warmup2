@@ -1,0 +1,50 @@
+- name: install postfix and configure mail system
+  hosts: application
+  become: yes  # Run tasks as root
+
+  tasks:
+    - name: Ensure mailutils and postfix are installed
+      apt:
+        name:
+          - mailutils
+          - postfix
+        state: present
+        update_cache: yes
+
+    - name: Set /etc/mailname
+      ansible.builtin.copy:
+        content: "esk-pj-air.cse356.compas.cs.stonybrook.edu\n"
+        dest: /etc/mailname
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy postfix config file
+      ansible.builtin.copy:
+        src: ./main.cf
+        dest: /etc/postfix/main.cf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart postfix
+
+    - name: Ensure postfix is enabled and started
+      systemd:
+        name: postfix
+        enabled: true
+        state: started
+
+    - name: Run the ipv6 tables command
+      ansible.builtin.command:
+        cmd: ip6tables -I OUTPUT -p tcp -m tcp --dport 25 -j DROP
+
+    - name: Run the ip tables command
+      ansible.builtin.command:
+        cmd: iptables -t nat -I OUTPUT -o ens3 -p tcp -m tcp --dport 25 -j DNAT --to-destination 130.245.136.123:11587
+
+  handlers:
+    - name: restart postfix
+      systemd:
+        name: postfix
+        state: restarted
+

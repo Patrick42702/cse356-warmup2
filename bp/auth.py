@@ -22,7 +22,7 @@ def testmail():
     try:
         email = request.args["email"]
         print(email + '\n')
-        from_addr = "root@esk-pj.cse356.compas.cs.stonybrook.edu"
+        from_addr = "root@esk-pj-air.cse356.compas.cs.stonybrook.edu"
         to_addr = email
         verify_key = os.urandom(12).hex()
         body = f"http://{DOMAIN}/verify?email={quote(email)}&key={verify_key}"
@@ -63,15 +63,15 @@ def add_user():
 
             cs = charset.Charset('utf-8')
             cs.body_encoding = charset.QP
-            from_addr = "root@esk-pj-airplanes.cse356.compas.cs.stonybrook.edu"
+            from_addr = "root@esk-pj-air.cse356.compas.cs.stonybrook.edu"
             to_addr = email
             body = f"Please verify your email for eskpj-airplanes video viewer at the following link: https://{DOMAIN}/api/verify?email={quote(email)}&key={verify_key}"
             msg = MIMEText(body, 'plain', cs)
             msg['From'] = from_addr
             msg['To'] = to_addr
             msg['Subject'] = "Verify your email with ESKPJ"
-            msg['Message-ID'] = f"<{os.urandom(12).hex()}@esk-pj.cse356.compas.cs.stonybrook.edu>"
-            s = smtplib.SMTP('10.0.1.19', 25)
+            msg['Message-ID'] = f"<{os.urandom(12).hex()}@esk-pj-air.cse356.compas.cs.stonybrook.edu>"
+            s = smtplib.SMTP('10.0.3.220', 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
             return success({'message': "Email sent"})

@@ -1,6 +1,5 @@
----
-- name: Deploy Flask Application Environment
-  hosts: remote_server
+- name: Install docker to system
+  hosts: all
   become: yes  # Run tasks as root
   vars:
     docker_compose_version: "1.29.2"
@@ -8,8 +7,8 @@
   tasks:
     - name: Ensure system packages are up to date
       apt:
+        upgrade: yes
         update_cache: yes
-        force_apt_get: yes
         upgrade: dist
 
     - name: Install Python 3 and pip3

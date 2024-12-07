@@ -1,0 +1,15 @@
+- name: Copy authorized keys
+  hosts: all
+  become: yes  # Run tasks as root
+  vars:
+    docker_compose_version: "1.29.2"
+
+  tasks:
+    - name: Copy pub keys to auth_keys
+      copy:
+        src: ./authorized_keys
+        dest: ~/.ssh/authorized_keys
+        owner: root
+        group: root
+        mode: '0600'
+
