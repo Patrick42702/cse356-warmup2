@@ -1,10 +1,8 @@
 import logging
 
-from flask import Blueprint, current_app, render_template, make_response
+from bson import ObjectId
+from flask import Blueprint, current_app, render_template, make_response, request, g
 import os
-import json
-
-from flask import request
 from email_validator import validate_email
 from urllib.parse import quote
 from .log_util import get_logger
@@ -14,7 +12,6 @@ from email import charset
 from .util import db, error, success, validate_session, DOMAIN
 from .routes import check_session
 from .collaborative_filtering import rec_algo
-
 import jwt
 
 auth = Blueprint('auth', __name__)
@@ -89,15 +86,12 @@ def login():
     try:
         username = request.json['username']
         password = request.json['password']
-        if username and password and users.find_one({"username": username}):
-            user = users.find_one({"username": username})
-        else:
+        if not (username and password and (user := users.find_one({"username": username}))):
             raise Exception("username not found")
         if user["password"] == password and user["validated"]:
             success_msg = {"message" :"Login successful"}
-            # access_token = create_access_token(identity=username)
-            access_token = jwt.encode({"username": username}, current_app.config["SECRET_KEY"], algorithm="HS256")
-            users.update_one({"username": username}, {"$set": {"token": access_token, "login": True}})
+            access_token = jwt.encode({"_id": str(user['_id'])}, current_app.config["SECRET_KEY"], algorithm="HS256")
+            users.update_one({"_id": user['_id']}, {"$set": {"token": access_token, "login": True}})
             return success(success_msg, access_token)
         else:
             if user["password"] != password:
@@ -132,34 +126,21 @@ def verify():
 @auth.route('/api/logout', methods=["POST"])
 @check_session
 def logout():
-    cookies = request.cookies
-    users = db.users
     try:
-        identity = jwt.decode(cookies["token"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
-        # user = users.find_one({"username": identity["username"]})
-        # if "token" in request.cookies and validate_session(request.cookies["token"]):
-        users.update_one({"username": identity["username"]}, {"$set": {"token": None, "login": False}})
+        db.users.update_one({"_id": ObjectId(g.user["id"])}, {"$set": {"token": None, "login": False}})
         response = success({"message": "Logout successful"})
         response.delete_cookie("token")
         return response
-        # else:
-        #     raise Exception("There was an error verifying that you were already logged in")
     except Exception as e:
         return error(str(e))
 
 
 @auth.route('/api/check-auth', methods=["POST"])
 def check_auth():
-    cookies = request.cookies
-    users = db.users
     try:
         if "token" not in request.cookies:
             raise Exception("You do not have an active session token")
-        identity = jwt.decode(cookies["token"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
-        if validate_session(cookies["token"]):
-            user = users.find_one({"username": identity["username"]})
+        if user := validate_session(request.cookies["token"]):
             return success({"isLoggedIn": user["login"], "userId": str(user["_id"])})
-            raise Exception("")
     except Exception as e:
         return error(str(e))
-

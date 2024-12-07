@@ -15,7 +15,8 @@ db = connect_db()
 def check_session(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if "token" in request.cookies and validate_session(request.cookies["token"]):
+        if "token" in request.cookies and (user := validate_session(request.cookies["token"])):
+            g.user = user
             return f(*args, **kwargs)
         else:
             return error("User not logged in")
@@ -52,7 +53,7 @@ def play_video(id):
 @check_session
 def view_video():
     try:
-        user = get_user(request.cookies)
+        user = g.user
         video_id = request.json['id']
         if video_id in user['watched']:
             return success({'viewed': True})
@@ -66,7 +67,7 @@ def view_video():
 @check_session
 def like_video():
     try:
-        user = get_user(request.cookies)
+        user = g.user
         video_id = request.json['id']
         value = 1 if request.json['value'] else -1
         likes = db.videos.find_one({'_id': ObjectId(video_id)})['likes']
@@ -85,9 +86,10 @@ def like_video():
         return error(str(e))
 
 @routes.route('/api/videos', methods=["POST"])
+@check_session
 def get_videos():
     try:
-        user = get_user(request.cookies)
+        user = g.user
         # get_videos_logger.debug(f"User liked: {[doc['_id'] for doc in db.videos.find({ 'likes': { '$elemMatch': { 'user': user['_id'] } } })]}")
         count = int(request.json["count"])
         video_id = request.json.get("videoId")
@@ -137,7 +139,7 @@ def upload_file():
     try:
         users = db.users
         videos = db.videos
-        user = get_user(request.cookies)
+        user = g.user
         author = request.form["author"]
         title = request.form["title"]
         description = request.form["description"]
@@ -164,7 +166,7 @@ def upload_file():
 def processing_status():
     try:
         videos = db.videos
-        user = get_user(request.cookies)
+        user = g.user
         videos = videos.find({"user": user["_id"]}, {"_id": 1, "title": 1, "status": 1})
         if videos:
             return success({"videos": [{"id": str(video["_id"]),

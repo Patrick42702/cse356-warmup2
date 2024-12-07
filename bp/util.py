@@ -1,3 +1,4 @@
+from bson import ObjectId
 from pymongo import MongoClient
 from flask import make_response, request, current_app, render_template
 import traceback
@@ -40,14 +41,6 @@ def success(data, token=None):
 def validate_session(token):
     with current_app.app_context():
         identity = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
-        username = identity["username"]
-        user = db.users.find_one({"username": username})
-        if user["token"] == request.cookies["token"]:
-            return True
-        else:
-            return False
-
-def get_user(cookies):
-    identity = jwt.decode(cookies["token"], current_app.config["SECRET_KEY"], algorithms=["HS256"])
-    user = db.users.find_one({"username": identity["username"]})
-    return user
+        user = db.users.find_one({"_id": ObjectId(identity["id"])})
+        if user and user["token"] == request.cookies["token"]: return user
+        return None

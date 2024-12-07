@@ -1,11 +1,10 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, g
 from bp.celery import make_celery
 from bp.auth import auth
 from bp.routes import routes
 from bp.log_util import get_logger
 from werkzeug.middleware.proxy_fix import ProxyFix
-from bp.util import get_user
 
 
 def create_app():
@@ -27,8 +26,8 @@ def create_app():
     def log_request_info():
         if not request.path.startswith('/static/media/') and request.remote_addr != "127.0.0.1":
             try:
-                user = get_user(request.cookies)
-            except Exception as e:
+                user = g.user
+            except AttributeError as e:
                 user = {'username':'not logged in', '_id':'not logged in'}
             logger = get_logger(request.path)
             logger.info("-" * 80)
