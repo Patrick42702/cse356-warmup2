@@ -28,17 +28,14 @@ class CollaborativeFiltering:
     def get_like(self, user_idx, video_idx):
         return int(self.con.hget('likes', f'{user_idx},{video_idx}'))
 
-    def build_matrix(self, id, watched, type):
+    def build_matrix(self, u2i, v2i):
         num_users = int(self.con.get('num_users'))
         num_videos = int(self.con.get('num_videos'))
         likes = self.con.hgetall('likes')
         M = np.zeros((num_users, num_videos), dtype=np.int8)
-        u2i = {}
-        v2i = {}
         for key, value in likes.items():
             user_id, video_id = key.split(',')
-            if type == 'user' and id == user_id: user_idx =
-            M[int(user_idx)][int(video_idx)] = int(value)
+            M[u2i[user_id]][v2i[video_id]] = int(value)
         return M
 
     def add_user(self, user_id):
@@ -58,7 +55,10 @@ class CollaborativeFiltering:
         return self.con.hincrby('like_count', video_id, 1 if value=='1' else (-1 if prev_value == '1' else 0))
 
     def user_based_recommendations(self, user_id, watched, count, ready_to_watch=False):
-        M, user_idx, watched = self.build_matrix(user_id, watched, "user")
+        user_idx = int(self.con.hget('u2i', user_id))
+        v2i = self.con.hgetall('v2i')
+        video_ids = self.con.lrange('video_ids', 0, -1)
+        M = self.build_matrix()
         similarities = np.dot(M, M[user_idx])  # might need to change to cosine similarity
         predictions = np.dot(similarities, M)  # how our user would rate each video
         recommendations = np.argsort(predictions)[::-1]  # sort indices from highest to lowest rating
@@ -74,6 +74,9 @@ class CollaborativeFiltering:
     def video_based_recommendations(self, video_id, watched, count, ready_to_watch=False):
         v2i = self.con.hgetall('v2i')
         video_ids = self.con.lrange('video_ids', 0, -1)
+        u2i = self.con.hgetall('u2i')
+        v2i = self.con.hgetall('v2i')
+        M = self.build_matrix(u2i, v2i)
         M = self.build_matrix()
         video_idx = int(v2i[video_id])
         similarities = np.dot(M[:, video_idx], M)  # how similar is each video to our video
