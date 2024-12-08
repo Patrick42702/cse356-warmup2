@@ -1,6 +1,7 @@
 services:
   nginx:
     image: nginx
+    container_name: nginx
     volumes:
      - certs:/etc/nginx/certs:rw
      - ./nginx.conf:/etc/nginx/nginx.conf:ro
@@ -78,9 +79,6 @@ services:
       - ./bp:/app/bp
       - ./templates:/app/templates
       - ./static:/app/static:rw
-    depends_on:
-      redis:
-        condition: service_healthy
     environment:
       - VIRTUAL_HOST=esk-pj-air.cse356.compas.cs.stonybrook.edu
       - VIRTUAL_PORT=5050

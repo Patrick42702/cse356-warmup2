@@ -4,13 +4,14 @@ from flask import make_response, request, current_app, render_template
 import traceback
 import json
 import jwt
+from config import MONGO_IP
 
 DOMAIN = "esk-pj-air.cse356.compas.cs.stonybrook.edu"
 SUBMIT_ID = "66d216517f77bf55c5005074"
 
 def connect_db():
     try:
-        client = MongoClient("mongo", 27017)
+        client = MongoClient(MONGO_IP, 27017)
         db = client.eskpj_airplanes
         return db
     except Exception as e:

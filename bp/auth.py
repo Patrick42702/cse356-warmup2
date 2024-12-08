@@ -12,6 +12,8 @@ from email import charset
 from .util import db, error, success, validate_session, DOMAIN
 from .routes import check_session
 from .collaborative_filtering import rec_algo
+from config import POSTFIX_IP
+
 import jwt
 
 auth = Blueprint('auth', __name__)
@@ -71,7 +73,7 @@ def add_user():
             msg['To'] = to_addr
             msg['Subject'] = "Verify your email with ESKPJ"
             msg['Message-ID'] = f"<{os.urandom(12).hex()}@esk-pj-air.cse356.compas.cs.stonybrook.edu>"
-            s = smtplib.SMTP('10.0.3.220', 25)
+            s = smtplib.SMTP(POSTFIX_IP, 25)
             s.sendmail(from_addr, to_addr, msg.as_string())
             s.quit()
             return success({'message': "Email sent"})

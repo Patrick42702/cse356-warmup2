@@ -5,12 +5,14 @@ from itertools import islice
 from .log_util import get_logger
 from .util import db
 import redis
+from bson import ObjectId
+from config import REDIS_IP
 
 logger = get_logger("/api/videos")
 
 class CollaborativeFiltering:
     def __init__(self):
-        self.con = redis.Redis(host='redis', decode_responses=True)
+        self.con = redis.Redis(host=REDIS_IP, decode_responses=True)
         self.con.delete('likes', 'like_count', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))

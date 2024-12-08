@@ -6,6 +6,8 @@ from bp.routes import routes
 from bp.log_util import get_logger
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.middleware.profiler import ProfilerMiddleware
+from bp.util import get_user
+from config import REDIS_IP, SECRET_KEY
 
 
 def create_app():
@@ -13,16 +15,15 @@ def create_app():
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1, x_port=1, x_prefix=1)
     # app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir='profiler', restrictions=[5])
     app.config.update(
-        broker_url='redis://redis:6379/0',
-        result_backend='redis://redis:6379/0',
+        broker_url=f'redis://{REDIS_IP}:6379/0',
+        result_backend=f'redis://{REDIS_IP}:6379/0',
         include=['bp.tasks']
     )
     celery = make_celery(app)
 
     #config env variables
     # os.environ['SECRET_KEY'] = os.urandom(12).hex()
-    os.environ['SECRET_KEY'] = "MY SECRET KEY"
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['SECRET_KEY'] = SECRET_KEY
 
     @app.before_request
     def log_request_info():

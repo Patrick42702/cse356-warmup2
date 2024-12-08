@@ -1,7 +1,8 @@
 from celery import Celery
 from pymongo import MongoClient
+from config import REDIS_IP
 
-ip = "10.0.3.220"
+ip = REDIS_IP
 
 def celery_conndb():
     try:
