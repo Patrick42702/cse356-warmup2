@@ -25,17 +25,11 @@ class CollaborativeFiltering:
         self.con.set('num_users', len(users))
         self.con.set('num_videos', len(videos))
 
-    def get_like(self, user_idx, video_idx):
-        return int(self.con.hget('likes', f'{user_idx},{video_idx}'))
-
-    def build_matrix(self, u2i, v2i):
-        num_users = int(self.con.get('num_users'))
-        num_videos = int(self.con.get('num_videos'))
-        likes = self.con.hgetall('likes')
-        M = np.zeros((num_users, num_videos), dtype=np.int8)
+    def build_matrix(self, likes, u2i, v2i):
+        M = np.zeros((len(u2i), len(v2i)), dtype=np.int8)
         for key, value in likes.items():
             user_id, video_id = key.split(',')
-            M[u2i[user_id]][v2i[video_id]] = int(value)
+            M[int(u2i[user_id])][int(v2i[video_id])] = int(value)
         return M
 
     def add_user(self, user_id):
@@ -55,14 +49,14 @@ class CollaborativeFiltering:
         return self.con.hincrby('like_count', video_id, 1 if value=='1' else (-1 if prev_value == '1' else 0))
 
     def user_based_recommendations(self, user_id, watched, count, ready_to_watch=False):
-        user_idx = int(self.con.hget('u2i', user_id))
-        v2i = self.con.hgetall('v2i')
-        video_ids = self.con.lrange('video_ids', 0, -1)
-        M = self.build_matrix()
+        likes, u2i, v2i, video_ids = self.con.pipeline().hgetall('likes').hgetall('u2i').hgetall('v2i').lrange('video_ids', 0, -1).execute()
+        M = self.build_matrix(likes, u2i, v2i)
+        user_idx = int(u2i[user_id])
+        watched = [int(v2i[vid]) for vid in watched]
+
         similarities = np.dot(M, M[user_idx])  # might need to change to cosine similarity
         predictions = np.dot(similarities, M)  # how our user would rate each video
         recommendations = np.argsort(predictions)[::-1]  # sort indices from highest to lowest rating
-        watched = [int(v2i[vid]) for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         logger.info(f"Total of {len(recommendations)} videos retrieved")
@@ -72,16 +66,13 @@ class CollaborativeFiltering:
         return final_video_list
 
     def video_based_recommendations(self, video_id, watched, count, ready_to_watch=False):
-        v2i = self.con.hgetall('v2i')
-        video_ids = self.con.lrange('video_ids', 0, -1)
-        u2i = self.con.hgetall('u2i')
-        v2i = self.con.hgetall('v2i')
-        M = self.build_matrix(u2i, v2i)
-        M = self.build_matrix()
-        video_idx = int(v2i[video_id])
+        likes, u2i, v2i, video_ids = self.con.pipeline().hgetall('likes').hgetall('u2i').hgetall('v2i').lrange('video_ids', 0, -1).execute()
+        M = self.build_matrix(likes, u2i, v2i)
+        video_idx = int(u2i[video_id])
+        watched = [int(v2i[vid]) for vid in watched]
+
         similarities = np.dot(M[:, video_idx], M)  # how similar is each video to our video
         recommendations = np.argsort(similarities)[::-1]  # sort indices from highest to lowest rating
-        watched = [int(v2i[vid]) for vid in watched]
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         logger.info(f"Total of {len(recommendations)} videos retrieved")
