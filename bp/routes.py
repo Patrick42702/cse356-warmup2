@@ -69,19 +69,9 @@ def like_video():
     try:
         user = g.user
         video_id = request.json['id']
-        value = 1 if request.json['value'] else -1
-        likes = db.videos.find_one({'_id': ObjectId(video_id)})['likes']
-        likecount = sum(1 for like in likes if like['value']==1)
-        like = next((like for like in likes if like['user'] == user['_id']), None)
-        if like:
-            if like['value'] == value: return error("Video already liked") if value == 1 else error("Video already disliked")
-            db.videos.update_one({'_id': ObjectId(video_id), 'likes.user': like['user']}, {'$set': {'likes.$.value': value}})
-            likecount += value
-        else:
-            db.videos.update_one({'_id': ObjectId(video_id)}, {'$push': {'likes': {'user': user['_id'], 'value': value}}})
-            if value == 1: likecount += 1
-        rec_algo.add_like(str(user['_id']), video_id, value)
-        return success({'likes': likecount})
+        value = '1' if request.json['value'] else '-1'
+        like_count = rec_algo.add_like(str(user['_id']), video_id, value)
+        return error("Value already set") if like_count==-1 else success({'likes': like_count})
     except Exception as e:
         return error(str(e))
 
@@ -98,10 +88,10 @@ def get_videos():
             if isinstance(video_id, dict): video_id = video_id['id']
             # get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']}) based on video {video_id}\nwatched: {user['watched']}")
             # get_videos_logger.debug(f"Video: {list(db.videos.find({'_id': ObjectId(video_id)}))}")
-            recommended_video_ids = rec_algo.video_based_recommendations(video_id, user['watched'], count, ready_to_watch=ready_to_watch)
+            recommended_video_ids = rec_algo.video_based_recommendations(video_id, set(user['watched']), count, ready_to_watch=ready_to_watch)
         else:
             # get_videos_logger.info(f"Getting {count} recommendations for user {user['username']} ({user['_id']})\nwatched: {user['watched']}")
-            recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count, ready_to_watch=ready_to_watch)
+            recommended_video_ids = rec_algo.user_based_recommendations(str(user['_id']), set(user['watched']), count, ready_to_watch=ready_to_watch)
         recommended_videos = db.videos.find({'_id': {'$in': recommended_video_ids}})
         videos_info = []
         for video in recommended_videos:
