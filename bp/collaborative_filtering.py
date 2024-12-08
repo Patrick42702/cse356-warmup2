@@ -5,7 +5,6 @@ from itertools import islice
 from .log_util import get_logger
 from .util import db
 import redis
-from bson import ObjectId
 
 logger = get_logger("/api/videos")
 
@@ -40,6 +39,7 @@ class CollaborativeFiltering:
         self.con.rpush('video_ids', video_id)
         num_videos = self.con.incr('num_videos')
         self.con.hset('v2i', video_id, num_videos-1)
+        self.con.hset('like_count', video_id, '0')
 
     def add_like(self, user_id, video_id, value):
         key = f'{user_id},{video_id}'
@@ -47,6 +47,11 @@ class CollaborativeFiltering:
         if prev_value == value: return -1
         self.con.hset('likes', key, value)
         return self.con.hincrby('like_count', video_id, 1 if value=='1' else (-1 if prev_value == '1' else 0))
+
+    def get_like_counts(self, video_ids):
+        pipe = self.con.pipeline()
+        for video_id in video_ids: pipe.hget('like_count', video_id)
+        return pipe.execute()
 
     def user_based_recommendations(self, user_id, watched, count, ready_to_watch=False):
         likes, u2i, v2i, video_ids = self.con.pipeline().hgetall('likes').hgetall('u2i').hgetall('v2i').lrange('video_ids', 0, -1).execute()
@@ -61,11 +66,13 @@ class CollaborativeFiltering:
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         logger.info(f"Total of {len(recommendations)} videos retrieved")
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
-        final_video_list = list(islice((ObjectId(vid_id) for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
+        final_video_list = list(islice((vid_id for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
+        liked_list = [likes.get(f'{user_id},{vid_id}') for vid_id in final_video_list]
+        like_counts = self.get_like_counts(final_video_list)
         logger.info(f"Total of {len(final_video_list)} videos returned")
-        return final_video_list
+        return final_video_list, liked_list, like_counts
 
-    def video_based_recommendations(self, video_id, watched, count, ready_to_watch=False):
+    def video_based_recommendations(self, user_id, video_id, watched, count, ready_to_watch=False):
         likes, u2i, v2i, video_ids = self.con.pipeline().hgetall('likes').hgetall('u2i').hgetall('v2i').lrange('video_ids', 0, -1).execute()
         M = self.build_matrix(likes, u2i, v2i)
         video_idx = int(u2i[video_id])
@@ -77,8 +84,10 @@ class CollaborativeFiltering:
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         logger.info(f"Total of {len(recommendations)} videos retrieved")
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
-        final_video_list = list(islice((ObjectId(vid_id) for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
+        final_video_list = list(islice((vid_id for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
+        liked_list = [likes.get(f'{user_id},{vid_id}') for vid_id in final_video_list]
+        like_counts = self.get_like_counts(final_video_list)
         logger.info(f"Total of {len(final_video_list)} videos returned")
-        return final_video_list
+        return final_video_list, liked_list, like_counts
 
 rec_algo = CollaborativeFiltering()
