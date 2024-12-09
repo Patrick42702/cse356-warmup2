@@ -1,5 +1,5 @@
 from flask import send_from_directory, request, make_response, Blueprint, render_template, current_app, g, redirect, url_for
-from .util import error, success, SUBMIT_ID, validate_session, connect_db, get_user
+from .util import error, success, SUBMIT_ID, validate_session, connect_db
 from functools import wraps
 import json
 import jwt

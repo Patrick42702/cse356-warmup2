@@ -6,7 +6,6 @@ from bp.routes import routes
 from bp.log_util import get_logger
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.middleware.profiler import ProfilerMiddleware
-from bp.util import get_user
 from config import REDIS_IP, SECRET_KEY
 
 
