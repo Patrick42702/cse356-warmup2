@@ -13,9 +13,8 @@ logger = get_logger("/api/videos")
 class CollaborativeFiltering:
     def __init__(self):
         self.con = redis.Redis(host=REDIS_IP, decode_responses=True)
-        # TODO: uncomment
-        # self.con.delete('likes', 'like_count', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
-        self.con.delete('video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
+        self.con.delete('likes', 'like_count', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
+        # self.con.delete('video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
         users = list(db.users.find({}))
         videos = list(db.videos.find({}))
         video_ids = [str(video['_id']) for video in videos]  # String ID
@@ -92,7 +91,7 @@ class CollaborativeFiltering:
         logger.info(f"Recommendations: {[(int(idx), video_ids[idx]) for idx in recommendations]}")
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
-        logger.info(f"Recommendations: {[(idx, video_ids[idx]) for idx in recommendations]}")
+        logger.info(f"Recommendations: {[(int(idx), video_ids[idx]) for idx in recommendations]}")
         logger.info(f"Total of {len(recommendations)} videos retrieved")
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
         final_video_list = list(islice((vid_id for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
