@@ -1,5 +1,5 @@
 - name: Setup NFS server filesystem instance
-  hosts: compute
+  hosts: filesystem
   become: yes  # Run tasks as root
 
   tasks:

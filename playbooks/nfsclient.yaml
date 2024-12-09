@@ -1,5 +1,5 @@
 - name: Setup NFS on client instances
-  hosts: application
+  hosts: application, nginx, compute
   become: yes  # Run tasks as root
 
   tasks:
