@@ -13,18 +13,19 @@ logger = get_logger("/api/videos")
 class CollaborativeFiltering:
     def __init__(self):
         self.con = redis.Redis(host=REDIS_IP, decode_responses=True)
-        self.con.delete('likes', 'like_count', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
-        users = list(db.users.find({}))
-        videos = list(db.videos.find({}))
-        video_ids = [str(video['_id']) for video in videos]  # String ID
-        u2i = {str(doc['_id']): idx for idx, doc in enumerate(users)}  # String ID
-        v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
-        for video in videos: self.con.hset('like_count', str(video['_id']), '0')
-        self.con.rpush('video_ids', *video_ids)
-        self.con.hset('u2i', mapping=u2i)
-        self.con.hset('v2i', mapping=v2i)
-        self.con.set('num_users', len(users))
-        self.con.set('num_videos', len(videos))
+        # TODO: uncomment
+        # self.con.delete('likes', 'like_count', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
+        # users = list(db.users.find({}))
+        # videos = list(db.videos.find({}))
+        # video_ids = [str(video['_id']) for video in videos]  # String ID
+        # u2i = {str(doc['_id']): idx for idx, doc in enumerate(users)}  # String ID
+        # v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
+        # for video in videos: self.con.hset('like_count', str(video['_id']), '0')
+        # self.con.rpush('video_ids', *video_ids)
+        # self.con.hset('u2i', mapping=u2i)
+        # self.con.hset('v2i', mapping=v2i)
+        # self.con.set('num_users', len(users))
+        # self.con.set('num_videos', len(videos))
 
     def build_matrix(self, likes, u2i, v2i):
         M = np.zeros((len(u2i), len(v2i)), dtype=np.int8)
@@ -82,11 +83,14 @@ class CollaborativeFiltering:
 
         similarities = np.dot(M[:, video_idx], M)  # how similar is each video to our video
         recommendations = np.argsort(similarities)[::-1]  # sort indices from highest to lowest rating
+        logger.info(f"User watched: {watched}")
         logger.info(f"Likes on our video: {M[:, video_idx]}")
-        logger.info(f"Similarities: {similarities}")
+        logger.info(f"Similarities: {[(video_ids[idx], val) for idx, val in enumerate(similarities)]}")
         logger.info(f"Likes: {likes}")
+        logger.info(f"Recommendations: {[(idx, video_ids[idx]) for idx in recommendations]}")
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
+        logger.info(f"Recommendations: {[(idx, video_ids[idx]) for idx in recommendations]}")
         logger.info(f"Total of {len(recommendations)} videos retrieved")
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
         final_video_list = list(islice((vid_id for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
