@@ -77,7 +77,7 @@ class CollaborativeFiltering:
     def video_based_recommendations(self, user_id, video_id, watched, count, ready_to_watch=False):
         likes, u2i, v2i, video_ids = self.con.pipeline().hgetall('likes').hgetall('u2i').hgetall('v2i').lrange('video_ids', 0, -1).execute()
         M = self.build_matrix(likes, u2i, v2i)
-        video_idx = int(u2i[video_id])
+        video_idx = int(v2i[video_id])
         watched = [int(v2i[vid]) for vid in watched]
 
         similarities = np.dot(M[:, video_idx], M)  # how similar is each video to our video
