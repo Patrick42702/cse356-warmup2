@@ -1,7 +1,7 @@
 from logging.config import dictConfig
 from logging import getLogger
 
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "ERROR"
 
 request_logger_types = ["video_interaction", "get_videos", "upload_file", "processing_status", "auth"]
 

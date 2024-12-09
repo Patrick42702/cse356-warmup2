@@ -90,21 +90,21 @@ class CollaborativeFiltering:
 
         similarities = np.dot(M[:, video_idx], M)  # how similar is each video to our video
         recommendations = np.argsort(similarities)[::-1]  # sort indices from highest to lowest rating
-        logger.info(f"User watched: {watched}")
-        logger.info(f"Likes on our video: {M[:, video_idx]}")
-        logger.info(f"Similarities: {[(video_ids[idx], int(val)) for idx, val in enumerate(similarities)]}")
-        logger.info(f"Likes: {likes}")
-        logger.info(f"Recommendations: {[(int(idx), video_ids[idx]) for idx in recommendations]}")
+        # logger.info(f"User watched: {watched}")
+        # logger.info(f"Likes on our video: {M[:, video_idx]}")
+        # logger.info(f"Similarities: {[(video_ids[idx], int(val)) for idx, val in enumerate(similarities)]}")
+        # logger.info(f"Likes: {likes}")
+        # logger.info(f"Recommendations: {[(int(idx), video_ids[idx]) for idx in recommendations]}")
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
-        logger.info(f"Recommendations: {[(int(idx), video_ids[idx]) for idx in recommendations]}")
-        logger.info(f"Total of {len(recommendations)} videos retrieved")
+        # logger.info(f"Recommendations: {[(int(idx), video_ids[idx]) for idx in recommendations]}")
+        # logger.info(f"Total of {len(recommendations)} videos retrieved")
         processing_videos = {str(vid['_id']) for vid in db.videos.find({'status': 'processing'})} if ready_to_watch else set()
         final_video_list = list(islice((vid_id for vid_idx in recommendations if (vid_id := video_ids[vid_idx]) not in processing_videos), count))
         liked_list = [likes.get(f'{user_id},{vid_id}') for vid_id in final_video_list]
-        logger.info(f"Liked list: {liked_list}")
+        # logger.info(f"Liked list: {liked_list}")
         like_counts = self.get_like_counts(final_video_list)
-        logger.info(f"Total of {len(final_video_list)} videos returned")
+        # logger.info(f"Total of {len(final_video_list)} videos returned")
         return final_video_list, liked_list, like_counts
 
 rec_algo = CollaborativeFiltering()
