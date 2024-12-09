@@ -5,6 +5,7 @@ import traceback
 import json
 import jwt
 from config import MONGO_IP
+from .log_util import get_logger
 
 DOMAIN = "esk-pj-air.cse356.compas.cs.stonybrook.edu"
 SUBMIT_ID = "66d216517f77bf55c5005074"
@@ -42,6 +43,8 @@ def success(data, token=None):
 def validate_session(token):
     with current_app.app_context():
         identity = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
+        logger = get_logger("/api/login")
+        logger.info(f"identity: {identity}")
         user = db.users.find_one({"_id": ObjectId(identity["id"])})
         if user and user["token"] == request.cookies["token"]: return user
         return None
