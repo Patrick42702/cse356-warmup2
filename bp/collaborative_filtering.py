@@ -13,20 +13,26 @@ logger = get_logger("/api/videos")
 class CollaborativeFiltering:
     def __init__(self):
         self.con = redis.Redis(host=REDIS_IP, decode_responses=True)
-        self.con.delete('likes', 'like_count', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
-        # self.con.delete('video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
-        users = list(db.users.find({}))
-        videos = list(db.videos.find({}))
-        video_ids = [str(video['_id']) for video in videos]  # String ID
-        u2i = {str(doc['_id']): idx for idx, doc in enumerate(users)}  # String ID
-        v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
-        for video in videos: self.con.hset('like_count', str(video['_id']), '0')
-        self.con.rpush('video_ids', *video_ids)
-        self.con.hset('u2i', mapping=u2i)
-        self.con.hset('v2i', mapping=v2i)
-        self.con.set('num_users', len(users))
-        self.con.set('num_videos', len(videos))
-
+        lock = self.con.lock('init', timeout=60)
+        if lock.acquire(blocking=False):
+            try:
+                self.con.delete('likes', 'like_count', 'video_ids', 'u2i', 'v2i', 'num_users', 'num_videos')
+                users = list(db.users.find({}))
+                videos = list(db.videos.find({}))
+                video_ids = [str(video['_id']) for video in videos]  # String ID
+                u2i = {str(doc['_id']): idx for idx, doc in enumerate(users)}  # String ID
+                v2i = {str(doc['_id']): idx for idx, doc in enumerate(videos)}  # String ID
+                for video in videos: self.con.hset('like_count', str(video['_id']), '0')
+                self.con.rpush('video_ids', *video_ids)
+                self.con.hset('u2i', mapping=u2i)
+                self.con.hset('v2i', mapping=v2i)
+                self.con.set('num_users', len(users))
+                self.con.set('num_videos', len(videos))
+            finally:
+                lock.release()
+        else:
+            while not self.con.exists('video_ids'):
+                pass
 
     def build_matrix(self, likes, u2i, v2i):
         M = np.zeros((len(u2i), len(v2i)), dtype=np.int8)
