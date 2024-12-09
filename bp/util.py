@@ -35,7 +35,7 @@ def success(data, token=None):
     body = json.dumps(data, separators=(',', ':')) # take out any spaces in json response
     response = make_response(body)
     if token:
-        response.set_cookie("token", value=token, httponly=True)
+        response.set_cookie("token", value=token, httponly=False)
     response.headers["X-CSE356"] = SUBMIT_ID
     return response
 
