@@ -87,9 +87,9 @@ class CollaborativeFiltering:
         recommendations = np.argsort(similarities)[::-1]  # sort indices from highest to lowest rating
         logger.info(f"User watched: {watched}")
         logger.info(f"Likes on our video: {M[:, video_idx]}")
-        logger.info(f"Similarities: {[(video_ids[idx], val) for idx, val in enumerate(similarities)]}")
+        logger.info(f"Similarities: {[(video_ids[idx], int(val)) for idx, val in enumerate(similarities)]}")
         logger.info(f"Likes: {likes}")
-        logger.info(f"Recommendations: {[(idx, video_ids[idx]) for idx in recommendations]}")
+        logger.info(f"Recommendations: {[(int(idx), video_ids[idx]) for idx in recommendations]}")
         watched_mask = np.isin(recommendations, watched)
         recommendations = np.concatenate((recommendations[~watched_mask], recommendations[watched_mask]))  # prioritize unwatched videos
         logger.info(f"Recommendations: {[(idx, video_ids[idx]) for idx in recommendations]}")
