@@ -94,7 +94,6 @@ def get_videos():
             recommended_video_ids, liked_list, like_counts = rec_algo.user_based_recommendations(str(user['_id']), user['watched'], count, ready_to_watch=ready_to_watch)
         get_videos_logger.info(f"Recommended video ids: {recommended_video_ids}")
         get_videos_logger.info(db.videos.find({}))
-
         recommended_videos = db.videos.find({'_id': {'$in': [ObjectId(video_id) for video_id in recommended_video_ids]}})
         videos_info = []
         for video, liked, like_count in zip(recommended_videos, liked_list, like_counts):
