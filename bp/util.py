@@ -43,8 +43,6 @@ def success(data, token=None):
 def validate_session(token):
     with current_app.app_context():
         identity = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
-        logger = get_logger("/api/login")
-        logger.info(f"identity: {identity}")
-        user = db.users.find_one({"_id": ObjectId(identity["id"])})
+        user = db.users.find_one({"_id": ObjectId(identity["_id"])})
         if user and user["token"] == request.cookies["token"]: return user
         return None
