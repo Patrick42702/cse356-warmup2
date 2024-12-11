@@ -13,3 +13,4 @@ beautifulsoup4
 netifaces
 gunicorn
 locust
+requests_toolbelt
