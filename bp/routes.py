@@ -123,7 +123,7 @@ def upload_page():
     return render_template("upload.html")
 
 
-@routes.route('/api/upload', methods=["POST"])
+@routes.route('/api/process', methods=["POST"])
 @check_session
 def upload_file():
     try:

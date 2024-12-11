@@ -31,6 +31,24 @@ server {
         proxy_pass http://esk-pj-air.cse356.compas.cs.stonybrook.edu;
         set $upstream_keepalive false;
     }
+
+    location /api/upload {
+        upload_store /root/cse356-warmup2/static/media;
+        upload_pass /api/process;
+        upload_set_form_field $upload_field_name.name "$upload_file_name";
+        upload_set_form_field $upload_field_name.content_type "$upload_content_type";
+        upload_set_form_field $upload_field_name.path "$upload_tmp_path";
+        # Pass upload metadata to Flask
+        upload_cleanup 400-599;
+    }
+
+    # Process metadata via Flask
+    location /api/process {
+        proxy_pass http://esk-pj-air.cse356.compas.cs.stonybrook.edu;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
 }
 
 
