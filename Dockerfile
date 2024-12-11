@@ -23,10 +23,12 @@ RUN npm install pm2 -g
 # Create a virtual environment using virtualenv instead of venv
 RUN virtualenv venv
 
-COPY . .
+COPY requirements.txt .
 
 # Activate the virtual environment and install Python dependencies
 RUN /bin/bash -c "source venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"
+
+COPY . .
 
 # Expose necessary ports for Flask and Celery Flower
 EXPOSE 5050 5555
