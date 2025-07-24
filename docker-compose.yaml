@@ -1,91 +1,110 @@
 services:
   nginx:
-    image: nginx
     container_name: nginx
-    volumes:
-     - certs:/etc/nginx/certs:rw
-     - ./nginx.conf:/etc/nginx/nginx.conf:ro
-     - ./nginx.tmpl:/etc/nginx/conf.d/default.conf:ro
-    ports:
-     - "80:80"
-     - "443:443"
-
-  nginx-proxy:
-    image: nginxproxy/nginx-proxy:1.6
-    container_name: nginx-proxy
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./confs:/etc/nginx/vhost.d:ro
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - certs:/etc/nginx/certs:rw
-      - html:/usr/share/nginx/html:rw
-    environment:
-      - DEFAULT_HOST=esk-pj-air.cse356.compas.cs.stonybrook.edu
-    labels:
-      - "com.github.nginx-proxy.nginx"
-    restart: always
 
-  acme-companion:
-    image: nginxproxy/acme-companion
-    container_name: acme-companion
-    depends_on:
-      - nginx-proxy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - certs:/etc/nginx/certs:rw
-      - html:/usr/share/nginx/html:rw
-      - acme:/etc/acme.sh
-    environment:
-      - DEFAULT_EMAIL=patrick.muller.1@stonybrook.edu
-      - NGINX_PROXY_CONTAINER=nginx-proxy
-    restart: always
-
-  redis:
-    image: "redis:latest"
-    container_name: redis
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-
-  mongo:
-    image: "mongo:latest"
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-
-  flask:
-    container_name: flask_app
+  auth:
+    container_name: auth
     build:
-      context: .
+      context: ./auth
       dockerfile: Dockerfile
-    command: pm2-runtime start flask.config.js
     ports:
-      - "5050:5050"
-    volumes:
-      - ./server.py:/app/server.py
-      - ./bp:/app/bp
-      - ./templates:/app/templates
-      - ./static:/app/static:rw
-    environment:
-      - VIRTUAL_HOST=esk-pj-air.cse356.compas.cs.stonybrook.edu
-      - VIRTUAL_PORT=5050
-      - LETSENCRYPT_HOST=esk-pj-air.cse356.compas.cs.stonybrook.edu
-      - LETSENCRYPT_EMAIL=patrick.muller.1@stonybrook.edu
+      - "5000"
+    env_file:
+      - ./auth/.env
 
-volumes:
-  certs:
-  html:
-  acme:
+#   nginx:
+#     image: nginx
+#     container_name: nginx
+#     volumes:
+#      - certs:/etc/nginx/certs:rw
+#      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#      - ./nginx.tmpl:/etc/nginx/conf.d/default.conf:ro
+#     ports:
+#      - "80:80"
+#      - "443:443"
+#
+#   nginx-proxy:
+#     image: nginxproxy/nginx-proxy:1.6
+#     container_name: nginx-proxy
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./confs:/etc/nginx/vhost.d:ro
+#       - /var/run/docker.sock:/tmp/docker.sock:ro
+#       - certs:/etc/nginx/certs:rw
+#       - html:/usr/share/nginx/html:rw
+#     environment:
+#       - DEFAULT_HOST=esk-pj-air.cse356.compas.cs.stonybrook.edu
+#     labels:
+#       - "com.github.nginx-proxy.nginx"
+#     restart: always
+#
+#   acme-companion:
+#     image: nginxproxy/acme-companion
+#     container_name: acme-companion
+#     depends_on:
+#       - nginx-proxy
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock:ro
+#       - certs:/etc/nginx/certs:rw
+#       - html:/usr/share/nginx/html:rw
+#       - acme:/etc/acme.sh
+#     environment:
+#       - DEFAULT_EMAIL=patrick.muller.1@stonybrook.edu
+#       - NGINX_PROXY_CONTAINER=nginx-proxy
+#     restart: always
+#
+#   redis:
+#     image: "redis:latest"
+#     container_name: redis
+#     ports:
+#       - "6379:6379"
+#     healthcheck:
+#       test: ["CMD", "redis-cli", "ping"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 5s
+#
+#   mongo:
+#     image: "mongo:latest"
+#     container_name: mongodb
+#     ports:
+#       - "27017:27017"
+#     healthcheck:
+#       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 5s
+#
+#   flask:
+#     container_name: flask_app
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     command: pm2-runtime start flask.config.js
+#     ports:
+#       - "5050:5050"
+#     volumes:
+#       - ./server.py:/app/server.py
+#       - ./bp:/app/bp
+#       - ./templates:/app/templates
+#       - ./static:/app/static:rw
+#     environment:
+#       - VIRTUAL_HOST=esk-pj-air.cse356.compas.cs.stonybrook.edu
+#       - VIRTUAL_PORT=5050
+#       - LETSENCRYPT_HOST=esk-pj-air.cse356.compas.cs.stonybrook.edu
+#       - LETSENCRYPT_EMAIL=patrick.muller.1@stonybrook.edu
+#
+# volumes:
+#   certs:
+#   html:
+#   acme:
