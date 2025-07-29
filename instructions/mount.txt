@@ -1,4 +1,0 @@
-mkfs.ext4 "/dev/xdX"
-# make dir if it doesn't exist
-mount "/dev/vdX" "~/cse356-warmup2/static/media"
-/dev/vdX ~/cse356-warmup2/static/media ext4 defaults,noatime,nofail 0 2

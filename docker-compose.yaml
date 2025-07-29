@@ -4,6 +4,9 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+    depends_on:
+      - auth
+      - video-api
     ports:
       - "80:80"
       - "443:443"
@@ -17,6 +20,41 @@ services:
       - "5000"
     env_file:
       - ./auth/.env
+
+  video-api:
+    container_name: video-api
+    build:
+      context: ./video
+      dockerfile: Dockerfile
+    ports:
+      - "5001"
+    depends_on:
+      - redis
+    env_file:
+      - ./video/.env
+    volumes:
+      - /Users/patrickmuller/school/sb356/cse356-warmup2/temp:/app/videos
+
+  transcoder:
+    container_name: transcoder
+    build:
+      context: ./transcoder
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    env_file:
+      - ./transcoder/.env
+    volumes:
+      - /Users/patrickmuller/school/sb356/cse356-warmup2/temp:/app/videos:rw
+
+  redis:
+    image: redis:8
+    container_name: redis
+    ports:
+      - "6379"
+
+volumes:
+  videos:
 
 #   nginx:
 #     image: nginx
