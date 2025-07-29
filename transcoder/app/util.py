@@ -6,6 +6,8 @@ import requests
 
 TEMP_VIDEO_DIRECTORY = os.environ.get("TEMP_VIDEO_DIRECTORY")
 S3_BUCKET = os.environ.get("S3_BUCKET")
+PROCESSING = os.environ.get("PROCESSING")
+PROCESSED = os.environ.get("PROCESSED")
 
 session = boto3.session.Session()
 
@@ -19,7 +21,7 @@ s3 = session.client(
 def upload_directory(local_dir, bucket, prefix):
     for root, dirs, files in os.walk(local_dir):
         for file in files:
-            if ".mp4" in file:
+            if not file.startswith("init_") and ".mp4" in file:
                 continue
             full_path = os.path.join(root, file)
             s3_key = f"{prefix}/{file}"
@@ -29,7 +31,7 @@ def upload_directory(local_dir, bucket, prefix):
             except Exception as e:
                 print(f"Upload failed for {file}: {e}")
 
-def transcode_to_mpeg_dash(s3_url, file, file_id):
+def transcode_to_mpeg_dash(s3_url, file, file_id, db):
     # Video filter for padding to 16:9 aspect ratio
     output_path = f"{TEMP_VIDEO_DIRECTORY}/{file_id}"
     output_file = os.path.join(output_path, file)
@@ -46,7 +48,12 @@ def transcode_to_mpeg_dash(s3_url, file, file_id):
             for chunk in req.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
-                    print(f"Downloaded to: {output_path}")
+        print(f"Downloaded to: {output_path}")
+
+        db.videos.update_one({
+            "video_id": file_id
+        },{"$set": {"status": PROCESSING}})
+
 
         # set ffmpeg options
         scale_filter = "scale='if(gt(a,16/9),1280,-2)':'if(gt(a,16/9),-2,720)',pad=1280:720:(ow-iw)/2:(oh-ih)/2:black"
@@ -101,6 +108,10 @@ def transcode_to_mpeg_dash(s3_url, file, file_id):
         subprocess.run(thumbnail_cmd, check=True)
 
         upload_directory(output_path, S3_BUCKET, f"videos/{file_id}")
+
+        db.videos.update_one({
+            "video_id": file_id
+        },{"$set": {"status": PROCESSED}})
     except requests.exceptions.RequestException as e:
         print(f"[Error] Download failed: {e}")
     except subprocess.CalledProcessError as e:
