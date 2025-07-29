@@ -40,14 +40,15 @@ def upload_video():
         return error(f"Invalid MIME type: {mime}", 400)
     video_id = uuid.uuid4()
     filename = f"{video_id}.mp4"
+    s3_key = f"videos/{video_id}/{filename}"
     try:
-        s3.upload_fileobj(video, "video-bucket", f"videos/{filename}")
+        s3.upload_fileobj(video, "video-bucket", s3_key)
     except Exception as e:
         return error(f"S3 Upload failed. {str(e)}", 500)
 
     url = s3.generate_presigned_url("get_object", {
         "Bucket": "video-bucket",
-        "Key": f"videos/{filename}"
+        "Key": s3_key
     })
 
     db["videos"].insert_one({
@@ -55,7 +56,7 @@ def upload_video():
         "filename": filename,
         "uploader_id": "user", # TODO
         "status": "uploaded",
-        "s3_key": f"videos/{filename}",
+        "s3_key": s3_key,
         "created_at": datetime.now()
     })
 
