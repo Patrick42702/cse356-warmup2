@@ -16,6 +16,8 @@ services:
     build:
       context: ./auth
       dockerfile: Dockerfile
+    depends_on:
+      - mongo
     ports:
       - "5000"
     env_file:
@@ -30,6 +32,9 @@ services:
       - "5001"
     depends_on:
       - redis
+      - auth
+      - minio
+      - mongo
     env_file:
       - ./video/.env
     volumes:
@@ -42,6 +47,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - redis
+      - mongo
+      - minio
     env_file:
       - ./transcoder/.env
     volumes:
@@ -52,6 +59,26 @@ services:
     container_name: redis
     ports:
       - "6379"
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console UI
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - /tmp/minio-data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
 
 volumes:
   videos:

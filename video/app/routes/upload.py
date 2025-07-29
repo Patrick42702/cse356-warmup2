@@ -7,7 +7,7 @@ import magic
 from app.db import db
 from app.s3 import s3
 from app.services.transcode_trigger import trigger_transcode
-from app.util import error, success
+from app.util import error, jwt_required, success
 from flask import Blueprint, request
 
 ALLOWED_EXTENSIONS = {'mp4'}
@@ -19,6 +19,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @upload_bp.route('/upload', methods=['POST'])
+@jwt_required
 def upload_video():
     video = request.files.get('video')
     if not video:

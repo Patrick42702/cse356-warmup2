@@ -49,7 +49,7 @@ def login():
             return error("Invalid email or password", 401)
 
         token = generate_token(str(user["_id"]))
-        return success(data=token, message="User succesfully logged in")
+        return success(data={"token": token}, message="User succesfully logged in")
     except Exception as e:
         current_app.logger.exception(f"Login error: {e}")
         return error("Internal server error", 500)
