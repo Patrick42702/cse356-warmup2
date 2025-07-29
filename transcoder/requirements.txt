@@ -1,0 +1,4 @@
+Celery==5.5.3
+redis==6.2.0
+boto3==1.39.14
+requests==2.32.4
