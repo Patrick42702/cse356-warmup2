@@ -80,6 +80,18 @@ services:
     command: server /data --console-address ":9001"
     restart: unless-stopped
 
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src/:/app/src/
+      - ./frontend/public/:/app/public/
+
+
 volumes:
   videos:
 
