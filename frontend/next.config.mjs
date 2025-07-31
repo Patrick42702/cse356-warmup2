@@ -1,4 +1,15 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'host.docker.internal',
+        port: '9000',
+        pathname: '/**',
+      },
+    ],
+  },
+};
 
 export default nextConfig;

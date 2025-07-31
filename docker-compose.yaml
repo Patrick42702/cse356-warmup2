@@ -85,6 +85,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    depends_on:
+      - video-api
+      - auth
     ports:
       - "3000:3000"
     volumes:
