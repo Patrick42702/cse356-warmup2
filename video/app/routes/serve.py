@@ -10,7 +10,7 @@ VIDEO_BUCKET = os.environ.get("S3_BUCKET")
 
 serve_bp = Blueprint('serve', __name__)
 
-@serve_bp.route('/videos', methods=['GET'])
+@serve_bp.route('/videos', methods=['POST'])
 def get_videos(): # TODO: PAGING
     req = request.get_json()
     size = req.get("size", 10)
@@ -51,5 +51,5 @@ def get_videos(): # TODO: PAGING
 
     except Exception as e:
         traceback_str = traceback.format_exc()
-        logging.logging.error(traceback_str)
+        logging.logging.error("Traceback str:", traceback_str)
         return error(f"There was an error: {e}", 500)
