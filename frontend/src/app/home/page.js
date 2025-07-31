@@ -8,11 +8,11 @@ export default function ExampleComponent() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log(`${process.env.NEXT_PUBLIC_VIDEO_API_URL}/api/video/videos`); // Log the URL to check if it's correct
+    console.log(`${process.env.NEXT_PUBLIC_VIDEO_API_URL}/videos`); // Log the URL to check if it's correct
     const payload = {
       "size": 10,
     }
-    const req = axios.post(`${process.env.NEXT_PUBLIC_VIDEO_API_URL}/api/video/videos`,
+    const req = axios.post(`${process.env.NEXT_PUBLIC_VIDEO_API_URL}/videos`,
       JSON.stringify(payload),
       {
         headers: {

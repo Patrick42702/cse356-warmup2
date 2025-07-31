@@ -10,8 +10,8 @@ from app.services.transcode_trigger import trigger_transcode
 from app.util import error, jwt_required, success
 from flask import Blueprint, request
 
-ALLOWED_EXTENSIONS = {'mp4'}
-ALLOWED_MIME_TYPES = {'video/mp4'}
+ALLOWED_EXTENSIONS = {'mp4', 'mov'}
+ALLOWED_MIME_TYPES = {'video/mp4', 'video/quicktime'}
 
 upload_bp = Blueprint('upload', __name__)
 
@@ -19,7 +19,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @upload_bp.route('/upload', methods=['POST'])
-@jwt_required
+# @jwt_required
 def upload_video():
     video = request.files.get('video')
     if not video:
@@ -53,7 +53,7 @@ def upload_video():
         db["videos"].insert_one({
             "video_id": video_id,
             "filename": filename,
-            "uploader_id": "user", # TODO
+            "uploader_id": "user", # TODO:
             "status": "uploaded",
             "s3_key": s3_key,
             "created_at": datetime.now()

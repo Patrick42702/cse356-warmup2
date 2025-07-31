@@ -5,9 +5,13 @@ const nextConfig = {
       {
         protocol: 'http',
         hostname: 'host.docker.internal',
-        port: '9000',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/**',
+      }
     ],
   },
 };

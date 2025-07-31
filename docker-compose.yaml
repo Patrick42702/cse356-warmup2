@@ -65,6 +65,8 @@ services:
     container_name: mongo
     ports:
       - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 
   minio:
     image: minio/minio
@@ -97,6 +99,7 @@ services:
 
 volumes:
   videos:
+  mongo_data:
 
 #   nginx:
 #     image: nginx
