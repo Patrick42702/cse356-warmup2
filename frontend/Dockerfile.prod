@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache bash
+
+COPY package*.json .
+
+RUN npm i next@latest react@latest react-dom@latest
+
+COPY . .
+
+EXPOSE 3000
+
+RUN npm run build
+
+CMD ["npm", "run", "start"]
+

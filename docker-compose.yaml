@@ -37,8 +37,6 @@ services:
       - mongo
     env_file:
       - ./video/.env
-    volumes:
-      - /Users/patrickmuller/school/sb356/cse356-warmup2/temp:/app/videos
 
   transcoder:
     container_name: transcoder
@@ -51,8 +49,6 @@ services:
       - minio
     env_file:
       - ./transcoder/.env
-    volumes:
-      - /Users/patrickmuller/school/sb356/cse356-warmup2/temp:/app/videos:rw
 
   redis:
     image: redis:8

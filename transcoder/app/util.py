@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 
@@ -57,35 +58,54 @@ def transcode_to_mpeg_dash(s3_url, file, file_id, db):
 
         # set ffmpeg options
         scale_filter = "scale='if(gt(a,16/9),1280,-2)':'if(gt(a,16/9),-2,720)',pad=1280:720:(ow-iw)/2:(oh-ih)/2:black"
-        ffmpeg_options = [
+        video_options = [
             ('512k', '640x360'),
             ('768k', '960x540'),
-            ('1024k', '1280x720')
+            ('1024k', '1280x720'),
+            ('2048k', '1920x1080')
         ]
+
+        audio_options = [
+            '64k',
+        ]
+
         dash_options = [
             '-use_template', '1',
             '-use_timeline', '1',
             '-seg_duration', '10',
-            '-adaptation_sets', 'id=0,streams=v',
-            '-f', 'dash'
+            '-adaptation_sets', 'id=0,streams=v id=1,streams=a',
+            '-f', 'dash', '-copyts', '-start_at_zero', '-avoid_negative_ts', 'make_zero',
         ]
         output_mpd = f"{file_id}.mpd"
 
         # Start constructing the FFmpeg command
         ffmpeg_cmd = [
-            'ffmpeg','-hide_banner', '-loglevel', 'error', '-y', '-i', file,
+            'ffmpeg','-hide_banner', '-loglevel', 'error', '-y',
+            "-fflags", "+genpts", '-i', file,
             '-vf', scale_filter, '-report'
         ]
 
         # Add video bitrates and resolutions
-        for i, (bitrate, resolution) in enumerate(ffmpeg_options):
+        for i, (bitrate, resolution) in enumerate(video_options):
             ffmpeg_cmd.extend([
-                '-map', '0:v',
+                '-map', '0:v:0',
+                f'-c:v:{i}', 'libx264',
                 f'-b:v:{i}', bitrate,
-                f'-s:v:{i}', resolution
+                f'-s:v:{i}', resolution,
+                '-pix_fmt', 'yuv420p',
+                f'-profile:v:{i}', 'main',
             ])
 
-        # Set segment names with video_id
+        # Add audio streams
+        for i, bitrate in enumerate(audio_options):
+            ffmpeg_cmd.extend([
+                '-map', '0:a:0',
+                f'-c:a:{i}', 'aac',
+                f'-b:a:{i}', bitrate,
+                f'-ac:a:{i}', '2',  # Stereo
+                f'-ar:a:{i}', '48000'  # Sample rate
+            ])
+
         ffmpeg_cmd.extend([
             '-init_seg_name', f"init_{file_id}_$RepresentationID$.mp4",
             '-media_seg_name', f"chunk_{file_id}_$Bandwidth$_$Number$.m4s"
@@ -94,6 +114,7 @@ def transcode_to_mpeg_dash(s3_url, file, file_id, db):
         # Add DASH options and output MPD file path
         ffmpeg_cmd.extend(dash_options)
         ffmpeg_cmd.append(output_mpd)
+        print(f"FFmpeg command: {' '.join(ffmpeg_cmd)}")
 
         # Run the FFmpeg command for DASH
         subprocess.run(ffmpeg_cmd, check=True)
@@ -118,5 +139,6 @@ def transcode_to_mpeg_dash(s3_url, file, file_id, db):
         print(f"[Error] FFmpeg failed: {e}")
     except Exception as e:
         print(f"[Error] Unexpected failure: {e}")
+
     return
 

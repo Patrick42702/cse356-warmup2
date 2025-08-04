@@ -4,6 +4,7 @@ import traceback
 from app.db import db
 from app.s3 import s3
 from app.util import error, success
+from bson import ObjectId
 from flask import Blueprint, logging, request, url_for
 
 VIDEO_BUCKET = os.environ.get("S3_BUCKET")
@@ -23,10 +24,13 @@ def get_videos(): # TODO: PAGING
             video_id = str(video["video_id"])
             thumbnail_filename = f"thumbnail_{video_id}.jpg"
             thumbnail_url = f"http://host.docker.internal/api/video/dash/{video_id}/{thumbnail_filename}"
+            user = db.users.find_one({"_id": ObjectId(video["user_id"])})
 
             urls.append({
                 "video_id": video_id,
-                "thumbnail_url": thumbnail_url
+                "thumbnail_url": thumbnail_url,
+                "title": video.get("title", "No title provided"),
+                "user": user.get("email", "Unknown user")
             })
         return success(data={"videos": urls}, message="URL's for the mpeg-dash files")
 

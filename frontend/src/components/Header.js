@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Logout from './Logout';
 
 export default function Header() {
 
@@ -10,9 +11,11 @@ export default function Header() {
         </Link>
         <nav className="space-x-4">
           <Link href="/home" className="text-red-700 hover:underline">Home</Link>
+          <Link href="/signup" className="hover:underline">Sign up</Link>
+          <Link href="/login" className="hover:underline">Login</Link>
           <Link href="/upload" className="hover:underline">Upload</Link>
           <Link href="/profile" className="hover:underline">Profile</Link>
-          <Link href="/logout" className="hover:underline text-red-400">Logout</Link>
+          <Logout />
         </nav>
       </div>
     </header>

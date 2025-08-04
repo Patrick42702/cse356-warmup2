@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ExampleComponent() {
   const [data, setData] = useState(null);
@@ -37,21 +38,25 @@ export default function ExampleComponent() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {data.data.videos.map((video, index) => (
+      {data.data.videos.length === 0 && "There are no videos currently uploaded. Upload something to view!"}
+      {(data.data.videos.length > 0) && (data.data.videos.map((video, index) => (
+        console.log(video),
         <div key={index} className="border rounded p-4 shadow">
-          <p>{video.description || 'No description available.'}</p>
-          {/* Add a thumbnail or link if available */}
           {video.thumbnail_url && (
-            <Image
-              src={video.thumbnail_url}
-              alt={video.title || `Thumbnail for video ${index + 1}`}
-              width={300}
-              height={200}
-              className="mt-2 rounded"
-            />
+            <Link href={`/player/${video.video_id}`} className="block">
+              <Image
+                src={video.thumbnail_url}
+                alt={video.title || `Thumbnail for video ${index + 1}`}
+                width={300}
+                height={200}
+                className="mt-2 rounded"
+              />
+            </Link>
           )}
+          <p>Title: {video.title}</p>
+          <p>User: {video.user}</p>
         </div>
-      ))}
+      )))}
     </div>
   );
 

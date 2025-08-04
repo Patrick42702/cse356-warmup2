@@ -8,7 +8,7 @@ from app.db import db
 from app.s3 import s3
 from app.services.transcode_trigger import trigger_transcode
 from app.util import error, jwt_required, success
-from flask import Blueprint, request
+from flask import Blueprint, g, request
 
 ALLOWED_EXTENSIONS = {'mp4', 'mov'}
 ALLOWED_MIME_TYPES = {'video/mp4', 'video/quicktime'}
@@ -19,14 +19,18 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @upload_bp.route('/upload', methods=['POST'])
-# @jwt_required
+@jwt_required
 def upload_video():
     video = request.files.get('video')
+    title = request.form.get('title')
     if not video:
         return error("No file uploaded", 400)
 
     if not allowed_file(video.filename):
-        return error("Only .mp4 files are allowed", 400)
+        return error("Only .mp4/mov files are allowed", 400)
+
+    if not title:
+        return error("Title is required", 400)
 
     mime = magic.from_buffer(video.read(2048), mime=True)
     video.seek(0)
@@ -52,9 +56,10 @@ def upload_video():
     try:
         db["videos"].insert_one({
             "video_id": video_id,
+            "user_id": g.current_user["sub"],
             "filename": filename,
-            "uploader_id": "user", # TODO:
             "status": "uploaded",
+            "title": title,
             "s3_key": s3_key,
             "created_at": datetime.now()
         })
@@ -66,5 +71,5 @@ def upload_video():
     except Exception as e:
         error(f"Transcoding trigger failed: {str(e)}", 500)
 
-    return success(data={"url": url}, message="video uploaded")
+    return success(data={}, message="video uploaded")
 
