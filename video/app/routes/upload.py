@@ -41,13 +41,13 @@ def upload_video():
     s3_key = f"videos/{video_id}"
     s3_file = f"{s3_key}/{filename}"
     try:
-        s3.upload_fileobj(video, "video-bucket", s3_file)
+        s3.upload_fileobj(video, os.environ.get("S3_BUCKET"), s3_file)
     except Exception as e:
         return error(f"S3 Upload failed. {str(e)}", 500)
 
     try:
         url = s3.generate_presigned_url("get_object", {
-            "Bucket": "video-bucket",
+            "Bucket": os.environ.get("S3_BUCKET"),
             "Key": s3_file
         })
     except Exception as e:

@@ -13,7 +13,7 @@ export default function SignUpPage() {
       email: formData.get('email'),
       password: formData.get('password'),
     };
-    const auth = `${process.env.NEXT_PUBLIC_AUTH_API_URL}/register`
+    const auth = `/api/auth/register`
     const res = await axios.post(auth, data)
       .then(response => {
         if (response.status === 200) {

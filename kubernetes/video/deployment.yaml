@@ -1,0 +1,25 @@
+# video-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: video-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: video-api
+  template:
+    metadata:
+      labels:
+        app: video-api
+    spec:
+      containers:
+        - name: video-api
+          image: patrick42702/video-api-video-app:1
+          ports:
+            - containerPort: 5001
+          envFrom:
+            - secretRef:
+                name: video-api-secret
+          imagePullPolicy: Always
+

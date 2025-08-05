@@ -1,0 +1,28 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY ./ffmpeg /usr/local/bin/ffmpeg
+
+# Install system dependencies including ffmpeg
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  gcc \
+  bash \
+  libffi-dev \
+  libssl-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /app/temp/videos
+
+# Install Python dependencies
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+# Copy the rest of the app
+COPY . .
+
+# Run the Celery worker
+CMD ["celery", "-A", "app", "worker", "--loglevel=info"]
+

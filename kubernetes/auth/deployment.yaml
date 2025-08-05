@@ -1,0 +1,23 @@
+# auth-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: patrick42702/auth-video-app:1
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - secretRef:
+                name: auth-secret

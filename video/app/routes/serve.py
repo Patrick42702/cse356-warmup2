@@ -23,7 +23,7 @@ def get_videos(): # TODO: PAGING
         for video in query:
             video_id = str(video["video_id"])
             thumbnail_filename = f"thumbnail_{video_id}.jpg"
-            thumbnail_url = f"http://host.docker.internal/api/video/dash/{video_id}/{thumbnail_filename}"
+            thumbnail_url = f"http://{os.environ.get('VIDEO_API_DOMAIN')}/api/video/dash/{video_id}/{thumbnail_filename}"
             user = db.users.find_one({"_id": ObjectId(video["user_id"])})
 
             urls.append({

@@ -17,7 +17,7 @@ export default function SignUpPage() {
       email: formData.get('email'),
       password: formData.get('password'),
     };
-    const auth = `${process.env.NEXT_PUBLIC_AUTH_API_URL}/login`
+    const auth = `/api/auth/login`;
     const res = await axios.post(auth, data)
       .then(async response => {
         if (response.status === 200) {

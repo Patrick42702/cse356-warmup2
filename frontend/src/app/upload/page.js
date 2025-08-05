@@ -70,7 +70,7 @@ export default function UploadForm() {
       }
 
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_VIDEO_API_URL}/upload`,
+        `/api/video/upload`,
         formData,
         {
           headers: {

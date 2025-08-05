@@ -9,11 +9,10 @@ export default function ExampleComponent() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log(`${process.env.NEXT_PUBLIC_VIDEO_API_URL}/videos`); // Log the URL to check if it's correct
     const payload = {
       "size": 10,
     }
-    const req = axios.post(`${process.env.NEXT_PUBLIC_VIDEO_API_URL}/videos`,
+    const req = axios.post(`/api/video/videos`,
       JSON.stringify(payload),
       {
         headers: {
@@ -49,7 +48,7 @@ export default function ExampleComponent() {
                 alt={video.title || `Thumbnail for video ${index + 1}`}
                 width={300}
                 height={200}
-                className="mt-2 rounded"
+                className="mt-2 rounded height-auto w-auto"
               />
             </Link>
           )}

@@ -7,3 +7,4 @@ Dockerfile
 *.pyc
 __pycache__
 venv
+ffmpeg
