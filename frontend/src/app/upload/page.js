@@ -16,7 +16,8 @@ export default function UploadForm() {
     'title': '',
     'file': null
   });
-  const isLoggedIn = useAuth();
+  const { isLoggedIn } = useAuth();  // ✅ Destructure auth context
+  const token = Cookies.get('AuthToken');
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
