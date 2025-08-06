@@ -170,3 +170,4 @@ videos/
 # ignore my deploy file with sensitive information
 mydeploy.yaml
 authorized_keys
+.ignore
