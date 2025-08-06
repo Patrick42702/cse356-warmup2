@@ -1,10 +1,11 @@
 'use client';
-import React from 'react';
+import { React, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
 export default function SignUpPage() {
   const router = useRouter();
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,8 +23,9 @@ export default function SignUpPage() {
       })
       .catch(err => {
         if (err.response) {
-          const errorMsg = err.response.data.error;
-          setMessage(`Signup failed: ${errorMsg}`);
+          const status = err.response.status;
+          const errorMsg = err.response.data.error || 'Unknown error';
+          setMessage(`Signup failed: ${errorMsg} (Status code: ${status})`);
         } else if (err.request) {
           // Request was made but no response received
           setMessage('No response from server.');
@@ -46,6 +48,7 @@ export default function SignUpPage() {
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
           <input type="password" id="password" name="password" required className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
         </div>
+        {message && <p className="mb-4 text-red-500">{message}</p>}
         <button type="submit" className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Sign Up</button>
       </form>
     </div>

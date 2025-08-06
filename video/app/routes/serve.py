@@ -2,10 +2,9 @@ import os
 import traceback
 
 from app.db import db
-from app.s3 import s3
 from app.util import error, success
 from bson import ObjectId
-from flask import Blueprint, logging, request, url_for
+from flask import Blueprint, logging, request
 
 VIDEO_BUCKET = os.environ.get("S3_BUCKET")
 

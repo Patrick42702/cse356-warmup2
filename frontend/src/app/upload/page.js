@@ -2,7 +2,8 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 const ALLOWED_FILE_TYPES = ['video/mp4', 'video/quicktime'];
 
@@ -15,6 +16,7 @@ export default function UploadForm() {
     'title': '',
     'file': null
   });
+  const isLoggedIn = useAuth();
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -60,15 +62,6 @@ export default function UploadForm() {
     formData.append('title', title);
 
     try {
-      const token = Cookies.get('AuthToken');
-      if (!token) {
-        setStatus({
-          'message': 'You must be logged in to upload a video.',
-          'type': 'error'
-        });
-        return;
-      }
-
       const res = await axios.post(
         `/api/video/upload`,
         formData,
@@ -112,30 +105,34 @@ export default function UploadForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded max-w-md mx-auto mt-10">
-      <input
-        type="file"
-        accept="video/*"
-        onChange={handleFileChange}
-        className="block w-full text-sm"
-      />
-      <input
-        type="text"
-        name="title"
-        placeholder="Video Title"
-        className="block w-full text-sm border rounded p-2"
-      />
-      <button
-        type="submit"
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        Upload MP4
-      </button>
-      {status.message && (
-        <p className={`text-sm ${(status.type === 'error') ? 'text-red-600' : 'text-green-600'}`}>
-          {status.message}
-        </p>
+    <div>
+      {!isLoggedIn ? (<p className="text-center">You must be logged in to upload a video.</p>) : (
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded max-w-md mx-auto mt-10">
+          <input
+            type="file"
+            accept="video/*"
+            onChange={handleFileChange}
+            className="block w-full text-sm"
+          />
+          <input
+            type="text"
+            name="title"
+            placeholder="Video Title"
+            className="block w-full text-sm border rounded p-2"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Upload MP4
+          </button>
+          {status.message && (
+            <p className={`text-sm ${(status.type === 'error') ? 'text-red-600' : 'text-green-600'}`}>
+              {status.message}
+            </p>
+          )}
+        </form>
       )}
-    </form>
+    </div>
   );
 }

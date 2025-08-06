@@ -39,7 +39,6 @@ export default function ExampleComponent() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {data.data.videos.length === 0 && "There are no videos currently uploaded. Upload something to view!"}
       {(data.data.videos.length > 0) && (data.data.videos.map((video, index) => (
-        console.log(video),
         <div key={index} className="border rounded p-4 shadow">
           {video.thumbnail_url && (
             <Link href={`/player/${video.video_id}`} className="block">

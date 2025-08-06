@@ -2,11 +2,12 @@
 import React from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SignUpPage() {
-
+  const { refreshAuth } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState('');
 
@@ -24,6 +25,7 @@ export default function SignUpPage() {
           Cookies.set('AuthToken', `Bearer ${response.data.data.token}`, {
             expires: 7
           });
+          refreshAuth();
           router.push("/home");
         }
       })
