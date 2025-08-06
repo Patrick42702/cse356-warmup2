@@ -8,7 +8,7 @@ export default function DashPlayerPage() {
   const { video_id } = useParams()
   const [player, setPlayer] = useState(null)
   const [bitrates, setBitrates] = useState([])
-  const mpdUrl = `http://localhost/api/video/dash/${video_id}/${video_id}.mpd`
+  const mpdUrl = `/api/video/dash/${video_id}/${video_id}.mpd`
 
   useEffect(() => {
     if (!video_id) return
