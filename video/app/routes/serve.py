@@ -8,13 +8,14 @@ from flask import Blueprint, logging, request
 
 VIDEO_BUCKET = os.environ.get("S3_BUCKET")
 
-serve_bp = Blueprint('serve', __name__)
+serve_bp = Blueprint("serve", __name__)
 
-@serve_bp.route('/videos', methods=['POST'])
-def get_videos(): # TODO: PAGING
+
+@serve_bp.route("/videos", methods=["POST"])
+def get_videos():  # TODO: PAGING
     req = request.get_json()
     size = req.get("size", 10)
-    size = max(size, 10) # Max serve 10 videos
+    size = max(size, 10)  # Max serve 10 videos
     urls = []
 
     try:
@@ -22,15 +23,17 @@ def get_videos(): # TODO: PAGING
         for video in query:
             video_id = str(video["video_id"])
             thumbnail_filename = f"thumbnail_{video_id}.jpg"
-            thumbnail_url = f"http://{os.environ.get('VIDEO_API_DOMAIN')}/api/video/dash/{video_id}/{thumbnail_filename}"
+            thumbnail_url = f"/api/video/dash/{video_id}/{thumbnail_filename}"
             user = db.users.find_one({"_id": ObjectId(video["user_id"])})
 
-            urls.append({
-                "video_id": video_id,
-                "thumbnail_url": thumbnail_url,
-                "title": video.get("title", "No title provided"),
-                "user": user.get("email", "Unknown user")
-            })
+            urls.append(
+                {
+                    "video_id": video_id,
+                    "thumbnail_url": thumbnail_url,
+                    "title": video.get("title", "No title provided"),
+                    "user": user.get("email", "Unknown user"),
+                }
+            )
         return success(data={"videos": urls}, message="URL's for the mpeg-dash files")
 
     except Exception as e:
