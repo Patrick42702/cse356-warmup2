@@ -13,13 +13,33 @@ serve_bp = Blueprint("serve", __name__)
 
 @serve_bp.route("/videos", methods=["POST"])
 def get_videos():  # TODO: PAGING
+    """
+        Get paginated videos
+    ---
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          properties:
+            page:
+              type: integer
+            size:
+              type: integer
+    responses:
+      200:
+        description: A list of video URLs
+    """
     req = request.get_json()
-    size = req.get("size", 10)
-    size = max(size, 10)  # Max serve 10 videos
+    page = int(req.get("page", 1))
+    size = int(req.get("size", 10))
+    size = min(size, 10)  # Max serve 10 videos
+
+    skip = (page - 1) * size
     urls = []
 
     try:
-        query = db.videos.find({"status": "processed"}).limit(size)
+        query = db.videos.find({"status": "processed"}).skip(skip).limit(size)
         for video in query:
             video_id = str(video["video_id"])
             thumbnail_filename = f"thumbnail_{video_id}.jpg"
@@ -34,6 +54,7 @@ def get_videos():  # TODO: PAGING
                     "thumbnail_url": thumbnail_url,
                     "title": video.get("title", "No title provided"),
                     "user": user.get("email", "Unknown user"),
+                    "description": video.get("description", "No description provided"),
                 }
             )
         return success(data={"videos": urls}, message="URL's for the mpeg-dash files")
