@@ -13,23 +13,6 @@ serve_bp = Blueprint("serve", __name__)
 
 @serve_bp.route("/videos", methods=["POST"])
 def get_videos():  # TODO: PAGING
-    """
-        Get paginated videos
-    ---
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          properties:
-            page:
-              type: integer
-            size:
-              type: integer
-    responses:
-      200:
-        description: A list of video URLs
-    """
     req = request.get_json()
     page = int(req.get("page", 1))
     size = int(req.get("size", 10))
