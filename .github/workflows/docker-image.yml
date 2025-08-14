@@ -22,7 +22,7 @@ jobs:
           IMAGE_NAME=patrick42702/auth-video-app:$(date +%s)
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
           docker build auth \
-            --file auth/Dockerfile.prod \
+            --file auth/Dockerfile \
             --tag $IMAGE_NAME
 
 
