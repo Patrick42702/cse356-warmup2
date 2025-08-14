@@ -1,0 +1,68 @@
+name: Build and Scan Changed Services
+
+on:
+  push:
+    branches:
+      - 2025-refactor-main
+    paths:
+      - 'auth/**'
+      - 'video/**'
+      - 'transcoder/**'
+      - 'frontend/**'
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed to compare commits
+
+      - name: Detect changed services
+        id: changes
+        run: |
+          # Compare last commit on main with previous
+          CHANGED_DIRS=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u)
+          echo "Changed directories: $CHANGED_DIRS"
+
+          # Filter for our target services
+          TARGET_SERVICES=""
+          for svc in auth video transcoder frontend; do
+            if echo "$CHANGED_DIRS" | grep -q "^$svc$"; then
+              TARGET_SERVICES="$TARGET_SERVICES $svc"
+            fi
+          done
+
+          if [ -z "$TARGET_SERVICES" ]; then
+            echo "No relevant services changed. Exiting..."
+            echo "services=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "services=$TARGET_SERVICES" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        if: steps.changes.outputs.services != ''
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install Trivy
+        if: steps.changes.outputs.services != ''
+        uses: aquasecurity/trivy-action@master
+        with:
+          version: latest
+
+      - name: Build and scan changed services
+        if: steps.changes.outputs.services != ''
+        run: |
+          set -e
+          for service in ${{ steps.changes.outputs.services }}; do
+            echo "=== Building $service ==="
+            docker build \
+              --file "$service/Dockerfile.prod" \
+              --tag "$service-image:latest" \
+              "$service"
+
+            echo "=== Scanning $service ==="
+            trivy image --exit-code 1 --severity CRITICAL "$service-image:latest"
+          done
