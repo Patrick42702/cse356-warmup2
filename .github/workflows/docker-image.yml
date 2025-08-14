@@ -1,0 +1,21 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "2025-refactor-main" ]
+  pull_request:
+    branches: [ "2025-refactor-main" ]
+  workflow_dispatch: # <-- lets you run manually from the GitHub UI
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build auth \
+        --file Dockerfile.prod \
+        --tag patrick42702/auth-video-app:$(date +%s)
