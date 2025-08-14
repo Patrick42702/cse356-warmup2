@@ -22,10 +22,6 @@ jobs:
         version: latest
 
     - name: Build the Docker image
-      run: docker build auth \
-        --file auth/Dockerfile \
-        --tag patrick42702/auth-video-app:$(date +%s)
-
       run: |
           IMAGE_NAME=patrick42702/auth-video-app:$(date +%s)
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
