@@ -43,6 +43,8 @@ export default function UploadForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const title = e.target.title.value.trim();
+    const description = e.target.description.value.trim();
+    console.log(description.length > 200);
     if (!form.file) {
       setStatus({
         'message': 'Please select a file to upload.',
@@ -57,10 +59,25 @@ export default function UploadForm() {
       });
       return;
     }
+    if (description === '') {
+      setStatus({
+        'message': 'Please enter a description for the video.',
+        'type': 'error'
+      });
+      return;
+    }
+    if (description.length > 200) {
+      setStatus({
+        'message': 'Description must be shorter than 200 characters long.',
+        'type': 'error'
+      });
+      return;
+    }
 
     const formData = new FormData();
     formData.append('video', form.file);
     formData.append('title', title);
+    formData.append('description', description);
 
     try {
       const res = await axios.post(
@@ -121,6 +138,10 @@ export default function UploadForm() {
             placeholder="Video Title"
             className="block w-full text-sm border rounded p-2"
           />
+          <textarea name="description" placeholder="Video description"
+            className="block w-full text-sm border rounded p-2"
+          ></textarea>
+
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"

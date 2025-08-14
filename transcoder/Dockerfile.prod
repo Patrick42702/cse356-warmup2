@@ -2,16 +2,21 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY ./ffmpeg /usr/local/bin/ffmpeg
-
 # Install system dependencies including ffmpeg
 RUN apt-get update && apt-get install -y --no-install-recommends \
   gcc \
   bash \
   libffi-dev \
   libssl-dev \
+  curl \
+  xz-utils \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
+
+RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
+  | tar -xJ --strip-components=1 -C /usr/local/bin
+
+RUN chmod +x /usr/local/bin/ffmpeg
 
 RUN mkdir -p /app/temp/videos
 
