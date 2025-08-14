@@ -16,6 +16,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build auth \
-        --file Dockerfile.prod \
-        --tag patrick42702/auth-video-app:$(date +%s)
+      run: docker build auth --file Dockerfile.prod --tag patrick42702/auth-video-app:$(date +%s)
