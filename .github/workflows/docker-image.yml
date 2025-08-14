@@ -28,6 +28,8 @@ jobs:
 
     - name:
       uses: aquasecurity/trivy-action@0.20.0
+      env:
+        IMAGE_NAME: ${{ env.IMAGE_NAME }}
       with:
-        image-ref: '$IMAGE_NAME'
+        image-ref: ${{ env.IMAGE_NAME }}
         severity: 'CRITICAL'
