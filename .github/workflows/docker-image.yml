@@ -15,5 +15,25 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name:
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        version: latest
+
     - name: Build the Docker image
-      run: docker build auth --file auth/Dockerfile --tag patrick42702/auth-video-app:$(date +%s)
+      run: docker build auth \
+        --file auth/Dockerfile \
+        --tag patrick42702/auth-video-app:$(date +%s)
+
+      run: |
+          IMAGE_NAME=patrick42702/auth-video-app:$(date +%s)
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          docker build auth \
+            --file auth/Dockerfile.prod \
+            --tag $IMAGE_NAME
+
+    - name: Scan image with Trivy (fail on CRITICAL)
+      run: |
+        trivy image --severity CRITICAL --exit-code 1 "$IMAGE_NAME"
+
