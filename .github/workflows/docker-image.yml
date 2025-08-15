@@ -31,3 +31,12 @@ jobs:
       with:
         image-ref: ${{ env.IMAGE_NAME }}
         severity: 'CRITICAL'
+        exit-code: '1'
+
+    - name: Log in to Docker Hub
+      if: success()
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+    - name: Push image
+      if: success()
+      run: docker push ${{ env.IMAGE_NAME }}
