@@ -16,14 +16,65 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-
-    - name: Build the Docker image
+    # Detect which services changed
+    - name: Detect changes
+      id: changes
       run: |
-          IMAGE_NAME=patrick42702/auth-video-app:$(date +%s)
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
-          docker build auth \
-            --file auth/Dockerfile \
-            --tag $IMAGE_NAME
+        echo "AUTH_CHANGED=false" >> $GITHUB_ENV
+        echo "TRANSCODER_CHANGED=false" >> $GITHUB_ENV
+        echo "VIDEO_CHANGED=false" >> $GITHUB_ENV
+
+        # Compare current commit with the base commit
+        git fetch origin ${{ github.base_ref || github.ref_name }} --depth=1
+
+        if git diff --name-only origin/${{ github.base_ref || github.ref_name }} HEAD | grep -q "^auth/"; then
+          echo "AUTH_CHANGED=true" >> $GITHUB_ENV
+        fi
+        if git diff --name-only origin/${{ github.base_ref || github.ref_name }} HEAD | grep -q "^transcoder/"; then
+          echo "TRANSCODER_CHANGED=true" >> $GITHUB_ENV
+        fi
+        if git diff --name-only origin/${{ github.base_ref || github.ref_name }} HEAD | grep -q "^video/"; then
+          echo "VIDEO_CHANGED=true" >> $GITHUB_ENV
+        fi
+
+    # Build Auth if changed
+    - name: Build auth image
+      if: env.AUTH_CHANGED == 'true'
+      run: |
+        IMAGE_NAME=patrick42702/auth-video-app:auth-$(date +%s)
+        echo "Building $IMAGE_NAME"
+        docker build auth \
+          --file auth/Dockerfile \
+          --tag $IMAGE_NAME
+
+    # Build Transcoder if changed
+    - name: Build transcoder image
+      if: env.TRANSCODER_CHANGED == 'true'
+      run: |
+        IMAGE_NAME=patrick42702/transcoder-video-app:transcoder-$(date +%s)
+        echo "Building $IMAGE_NAME"
+        docker build transcoder \
+          --file transcoder/Dockerfile.prod \
+          --tag $IMAGE_NAME
+
+    # Build Video if changed
+    - name: Build video image
+      if: env.VIDEO_CHANGED == 'true'
+      run: |
+        IMAGE_NAME=patrick42702/video-api-video-app:video-$(date +%s)
+        echo "Building $IMAGE_NAME"
+        docker build video \
+          --file video/Dockerfile.prod \
+          --tag $IMAGE_NAME
+
+
+    # - name: Build the Docker image
+    #   run: |
+    #       IMAGE_NAME=patrick42702/auth-video-app:$(date +%s)
+    #       echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+    #       docker build auth \
+    #         --file auth/Dockerfile \
+    #         --tag $IMAGE_NAME
 
 
     - name:
