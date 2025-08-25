@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: video-api
-          image: patrick42702/video-api-video-app:1
+          image: us-east4-docker.pkg.dev/my-gcp-project-466212/video-app-repo/video-app:latest
           ports:
             - containerPort: 5001
           envFrom:

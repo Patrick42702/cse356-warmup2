@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: patrick42702/frontend-video-app:1
+          image:  us-east4-docker.pkg.dev/my-gcp-project-466212/video-app-repo/frontend-app:latest
           ports:
             - containerPort: 80
           imagePullPolicy: Always

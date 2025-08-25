@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: transcoder
-          image: patrick42702/transcoder-video-app:1
+          image: us-east4-docker.pkg.dev/my-gcp-project-466212/video-app-repo/transcoder-app:latest
           envFrom:
             - secretRef:
                 name: transcoder-secret

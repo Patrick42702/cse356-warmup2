@@ -51,8 +51,8 @@ def login():
         if not user or not check_password(password, user["password"]):
             return error("Invalid email or password", 401)
 
-        if not user.get("verified", False):
-            return error("Email not verified", 403)
+        # if not user.get("verified", False):
+        #     return error("Email not verified", 403)
         token = generate_token(str(user["_id"]))
         return success(data={"token": token}, message="User succesfully logged in")
     except Exception as e:
